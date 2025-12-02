@@ -15,7 +15,6 @@ function preload(s) {
 
     // Preload dei vari elementi della scena
     preload_platforms(s);
-    preload_mushrooms(s);
     preload_player(s);
     preload_enemy(s);
 }
@@ -51,7 +50,6 @@ function create(s) {
 
     configure_player_animations(s, player); // Impostazione animazioni giocatore
     create_platforms(s, player);            // Creazione piattaforme
-    create_mushrooms(s, player);            // Creazione funghetti
     create_enemy(s, floor, player);
 
     // Impostiamo la camera che segua il giocatore
@@ -69,7 +67,6 @@ function update(s) {
 
     manage_player_update(s, player);    // Posizione del giocatore e animazioni
     update_platforms(s);                // Movimento piattaforme
-    update_mushrooms(s);                // Azioni funghetti
     update_enemy(s);
 
     PP.shapes.text_change(txt_mushrooms, "Mushrooms: " + PP.game_state.get_variable("mushrooms"));
