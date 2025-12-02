@@ -108,7 +108,7 @@ function create(s) {
     // Collisioni
     if (player) {
         s.physics.add.collider(player, gruppoMuri); // Controlla costantemente che Eren sbatta contro i muri
-        PP.camera.start_follow(s, player);; // Dico alla telecamera di seguire Eren ovunque vada
+        s.cameras.main.startFollow(player); // Dico alla telecamera di seguire Eren ovunque vada // Dico alla telecamera di seguire Eren ovunque vada
         
     }
 }
