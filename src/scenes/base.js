@@ -1,4 +1,4 @@
-let img_background;
+let img_sfondo_intero;
 let img_player;
 
 let player;
@@ -10,8 +10,9 @@ function preload(s) {
     console.log("Executing preload() - SCENE");
 
     // Carichiamo gli asset grafici
-    img_background = PP.assets.image.load(s, "assets/images/background.png");
+    img_sfondo_intero = PP.assets.image.load(s, "assets/images/sfondo_intero.png");
     img_player     = PP.assets.sprite.load_spritesheet(s, "assets/images/spritesheet_player.png", 52, 52);
+    
 
     // Preload dei vari elementi della scena
     preload_platforms(s);
@@ -34,7 +35,7 @@ function create(s) {
     console.log("Executing create() - SCENE");
 
     // Inseriamo background e giocatore
-    PP.assets.tilesprite.add(s, img_background, 0, 0, 10000, 800, 0, 0);
+    PP.assets.tilesprite.add(s, img_sfondo_intero, 0, 0,  10000, 800,  0, 0);
 
     player = PP.assets.sprite.add(s, img_player, 150, 620, 0.5, 1);
     // Aggiungiamo il giocatore alla fisica come entità dinamica
