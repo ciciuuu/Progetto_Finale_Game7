@@ -1,6 +1,11 @@
+let img_sfondo_menu
+
 function preload(s) {
+  
+  img_sfondo_menu = PP.assets.image.load(s, "assets/images/sfondo_menu.jpeg");
 
 }
+
 
 function increase_coins() {
   PP.game_state.set_variable("coins", PP.game_state.get_variable("coins") + 1);
@@ -8,6 +13,10 @@ function increase_coins() {
 
 function create(s) {
 
+
+    // aggiungo lo sfondo
+    img_sfondo_menu = PP.assets.image.add(s, img_sfondo_menu, 0, 0, 0, 0);
+    
     PP.game_state.set_variable("coins", 0);
     PP.game_state.set_variable("mushrooms", 0);
     PP.game_state.set_variable("HP", 3);
