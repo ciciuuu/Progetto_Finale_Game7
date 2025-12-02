@@ -1,7 +1,7 @@
 let img_background;
 let img_player;
 
-let player; //commento per vedere se tia riesce a pullare
+let player;
 let floor;
 let txt_score;
 let txt_mushrooms;
