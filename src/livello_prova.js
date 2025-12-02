@@ -20,7 +20,7 @@ function create(s) {
 
    
 
-    //Camera
+    //Camera edo- non riesco a cambiarla con quella PP
     s.cameras.main.setZoom(2);
     s.cameras.main.setBackgroundColor('#222222'); // Sfondo grigio (temporaneo, prima di mettere gli sfondi in parallasse)
 
@@ -108,7 +108,7 @@ function create(s) {
     // Collisioni
     if (player) {
         s.physics.add.collider(player, gruppoMuri); // Controlla costantemente che Eren sbatta contro i muri
-        s.cameras.main.startFollow(player); // Dico alla telecamera di seguire Eren ovunque vada
+        PP.camera.start_follow(s, player);; // Dico alla telecamera di seguire Eren ovunque vada
         
     }
 }
