@@ -1,81 +1,73 @@
-let img_sfondo_intero;
 let img_player;
 
 let player;
-let floor;
-let txt_score;
 let txt_mushrooms;
+let muri_livello; // Variabile per ricevere i muri da Godot
 
 function preload(s) {
     console.log("Executing preload() - SCENE");
 
-    // Carichiamo gli asset grafici
-    img_sfondo_intero = PP.assets.image.load(s, "assets/images/sfondo_intero.png");
-    img_player     = PP.assets.sprite.load_spritesheet(s, "assets/images/spritesheet_player.png", 52, 52);
-    
-
-    // Preload dei vari elementi della scena
-    preload_platforms(s);
-    preload_player(s);
-    preload_enemy(s);
-}
-
-function collider_test(s,a,b) {
-    console.log("Player colliding with the box!");
-}
-
-function end_game() {
-    if (PP.game_state.get_variable("mushrooms") < 10) {
-        PP.scenes.start("game_over");
+    // 1. CARICAMENTO TILESET DI GODOT (CHIAMATA CRITICA)
+    if (window.godot_preload) {
+        window.godot_preload(s);
     }
+
+    // Caricamento asset standard
+    img_player     = PP.assets.sprite.load_spritesheet(s, "assets/images/spritesheet_player.png", 52, 52);
+
+    preload_player(s);
 }
+
 
 function create(s) {
     console.log("Executing create() - SCENE");
 
-    // Inseriamo background e giocatore
-    PP.assets.tilesprite.add(s, img_sfondo_intero, 0, 0,  10000, 800,  0, 0);
 
-    player = PP.assets.sprite.add(s, img_player, 150, 620, 0.5, 1);
-    // Aggiungiamo il giocatore alla fisica come entità dinamica
+    // 2. COSTRUZIONE MAPPA
+    // Eseguiamo la creazione e salviamo il gruppo di muri restituito
+    if (window.godot_create) {
+        muri_livello = window.godot_create(s);
+    }
+
+    // 3. RECUPERO SPAWN POINT E CREAZIONE PLAYER
+    let startX = PP.game_state.get_variable("spawn_x") || 150;
+    let startY = PP.game_state.get_variable("spawn_y") || 620;
+
+    player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
     PP.physics.add(s, player, PP.physics.type.DYNAMIC); 
 
+    // *** RISOLUZIONE CONFLITTI VECCHI ***
+    // Rimuoviamo il pavimento fisso e il suo collider manuale
+    // floor = PP.shapes.rectangle_add(...);
+    // PP.physics.add(s, floor, PP.physics.type.STATIC); 
+    // PP.physics.add_collider(s, player, floor);
 
-    // Creiamo un pavimento "trasparente"
-    floor = PP.shapes.rectangle_add(s, 640, 620, 10000, 1, "0x000000", 0);
-    // Aggiungiamo il pavimento alla fisica come entità statica
-    PP.physics.add(s, floor, PP.physics.type.STATIC); 
+    // 4. COLLISIONI: Player contro i Muri di Godot
+    if (muri_livello) {
+        // [PHASER NATIVO] Colleghiamo il player nativo (.ph_obj) al gruppo di muri
+        s.physics.add.collider(player.ph_obj, muri_livello);
+    }
+    
+    configure_player_animations(s, player); 
 
-    // Creiamo un collider tra pavimento e giocatore
-    PP.physics.add_collider(s, player, floor);
-
-    configure_player_animations(s, player); // Impostazione animazioni giocatore
-    create_platforms(s, player);            // Creazione piattaforme
-    create_enemy(s, floor, player);
-
-    // Impostiamo la camera che segua il giocatore
+    // 5. CAMERA
     PP.camera.start_follow(s, player, 0, 220);
+    // Nota: La telecamera segue il player nativo, quindi .ph_obj non è necessario qui
+    // ma la telecamera usa i bordi che sono stati impostati in godot_create.
 
-    txt_mushrooms = PP.shapes.text_add(s, 50, 50, "Mushrooms: " + PP.game_state.get_variable("mushrooms"));
+    txt_mushrooms = PP.shapes.text_add(s, 50, 50, "Mushrooms: " + (PP.game_state.get_variable("mushrooms") || 0));
+    txt_mushrooms.ph_obj.setScrollFactor(0); // Fissa l'HUD alla camera
 
-    console.log(PP.game_state.get_variable("coins"));
-
-    PP.timers.add_timer(s,60000, end_game, false);
 }
 
+// ... resto del codice ...
 function update(s) {
-    // Azioni che vengono eseguite a ogni frame del gioco
+    if (player) manage_player_update(s, player);
 
-    manage_player_update(s, player);    // Posizione del giocatore e animazioni
-    update_platforms(s);                // Movimento piattaforme
-    update_enemy(s);
-
-    PP.shapes.text_change(txt_mushrooms, "Mushrooms: " + PP.game_state.get_variable("mushrooms"));
+    let mushrooms = PP.game_state.get_variable("mushrooms") || 0;
+    PP.shapes.text_change(txt_mushrooms, "Mushrooms: " + mushrooms);
 }
 
-function destroy(s) {
-    console.log("Executing destroy() - SCENE");
-
-}
+function destroy(s) { }
 
 PP.scenes.add("base", preload, create, update, destroy);

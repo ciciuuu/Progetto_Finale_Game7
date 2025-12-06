@@ -1,91 +1,79 @@
-let player_speed    = 500;
-let jump_init_speed = 300;
-let floor_height    = 620;
+let player_speed    = 300; // Ridotto per un controllo più fine su tile 32x32
+let jump_init_speed = 200; // Valore più adatto per il salto su tile 32x32
+// Variabile obsoleta: floor_height = 620;
 
-let curr_anim = "stop"; // Questa variabile contiene l'animazione corrente
-
-let img_shuriken;
+let curr_anim = "stop"; 
 
 function preload_player(s) {
 }
 
 function configure_player_animations(s, player) {
-    // Configuro le animazioni secondo lo spritesheet
-    PP.assets.sprite.animation_add_list(player, "run", [0, 1, 2, 3, 4, 5, 6, 7, 8,], 13, -1);    // Lista di frame, a 10 fps, inifito
+    // Configurazione animazioni
+    PP.assets.sprite.animation_add_list(player, "run", [0, 1, 2, 3, 4, 5, 6, 7, 8], 13, -1);
+    PP.assets.sprite.animation_add_list(player, "idle", [3, 8], 4, -1);
     PP.assets.sprite.animation_add(player, "jump_up", 3, 4, 10, 0);
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
     PP.assets.sprite.animation_play(player, "stop");
 
-    // Qui imposto la scala del personaggio
-    player.geometry.scale_x = 3;
-    player.geometry.scale_y = 3;
+    // CORREZIONE SCALA
+    player.geometry.scale_x = 1;
+    player.geometry.scale_y = 1;
 
+    // HITBOX 
+    
+    PP.physics.set_collision_rectangle(player, 20, 35, -10, 30);
+    
+    // player.ph_obj.body.setOffset(x, y) definisce il punto d'inizio dell'area.
+    // Serve per centrare la hitbox all'interno dell'immagine scalata.
+    player.ph_obj.body.setOffset(24, 25);
 }
 
 function manage_player_update(s, player) {
-    // Questa funzione e' chiamata ad ogni frame dalla update()
-
-    // Creo una variabile che conterra' l'animazione futura
-    // per poter verificare se cambia dalla attuale
     let next_anim = curr_anim;
-
+    
+    // Logica Movimento Orizzontale (invariata)
     if(PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
-        // Se e' premuto il tasto destro...
         PP.physics.set_velocity_x(player, + player_speed);
         next_anim = "run";
+        player.geometry.flip_x = false;
     }
     else if(PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
-        // Se e' premuto il tasto sinistro...
         PP.physics.set_velocity_x(player, - player_speed);
         next_anim = "run";
+        player.geometry.flip_x = true;
     } else {
-        // Se non e' premuto alcun tasto...
         PP.physics.set_velocity_x(player, 0);
-        next_anim = "stop";
+        next_anim = "idle";
     }
 
-    if(player.geometry.y>=floor_height-1 || player.is_on_platform) {
-        // Se mi trovo sul pavimento OPPURE su una piattaforma...
+    // --- NUOVA LOGICA DI SALTO BASATA SULLA FISICA ---
+    
+    // 1. Controlla se il corpo del player è bloccato verso il basso da un altro oggetto (i muri di Godot)
+    let is_on_solid_ground = player.ph_obj.body.blocked.down; 
 
+    // 2. Esegue il salto solo se il player è a terra
+    if (is_on_solid_ground) { 
         if(PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
-            // ... e premo il tasto spazio, allo salto
             PP.physics.set_velocity_y(player, -jump_init_speed);
         }
-
-        // Non gestisco qui le animazioni del salto, ma piu' avanti
+        // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
     }
 
-    player.is_on_platform = false;  // Resetto il flag che viene messo a true quando il giocatore 
-                                    // si trova sulla piattaforma
-
-    // Le animazioni del salto vengono gestite in base alla velocita'
-    // verticale
-    if(PP.physics.get_velocity_y(player) < 0) {
-        next_anim = "jump_up";
+    // 3. Logica Animazioni (si basa sulla velocità Y)
+    if (!is_on_solid_ground) {
+        if(PP.physics.get_velocity_y(player) < 0) {
+            next_anim = "jump_up";
+        }
+        else if(PP.physics.get_velocity_y(player) > 0) {
+            next_anim = "jump_down";
+        }
     }
-    else if(PP.physics.get_velocity_y(player) > 0) {
-        next_anim = "jump_down";
-    }
+    // Se is_on_solid_ground è TRUE, l'animazione sarà "run" o "stop" (impostata prima).
 
-    // Nota: non gestisco il caso == 0, perche' in quel caso l'animazione
-    // e' quella del movimento scelta prima.
-
-
-    // Ora verifico l'animazione scelta:
-    // - se e' uguale a quella attuale, non faccio niente
-    // - se e' cambiata, la applico e aggiorno curr_anim
+    // Applica animazione
     if(next_anim != curr_anim) {
         PP.assets.sprite.animation_play(player, next_anim);
         curr_anim = next_anim;
     }
-
-    // Logica per specchiare il giocatore:
-    if (PP.physics.get_velocity_x(player) < 0) {
-        player.geometry.flip_x = true;
-    }
-    else if (PP.physics.get_velocity_x(player) > 0) {
-        player.geometry.flip_x = false;
-    }
-
 }
