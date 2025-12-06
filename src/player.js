@@ -1,5 +1,5 @@
 let player_speed    = 300; // Ridotto per un controllo più fine su tile 32x32
-let jump_init_speed = 200; // Valore più adatto per il salto su tile 32x32
+let jump_init_speed = 600; // Valore più adatto per il salto su tile 32x32
 // Variabile obsoleta: floor_height = 620;
 
 let curr_anim = "stop"; 

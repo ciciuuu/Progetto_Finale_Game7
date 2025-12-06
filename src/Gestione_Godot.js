@@ -1,7 +1,7 @@
 // CONFIGURAZIONE LIVELLO
 const DIMENSIONE_TILE = 32; 
 const PUNTO_SPAWN = 30; 
-const BLOCCHI_SOLIDI = [42, 43, 44, 52, 53, 54]; 
+const BLOCCHI_SOLIDI = [42, 43, 44, 52, 54]; 
 const TILESET_KEY = "tiles"; 
 const TILESET_PATH = "assets/images/DESERTO.png";
 
