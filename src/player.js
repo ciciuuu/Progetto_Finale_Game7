@@ -22,11 +22,11 @@ function configure_player_animations(s, player) {
 
     // HITBOX 
     
-    PP.physics.set_collision_rectangle(player, 20, 35, -10, 30);
+    PP.physics.set_collision_rectangle(player, 25, 45, -10, 30);
     
     // player.ph_obj.body.setOffset(x, y) definisce il punto d'inizio dell'area.
     // Serve per centrare la hitbox all'interno dell'immagine scalata.
-    player.ph_obj.body.setOffset(24, 25);
+    player.ph_obj.body.setOffset(10, 8);
 }
 
 function manage_player_update(s, player) {
