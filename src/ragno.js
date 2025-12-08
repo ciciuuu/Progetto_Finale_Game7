@@ -1,4 +1,5 @@
 let img_enemy;
+let img_enemy2;
 let enemy;
 
 let vulnerable = true;
@@ -6,7 +7,12 @@ let vulnerable = true;
 function preload_enemy(s) {
     // Carico l'immagine come spritesheets
     img_enemy = PP.assets.sprite.load_spritesheet(s, 
-                        "assets/images/enemy.png", 36, 36);
+                        "assets/images/RAGNO/camminata_danno.png", 36, 36);
+
+    img_enemy2 = PP.assets.sprite.load_spritesheet(s, 
+                        "assets/images/RAGNO/attacco.png", 59, 59);
+
+
 }
 
 function set_vulnerable() {
@@ -18,7 +24,7 @@ function take_damage(s, p1, p2) {
         vulnerable = false;
         PP.game_state.set_variable("HP", PP.game_state.get_variable("HP") - 1);
         if (PP.game_state.get_variable("HP") <= 0) {
-            PP.scenes.start("game_over");
+            PP.scenes.start("game_over");v
         }
         PP.timers.add_timer(s,500, set_vulnerable,false);
     }
