@@ -87,11 +87,22 @@ function manage_player_update(s, player) {
 
     // 3. Logica Animazioni (si basa sulla velocità Y)
     if (!is_on_solid_ground) {
+
         if (PP.physics.get_velocity_y(player) < 0) {
             next_anim = "jump_up";
         }
         else if (PP.physics.get_velocity_y(player) > 0) {
             next_anim = "jump_down";
+        }
+
+        if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
+            space_pressed = true;
+            PP.physics.set_velocity_y(player, -jump_init_speed);
+            mid_jump = false;
+            // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
+        }
+        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true){
+            space_pressed = false;
         }
     }
     // Se is_on_solid_ground è TRUE, l'animazione sarà "run" o "stop" (impostata prima).
