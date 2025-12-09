@@ -3,12 +3,14 @@
 
 const DIMENSIONE_TILE = 32; 
 const PUNTO_SPAWN = 500; // ID Spawn Player
+
+// const PUNTO_SPAWN = 600; // ID Spawn Player
 // Elenco ID dei blocchi solidi (Muri/Pavimenti)
 const BLOCCHI_SOLIDI = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    31, 32, 33, 34, 35, 36, 37, 38, 40,
+    32, 33, 34, 35, 36, 37, 38, 40,
     41, 42, 43, 44, 52, 54
 ];
 const TILESET_KEY = "tiles"; 
@@ -71,7 +73,13 @@ function godot_create(s) {
                 PP.game_state.set_variable("spawn_y", posY);
                 continue; 
             }
-
+            
+           /*  if (id === PUNTO_SPAWN_RAGNO) {
+                PP.game_state.set_variable("spawn_x", posX + 16);
+                PP.game_state.set_variable("spawn_y", posY);
+                continue; 
+            }
+ */
             // -- DISEGNO GRAFICO (Semplice immagine per tutti) --
             // Non creiamo la fisica qui, solo l'immagine visiva.
             // Nota: id - 1 per il frame corretto di Phaser.

@@ -62,6 +62,12 @@ function manage_player_update(s, player) {
 
     // 1. Controlla se il corpo del player è bloccato verso il basso da un altro oggetto (i muri di Godot)
     let is_on_solid_ground = player.ph_obj.body.blocked.down;
+    
+    
+    // --------
+    // let is_on_air = player.ph_obj.body.blocked.
+    //--------
+
 
     // 2. Esegue il salto solo se il player è a terra
     if (is_on_solid_ground) {
@@ -70,6 +76,12 @@ function manage_player_update(s, player) {
         }
         // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
     }
+    // if (is_on_air) {
+    //     if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
+    //         PP.physics.set_velocity_y(player, -jump_init_speed);
+    //     }
+    //     // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
+    // }
 
     // 3. Logica Animazioni (si basa sulla velocità Y)
     if (!is_on_solid_ground) {
