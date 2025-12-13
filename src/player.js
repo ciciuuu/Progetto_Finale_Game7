@@ -1,7 +1,7 @@
 //Impostiamo una velocità massima di caduta (per la gravità) --> in modo che non "entri" in blocchi in cui non dovrebbe andare
 
 let player_speed = 300;
-let jump_init_speed = 700;
+let jump_init_speed = 500;
 
 let space_pressed = false;
 let mid_jump = true;
@@ -21,21 +21,14 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
     PP.assets.sprite.animation_play(player, "stop");
 
-    //Per evitare incastri con hitbox godot
-    player.ph_obj.body.setSize(player.ph_obj.width - 8, player.ph_obj.height - 8, true);
-
-
     // HITBOX 
-
-
-    PP.physics.set_collision_rectangle(player, 15, 45, -10, 30);
+    PP.physics.set_collision_rectangle(player, 20 , 44, -10, 30);
     PP.physics.set_friction_y(player, 0);
 
     // PP.physics.set_collision_circle(player, 23, 30 -10, 30);
 
-    // player.ph_obj.body.setOffset(x, y) definisce il punto d'inizio dell'area.
-    // Serve per centrare la hitbox all'interno dell'immagine scalata.
-    player.ph_obj.body.setOffset(9, 8);
+    // Per centrare la hitbox
+    player.ph_obj.body.setOffset(14, 8);
 }
 
 function manage_player_update(s, player) {
@@ -46,6 +39,8 @@ function manage_player_update(s, player) {
         PP.physics.set_velocity_x(player, + player_speed);
         next_anim = "run";
         player.geometry.flip_x = false;
+        player.ph_obj.body.setOffset(14, 8);
+
     }
     else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
         PP.physics.set_velocity_x(player, - player_speed);
