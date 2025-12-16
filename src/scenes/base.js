@@ -126,7 +126,7 @@ function create(s) {
     pistola.ph_obj.setScrollFactor(0);
     
     
-    create_enemy(s);
+    create_enemy(s, player, muri_livello);
 }
 
 

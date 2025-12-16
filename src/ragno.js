@@ -6,13 +6,8 @@ let enemy2;
 let vulnerable = true;
 
 function preload_enemy(s) {
-    // Carico l'immagine come spritesheets
-    img_enemy = PP.assets.sprite.load_spritesheet(s,
-        "assets/images/RAGNO/camminata_danno 36x36.png", 36, 36);
-
-    img_enemy2 = PP.assets.sprite.load_spritesheet(s,
-        "assets/images/RAGNO/attacco 59x59.png", 59, 59);
-
+    img_enemy = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/camminata_danno 36x36.png", 36, 36);
+    img_enemy2 = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/attacco 59x59.png", 59, 59);
 
 }
 
@@ -20,7 +15,7 @@ function set_vulnerable() {
     vulnerable = true;
 }
 
-function take_damage(s, p1, p2) {
+/* function take_damage(s, p1, p2) {
     if (vulnerable) {
         vulnerable = false;
         PP.game_state.set_variable("HP", PP.game_state.get_variable("HP") - 1);
@@ -29,15 +24,26 @@ function take_damage(s, p1, p2) {
         }
         PP.timers.add_timer(s, 500, set_vulnerable, false);
     }
-}
+} */
 
 
-function create_enemy(s, player) {
+function create_enemy(s, enemy, muri) {
 
+    if (muri) {
+        s.physics.add.collider(enemy.ph_obj, muri);
+    }
 
+    enemy = PP.assets.sprite.add(s, img_enemy, -200, -400, 0.5, 1);
+   
+        PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
 
-    enemy = PP.assets.sprite.add(s, img_enemy, 0, 0, 0.5, 1);
-  /*   // PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
+        if (muri) {
+            s.physics.add.collider(enemy.ph_obj, muri);
+        }
+
+   
+    /*  
+    PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
     
     // Velocità iniziale del nemico (verso dx)
     PP.physics.set_velocity_x(enemy, 100);
@@ -51,8 +57,8 @@ function create_enemy(s, player) {
 
     // Qui imposto la scala del personaggio
     enemy.geometry.scale_x = 2;
-    enemy.geometry.scale_y = 2; */
-
+    enemy.geometry.scale_y = 2;
+ */
 
 
 
