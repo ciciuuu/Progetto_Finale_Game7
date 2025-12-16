@@ -53,6 +53,9 @@ function manage_player_update(s, player) {
         next_anim = "idle";
     }
 
+
+    
+
     // --- NUOVA LOGICA DI SALTO BASATA SULLA FISICA ---
 
     // 1. Controlla se il corpo del player è bloccato verso il basso da un altro oggetto (i muri di Godot)

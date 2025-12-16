@@ -1,7 +1,6 @@
 let img_player;
 
 let player;
-let txt_mushrooms;
 let muri_livello; // Variabile per ricevere i muri da Godot
 
 let parallasse1;
@@ -13,9 +12,27 @@ let ts_background_1;
 let ts_background_2;
 let ts_background_3;
 
+//HUD
+let asset_ingranaggio_0;
+let ingranaggio;
+
+let asset_blueprint;
+let blueprint;
+
+let asset_pistola;
+let pistola;
+
 
 function preload(s) {
-    console.log("Executing preload() - SCENE");
+    //HUD
+    //ingranaggio
+    asset_ingranaggio_0 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/0_ingranaggio.png");
+
+    //blueprint
+    asset_blueprint = PP.assets.image.load(s, "assets/images/HUD/Blueprint/BP_boh.png");
+
+    //pistola
+    asset_pistola = PP.assets.image.load(s, "assets/images/HUD/Pistola/Pistola_buona.png");
 
 
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Personaggio 52x52.png", 52, 52);
@@ -40,25 +57,21 @@ function preload(s) {
     preload_player(s);
 }
 
-
-// ... (omissis: preload function)
-
 function create(s) {
-    console.log("Executing create() - SCENE");
 
 
     const PARALLAX_WIDTH = 12800;
     const PARALLAX_HEIGHT = 23000;
 
     // TS 1: Immagine più vicina
-    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 0 , PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.45 );
+    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 0, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.45);
 
     // CORREZIONE: Applica la scala al Tilesprite ORA
     ts_background_1.geometry.scale_x = 0.3;
     ts_background_1.geometry.scale_y = 0.3;
 
     // TS 2: Immagine media
-    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, -100, 0, 0, 0, 0.22 );
+    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, -100, 0, 0, 0, 0.22);
 
     // CORREZIONE: Applica la scala anche al secondo Tilesprite (esempio)
     ts_background_2.geometry.scale_x = 0.3;
@@ -71,10 +84,11 @@ function create(s) {
     ts_background_2.tile_geometry.scroll_factor_x = 0;
     ts_background_3.tile_geometry.scroll_factor_x = 0;
 
-    // ... (omissis: resto della funzione create)
 
     //ZOOM IN PHASER
     s.cameras.main.setZoom(2);
+
+
     // 2. COSTRUIONE MAPPA
     // Eseguiamo la creazione e salviamo il gruppo di muri restituito
     if (window.godot_create) {
@@ -100,13 +114,57 @@ function create(s) {
     // 5. CAMERA
     PP.camera.start_follow(s, player, 0, 75);
 
-    txt_mushrooms = PP.shapes.text_add(s, 50, 50, "Mushrooms: " + (PP.game_state.get_variable("mushrooms") || 0));
-    txt_mushrooms.ph_obj.setScrollFactor(0);
 
+
+    // 6. HUD
+    //ingranaggio
+    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 210, 0, 0, 0, 0);
+    ingranaggio.ph_obj.setScrollFactor(0);
+    //Blueprint
+    blueprint = PP.assets.image.add(s, asset_blueprint, 885, 255, 0, 0, 0, 0);
+    blueprint.ph_obj.setScrollFactor(0);
+    //Pistola
+    pistola = PP.assets.image.add(s, asset_pistola, 330, 210, 0, 0, 0, 0);
+    pistola.ph_obj.setScrollFactor(0);
 }
 
 
 function update(s) {
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
+        s.cameras.main.setZoom(0.2);
+
+    } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
+        s.cameras.main.setZoom(2);
+
+    }
+
+
+            // DEBUG: Premi 'L' per vedere la distanza in console
+            if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
+
+                // 1. Otteniamo gli oggetti nativi Phaser (più precisi)
+                let p_obj = player.ph_obj;
+                let i_obj = blueprint.ph_obj;
+                let cam = s.cameras.main;
+
+                // 2. Calcoliamo la posizione dell'ingranaggio nel "Mondo"
+                // Poiché l'ingranaggio segue la camera (ScrollFactor 0), la sua posizione reale 
+                // rispetto al player cambia mentre il player si muove.
+                // Posizione Mondo = Posizione Camera + Posizione Ingranaggio
+                let ingranaggio_world_x = cam.scrollX + i_obj.x;
+                let ingranaggio_world_y = cam.scrollY + i_obj.y;
+
+                // 3. Calcolo Distanza (Valore assoluto della differenza)
+                let dist_x = Math.abs(p_obj.x - ingranaggio_world_x);
+                let dist_y = Math.abs(p_obj.y - ingranaggio_world_y);
+
+                console.clear(); // Pulisce la console per leggere meglio
+                console.log("--- DEBUG DISTANZA ---");
+                console.log(`Player (Mondo): x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
+                console.log(`Ingranaggio (Proiettato): x=${ingranaggio_world_x.toFixed(0)}, y=${ingranaggio_world_y.toFixed(0)}`);
+                console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
+                console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
+            }
 
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
@@ -118,8 +176,7 @@ function update(s) {
 
     if (player) manage_player_update(s, player);
 
-    let mushrooms = PP.game_state.get_variable("mushrooms") || 0;
-    PP.shapes.text_change(txt_mushrooms, "Mushrooms: " + mushrooms);
+
 
 }
 
