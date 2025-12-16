@@ -51,9 +51,7 @@ function preload(s) {
     // Aggiungi i layer dal più “profondo”
 
 
-
-
-
+    preload_enemy(s)
     preload_player(s);
 }
 
@@ -124,8 +122,11 @@ function create(s) {
     blueprint = PP.assets.image.add(s, asset_blueprint, 885, 255, 0, 0, 0, 0);
     blueprint.ph_obj.setScrollFactor(0);
     //Pistola
-    pistola = PP.assets.image.add(s, asset_pistola, 330, 210, 0, 0, 0, 0);
+    pistola = PP.assets.image.add(s, asset_pistola, 332, 210, 0, 0, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
+    
+    
+    create_enemy(s);
 }
 
 
@@ -139,32 +140,38 @@ function update(s) {
     }
 
 
-            // DEBUG: Premi 'L' per vedere la distanza in console
-            if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
+                // DEBUG: Premi 'L' per vedere la distanza in console
+                if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
 
-                // 1. Otteniamo gli oggetti nativi Phaser (più precisi)
-                let p_obj = player.ph_obj;
-                let i_obj = blueprint.ph_obj;
-                let cam = s.cameras.main;
+                    // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
+                    let OGGETTO_TARGET = ingranaggio; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
 
-                // 2. Calcoliamo la posizione dell'ingranaggio nel "Mondo"
-                // Poiché l'ingranaggio segue la camera (ScrollFactor 0), la sua posizione reale 
-                // rispetto al player cambia mentre il player si muove.
-                // Posizione Mondo = Posizione Camera + Posizione Ingranaggio
-                let ingranaggio_world_x = cam.scrollX + i_obj.x;
-                let ingranaggio_world_y = cam.scrollY + i_obj.y;
 
-                // 3. Calcolo Distanza (Valore assoluto della differenza)
-                let dist_x = Math.abs(p_obj.x - ingranaggio_world_x);
-                let dist_y = Math.abs(p_obj.y - ingranaggio_world_y);
+                    // 2. Otteniamo gli oggetti nativi
+                    let p_obj = player.ph_obj;
+                    let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
+                    let cam = s.cameras.main;
 
-                console.clear(); // Pulisce la console per leggere meglio
-                console.log("--- DEBUG DISTANZA ---");
-                console.log(`Player (Mondo): x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
-                console.log(`Ingranaggio (Proiettato): x=${ingranaggio_world_x.toFixed(0)}, y=${ingranaggio_world_y.toFixed(0)}`);
-                console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
-                console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
-            }
+                    // 3. Calcolo Posizione "Mondo" Intelligente
+                    // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
+                    // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
+                    let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
+                    let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
+
+                    // 4. Calcolo Distanza
+                    let dist_x = Math.abs(p_obj.x - target_world_x);
+                    let dist_y = Math.abs(p_obj.y - target_world_y);
+
+                    console.clear();
+                    console.log("--- DEBUG DISTANZA ---");
+                    console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
+                    console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
+                    console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
+                    console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
+
+
+
+    }
 
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
@@ -176,10 +183,15 @@ function update(s) {
 
     if (player) manage_player_update(s, player);
 
+    update_enemy(s);
 
 
 }
 
-function destroy(s) { }
+function destroy(s) { 
+
+    destroy_enemy(s);
+
+}
 
 PP.scenes.add("base", preload, create, update, destroy);
