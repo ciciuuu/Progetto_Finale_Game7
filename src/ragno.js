@@ -40,7 +40,8 @@ function create_enemy(s, enemy, muri) {
         if (muri) {
             s.physics.add.collider(enemy.ph_obj, muri);
         }
-
+        enemy.geometry.scale_x = 1.3;
+        enemy.geometry.scale_y = 1.3;
    
     /*  
     PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);

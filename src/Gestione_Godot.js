@@ -196,29 +196,29 @@ window.godot_create = godot_create; */
 
 
 
- // CONFIGURAZIONE LIVELLO
+// CONFIGURAZIONE LIVELLO
 
 const DIMENSIONE_TILE = 32;
 const PUNTO_SPAWN = 500; // ID Spawn Player
 
 // Elenco ID dei blocchi solidi (Muri/Pavimenti Standard - Hitbox 32x32)
 const BLOCCHI_SOLIDI = [
-    1, 2, 3, 5, 6, 7, 8, 9, 10,
+    1, 2, 3, 5, 6, 8, 9, 10,
     11, 12, 13, 15, 16, 17, 18, 19, 20,
-    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    32, 34, 37, 40,
-    41, 43, 45, 47, 49,
-    52, 56, 57, 58,
+    21, 22, 23, 28, 29, 30,
+    32, 34, 35, 36, 37, 38, 39, 40,
+    44, 45, 46, 47, 48, 49, 50,
+    51, 52, 53, 56, 57, 58,
     64, 65, 66, 67, 68, 69, 70,
-    76, 77, 78,
-    85, 87, 89,
-    94, 97, 100
+    71, 72, 73, 74, 76, 77, 78,
+    81, 82, 83, 84, 86, 87, 88,
+    96, 97, 98
 ];
 
 // --- NUOVO: Blocchi Piattaforma (Hitbox stretta solo in alto) ---
 // Inserisci qui gli ID dei blocchi che vuoi comportino come piattaforme sottili.
 // Anche se questi numeri sono presenti in BLOCCHI_SOLIDI, questa lista avrà la precedenza.
-const BLOCCHI_PIATTAFORMA = [17, 42];
+const BLOCCHI_PIATTAFORMA = [25, 26, 27, 41, 42, 43];
 const ALTEZZA_PIATTAFORMA = 15; // Altezza in pixel della hitbox (attaccata in alto)
 
 const TILESET_KEY = "tiles";
@@ -422,4 +422,3 @@ window.godot_preload = godot_preload;
 window.godot_create = godot_create;
 
 
- 

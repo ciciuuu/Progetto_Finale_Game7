@@ -1,5 +1,3 @@
-//Impostiamo una velocità massima di caduta (per la gravità) --> in modo che non "entri" in blocchi in cui non dovrebbe andare
-
 let player_speed = 300;
 let jump_init_speed = 500;
 
@@ -19,93 +17,117 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "jump_up", 3, 4, 10, 0);
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
+    PP.assets.sprite.animation_add_list(player, "sparo", [20, 21, 22, 23, 24, 25, 26, 27, 28], 13, -1); 
     PP.assets.sprite.animation_play(player, "stop");
 
     // HITBOX 
-    PP.physics.set_collision_rectangle(player, 20 , 44, -10, 30);
+    PP.physics.set_collision_rectangle(player, 20, 44, -10, 30);
     PP.physics.set_friction_y(player, 0);
-
-    // PP.physics.set_collision_circle(player, 23, 30 -10, 30);
 
     // Per centrare la hitbox
     player.ph_obj.body.setOffset(14, 8);
+
+    // --- VARIABILI DI STATO (MEMORIA) ---
+    player.sparo_attivo = false; 
+    // player.c_rilasciato non serve più con la logica "tieni premuto"
 }
 
 function manage_player_update(s, player) {
     let next_anim = curr_anim;
 
-    // Logica Movimento Orizzontale (invariata)
+    // 1. GESTIONE MODALITÀ SPARO (TASTO N - HOLD)
+    // Se N è premuto = TRUE. Se N non è premuto = FALSE.
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
+        player.sparo_attivo = true;
+    } else {
+        player.sparo_attivo = false;
+    }
+
+    // 2. GESTIONE MOVIMENTO (Unificata)
+    
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
+        // --- DESTRA ---
         PP.physics.set_velocity_x(player, + player_speed);
-        next_anim = "run";
         player.geometry.flip_x = false;
         player.ph_obj.body.setOffset(14, 8);
+        
+        // Decidiamo l'animazione in base alla modalità
+        if (player.sparo_attivo) {
+            next_anim = "sparo";
+        } else {
+            next_anim = "run";
+        }
 
     }
     else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
+        // --- SINISTRA ---
         PP.physics.set_velocity_x(player, - player_speed);
-        next_anim = "run";
         player.geometry.flip_x = true;
-        player.ph_obj.body.setOffset(20, 8); //sposto l'offset quando il player va a destra, in modo che sia centrato
+        player.ph_obj.body.setOffset(20, 8); // Offset per specchiamento
+
+        // Decidiamo l'animazione in base alla modalità
+        if (player.sparo_attivo) {
+            next_anim = "sparo";
+        } else {
+            next_anim = "run";
+        }
 
     } else {
+        // --- FERMO ---
         PP.physics.set_velocity_x(player, 0);
-        next_anim = "idle";
+        
+        if (player.sparo_attivo) {
+            next_anim = "sparo"; 
+        } else {
+            next_anim = "idle";
+        }
     }
 
+    // 3. LOGICA DI SALTO
 
-    
 
-    // --- NUOVA LOGICA DI SALTO BASATA SULLA FISICA ---
-
-    // 1. Controlla se il corpo del player è bloccato verso il basso da un altro oggetto (i muri di Godot)
+    // Controlla se il corpo del player è bloccato verso il basso
     let is_on_solid_ground = player.ph_obj.body.blocked.down;
 
-
-    // 2. Esegue il salto solo se il player è a terra
-
     if (is_on_solid_ground) {
-
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
-            // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
         }
-        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true){
+        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true) {
             space_pressed = false;
         }
         mid_jump = true;
     }
-    // if (is_on_air) {
-    //     if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
-    //         PP.physics.set_velocity_y(player, -jump_init_speed);
-    //     }
-    //     // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
-    // }
 
-    // 3. Logica Animazioni (si basa sulla velocità Y)
+    // Logica Animazioni Salto (Sovrascrive run/sparo se in aria)
     if (!is_on_solid_ground) {
 
-        if (PP.physics.get_velocity_y(player) < 0) {
-            next_anim = "jump_up";
-        }
-        else if (PP.physics.get_velocity_y(player) > 0) {
-            next_anim = "jump_down";
+        // Se stiamo sparando in aria, diamo priorità all'animazione di sparo
+        if (player.sparo_attivo) {
+            next_anim = "sparo";
+        } else {
+            // Altrimenti animazioni di salto normali
+            if (PP.physics.get_velocity_y(player) < 0) {
+                next_anim = "jump_up";
+            }
+            else if (PP.physics.get_velocity_y(player) > 0) {
+                next_anim = "jump_down";
+            }
         }
 
+        // Doppio salto / Salto in aria
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
             mid_jump = false;
-            // Se a terra e fermo (o in corsa), resetta l'animazione di caduta/salto
         }
-        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true){
+        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true) {
             space_pressed = false;
         }
     }
-    // Se is_on_solid_ground è TRUE, l'animazione sarà "run" o "stop" (impostata prima).
 
-    // Applica animazione
+    // Applica animazione se è cambiata
     if (next_anim != curr_anim) {
         PP.assets.sprite.animation_play(player, next_anim);
         curr_anim = next_anim;

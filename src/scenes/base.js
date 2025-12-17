@@ -12,6 +12,8 @@ let ts_background_1;
 let ts_background_2;
 let ts_background_3;
 
+
+
 //HUD
 let asset_ingranaggio_0;
 let ingranaggio;
@@ -21,6 +23,10 @@ let blueprint;
 
 let asset_pistola;
 let pistola;
+
+let asset_proiettile;
+let proiettile; // Gruppo fisico per i proiettili
+let last_fired = 0; // Per gestire il tempo tra uno sparo e l'altro
 
 
 function preload(s) {
@@ -35,9 +41,13 @@ function preload(s) {
     asset_pistola = PP.assets.image.load(s, "assets/images/HUD/Pistola/Pistola_buona.png");
 
 
-    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Personaggio 52x52.png", 52, 52);
+    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
 
-    // 1. CARICAMENTO TILESET DI GODOT (CHIAMATA CRITICA)
+
+    proiettile = asset_proiettile = PP.assets.image.load(s, "assets/images/PLAYER/Proiettile.png");
+
+
+    // CARICAMENTO TILESET DI GODOT
     if (window.godot_preload) {
         window.godot_preload(s);
     }
@@ -60,6 +70,8 @@ function create(s) {
 
     const PARALLAX_WIDTH = 12800;
     const PARALLAX_HEIGHT = 23000;
+
+
 
     // TS 1: Immagine più vicina
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 0, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.45);
@@ -110,7 +122,7 @@ function create(s) {
     configure_player_animations(s, player);
 
     // 5. CAMERA
-    PP.camera.start_follow(s, player, 0, 75);
+    PP.camera.start_follow(s, player, 0, 50);
 
 
 
@@ -124,9 +136,22 @@ function create(s) {
     //Pistola
     pistola = PP.assets.image.add(s, asset_pistola, 332, 210, 0, 0, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
-    
-    
+
+
+
     create_enemy(s, player, muri_livello);
+
+
+    // PROIETTILI SETUP
+    proiettile = s.physics.add.group(); // 'proiettile' è il GRUPPO FISICO
+
+    // Collisione Proiettili contro Muri (si distruggono se toccano il muro)
+    if (muri_livello) {
+        s.physics.add.collider(proiettile, muri_livello, function (b, m) {
+            b.destroy(); // Distruggi il proiettile
+        });
+    }
+
 }
 
 
@@ -140,38 +165,133 @@ function update(s) {
     }
 
 
-                // DEBUG: Premi 'L' per vedere la distanza in console
-                if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
-
-                    // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
-                    let OGGETTO_TARGET = ingranaggio; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
 
 
-                    // 2. Otteniamo gli oggetti nativi
-                    let p_obj = player.ph_obj;
-                    let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
-                    let cam = s.cameras.main;
+    //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
 
-                    // 3. Calcolo Posizione "Mondo" Intelligente
-                    // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
-                    // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
-                    let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
-                    let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
+        let time_now = Date.now();
+        let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
 
-                    // 4. Calcolo Distanza
-                    let dist_x = Math.abs(p_obj.x - target_world_x);
-                    let dist_y = Math.abs(p_obj.y - target_world_y);
+        // Offset in pixel sopra il centro del player
+        const Y_OFFSET_SPARO = 25;
 
-                    console.clear();
-                    console.log("--- DEBUG DISTANZA ---");
-                    console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
-                    console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
-                    console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
-                    console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
+        // Se è passato abbastanza tempo dall'ultimo sparo
+        if (time_now > last_fired) {
+
+            // 1. Calcola posizione di partenza (con offset Y corretto)
+            let spawn_x = player.ph_obj.x;
+            let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
+
+            // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
+            let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+
+            // 3. Imposta la scala 
+            b.setScale(0.1);
+            b.body.setAllowGravity(false);
+
+            // 4. Gestione Direzione (Destra/Sinistra)
+            let velocita_proiettile = 600;
+            if (player.geometry.flip_x) {
+                b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
+                b.setFlipX(true);
+            } else {
+                b.setVelocityX(velocita_proiettile);  // Spara a Destra
+                b.setFlipX(false);
+            }
+
+            // 5. Autodistruzione dopo 2 secondi
+            s.time.delayedCall(2000, () => {
+                if (b.active) b.destroy();
+            });
+
+            // Aggiorna il tempo dell'ultimo sparo
+            last_fired = time_now + fire_rate;
+        }
+    } 
 
 
+   /*  //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
 
+        let time_now = Date.now();
+        let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
+
+        // Offset in pixel sopra il centro del player
+        const Y_OFFSET_SPARO = 25;
+
+        // Se è passato abbastanza tempo dall'ultimo sparo
+        if (time_now > last_fired) {
+
+            // 1. Calcola posizione di partenza (con offset Y corretto)
+            let spawn_x = player.ph_obj.x;
+            let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
+
+            // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
+            let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+
+            // 3. Imposta la scala 
+            b.setScale(0.1);
+            b.body.setAllowGravity(false);
+
+            // 4. Gestione Direzione (Destra/Sinistra)
+            let velocita_proiettile = 600;
+            if (player.geometry.flip_x) {
+                b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
+                b.setFlipX(true);
+            } else {
+                b.setVelocityX(velocita_proiettile);  // Spara a Destra
+                b.setFlipX(false);
+            }
+
+            // 5. Autodistruzione dopo 2 secondi
+            s.time.delayedCall(2000, () => {
+                if (b.active) b.destroy();
+            });
+
+            // Aggiorna il tempo dell'ultimo sparo
+            last_fired = time_now + fire_rate;
+        }
+    } */
+
+    // DEBUG: Premi 'L' per vedere la distanza in console
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
+
+        // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
+        let OGGETTO_TARGET = ingranaggio; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
+
+
+        // 2. Otteniamo gli oggetti nativi
+        let p_obj = player.ph_obj;
+        let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
+        let cam = s.cameras.main;
+
+        // 3. Calcolo Posizione "Mondo" Intelligente
+        // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
+        // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
+        let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
+        let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
+
+        // 4. Calcolo Distanza
+        let dist_x = Math.abs(p_obj.x - target_world_x);
+        let dist_y = Math.abs(p_obj.y - target_world_y);
+
+        console.clear();
+        console.log("--- DEBUG DISTANZA ---");
+        console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
+        console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
+        console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
+        console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
     }
+
+    // DEBUG: Premi 'P' per vedere SOLO le coordinate del Player
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
+        console.clear();
+        console.log("%c--- PLAYER POS ---", "color: #00ff00; font-weight: bold;");
+        console.log("X: " + player.ph_obj.x.toFixed(0));
+        console.log("Y: " + player.ph_obj.y.toFixed(0));
+    }
+
 
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
@@ -188,7 +308,7 @@ function update(s) {
 
 }
 
-function destroy(s) { 
+function destroy(s) {
 
     destroy_enemy(s);
 
