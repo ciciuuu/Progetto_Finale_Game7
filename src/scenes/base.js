@@ -27,6 +27,7 @@ let pistola;
 let asset_proiettile;
 let proiettile; // Gruppo fisico per i proiettili
 let last_fired = 0; // Per gestire il tempo tra uno sparo e l'altro
+let sparo = false; // Semaforo per il cooldown
 
 
 function preload(s) {
@@ -142,7 +143,7 @@ function create(s) {
     create_enemy(s, player, muri_livello);
 
 
-    // PROIETTILI SETUP
+    // PROIETTILI 
     proiettile = s.physics.add.group(); // 'proiettile' è il GRUPPO FISICO
 
     // Collisione Proiettili contro Muri (si distruggono se toccano il muro)
@@ -165,54 +166,119 @@ function update(s) {
     }
 
 
+    // --- PROIETTILE (CODICE CORRETTO) ---
+    
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo == false) {
 
+        // 1. Assegnazione corretta (non ==)
+        sparo = true;
 
-    //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
+        let altezza_sparo = 25; 
+        let spawn_x = player.geometry.x;
+        let spawn_y = player.geometry.y - altezza_sparo;
 
-        let time_now = Date.now();
-        let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
+        // 2. Creazione corretta usando il gruppo fisico
+        let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+        
+        // Impostazioni fisiche
+        colpo.setScale(0.1); // Scala
+        colpo.body.setAllowGravity(false); // Niente gravità
+        
+        let velocita = 600;
 
-        // Offset in pixel sopra il centro del player
-        const Y_OFFSET_SPARO = 25;
-
-        // Se è passato abbastanza tempo dall'ultimo sparo
-        if (time_now > last_fired) {
-
-            // 1. Calcola posizione di partenza (con offset Y corretto)
-            let spawn_x = player.ph_obj.x;
-            let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
-
-            // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
-            let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-
-            // 3. Imposta la scala 
-            b.setScale(0.1);
-            b.body.setAllowGravity(false);
-
-            // 4. Gestione Direzione (Destra/Sinistra)
-            let velocita_proiettile = 600;
-            if (player.geometry.flip_x) {
-                b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
-                b.setFlipX(true);
-            } else {
-                b.setVelocityX(velocita_proiettile);  // Spara a Destra
-                b.setFlipX(false);
-            }
-
-            // 5. Autodistruzione dopo 2 secondi
-            s.time.delayedCall(2000, () => {
-                if (b.active) b.destroy();
-            });
-
-            // Aggiorna il tempo dell'ultimo sparo
-            last_fired = time_now + fire_rate;
+        // 3. Direzione
+        if (player.geometry.flip_x == true) {
+            colpo.setVelocityX(-velocita); // Sinistra
+            colpo.setFlipX(true);
+        } else {
+            colpo.setVelocityX(velocita);  // Destra
+            colpo.setFlipX(false);
         }
-    } 
+
+        // 4. Timer Ricarica (Cooldown) - AGGIUNTO 'false' per evitare loop
+        PP.timers.add_timer(s, 500, function() {
+             sparo = false; 
+        }, false);
+
+        // 5. Timer Distruzione - AGGIUNTO 'false' per evitare loop
+        PP.timers.add_timer(s, 2000, function() {
+            if (colpo.active) {
+                colpo.destroy();
+            }
+        }, false);
+    }
+    
+    
+    
+    
+    /* // --- SPARO PROIETTILE (Tasto N) ---
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
+        sparo = false;
+
+        let altezza_sparo_dal_terreno = 25;
+        let spawn_x = player.ph_obj.x;
+        let spawn_y = player.ph_obj.y - altezza_sparo_dal_terreno;
+
+        let crea_proiettile = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+
+        let velocita_proiettile = 600;
+        crea_proiettile.body.setAllowGravity(false);
+
+        if (player.geometry.flip_x) {
+            crea_proiettile.setVelocityX(-velocita_proiettile);
+            crea_proiettile.setFlipX(true);
+        } else {
+            crea_proiettile.setVelocityX(velocita_proiettile);
+            crea_proiettile.setFlipX(false);
+        }
+
+        // TIMER
+        PP.timers.add_timer(s, 200, function () {
+            if (crea_proiettile) {
+                crea_proiettile.destroy();
+            }
+        }, false);
+
+        // --- CORREZIONE TIMER 2 (Ricarica) ---
+        // Aggiunto 'false' alla fine (parametro loop)
+        PP.timers.add_timer(s, 500, function () {
+            sparo = true;
+        }, false);
+    } */
 
 
-   /*  //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
+    /* // PROIETTILE
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
+
+        let sparo = true;
+        let altezza_sparo_dal_terreno = 25
+        let spawn_x = player.ph_obj.x;
+        let spawn_y = player.ph_obj.y - altezza_sparo_dal_terreno;
+
+        let crea_proiettile = proiettile.create(spawn_x, spawn_y, proiettile);
+
+        let velocita_proiettile = 100;
+        // crea_proiettile.setScale(1);
+        crea_proiettile.body.setAllowGravity(false);
+
+        if (player.geometry.flip_x) {
+            crea_proiettile.setVelocityX(-velocita_proiettile); // Spara a Sinistra
+
+        } else {
+            crea_proiettile.setVelocityX(velocita_proiettile);  // Spara a Destra
+        }
+
+        PP.timers.add_timer(s, 2000, function() {
+            if(sparo.active) {
+                crea_proiettile.destroy();
+            }
+        })
+    } */
+
+    /* //  SPARO PROIETTILE (Tasto N)
+   
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
+
 
         let time_now = Date.now();
         let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
@@ -254,7 +320,52 @@ function update(s) {
         }
     } */
 
-    // DEBUG: Premi 'L' per vedere la distanza in console
+
+    /* //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
+     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
+ 
+         let time_now = Date.now();
+         let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
+ 
+         // Offset in pixel sopra il centro del player
+         const Y_OFFSET_SPARO = 25;
+ 
+         // Se è passato abbastanza tempo dall'ultimo sparo
+         if (time_now > last_fired) {
+ 
+             // 1. Calcola posizione di partenza (con offset Y corretto)
+             let spawn_x = player.ph_obj.x;
+             let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
+ 
+             // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
+             let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+ 
+             // 3. Imposta la scala 
+             b.setScale(0.1);
+             b.body.setAllowGravity(false);
+ 
+             // 4. Gestione Direzione (Destra/Sinistra)
+             let velocita_proiettile = 600;
+             if (player.geometry.flip_x) {
+                 b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
+                 b.setFlipX(true);
+             } else {
+                 b.setVelocityX(velocita_proiettile);  // Spara a Destra
+                 b.setFlipX(false);
+             }
+ 
+             // 5. Autodistruzione dopo 2 secondi
+             s.time.delayedCall(2000, () => {
+                 if (b.active) b.destroy();
+             });
+ 
+             // Aggiorna il tempo dell'ultimo sparo
+             last_fired = time_now + fire_rate;
+         }
+     } */
+
+         
+   /*  // DEBUG: Premi 'L' per vedere la distanza in console
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
 
         // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
@@ -282,7 +393,7 @@ function update(s) {
         console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
         console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
         console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
-    }
+    } */
 
     // DEBUG: Premi 'P' per vedere SOLO le coordinate del Player
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {

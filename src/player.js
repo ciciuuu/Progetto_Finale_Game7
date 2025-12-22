@@ -17,7 +17,7 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "jump_up", 3, 4, 10, 0);
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
-    PP.assets.sprite.animation_add_list(player, "sparo", [20, 21, 22, 23, 24, 25, 26, 27, 28], 13, -1); 
+    PP.assets.sprite.animation_add_list(player, "sparo", [20, 21, 22, 23, 24, 25, 26, 27, 28], 13, -1);
     PP.assets.sprite.animation_play(player, "stop");
 
     // HITBOX 
@@ -28,7 +28,7 @@ function configure_player_animations(s, player) {
     player.ph_obj.body.setOffset(14, 8);
 
     // --- VARIABILI DI STATO (MEMORIA) ---
-    player.sparo_attivo = false; 
+    player.sparo_attivo = false;
     // player.c_rilasciato non serve più con la logica "tieni premuto"
 }
 
@@ -44,13 +44,13 @@ function manage_player_update(s, player) {
     }
 
     // 2. GESTIONE MOVIMENTO (Unificata)
-    
+
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
         // --- DESTRA ---
         PP.physics.set_velocity_x(player, + player_speed);
         player.geometry.flip_x = false;
         player.ph_obj.body.setOffset(14, 8);
-        
+
         // Decidiamo l'animazione in base alla modalità
         if (player.sparo_attivo) {
             next_anim = "sparo";
@@ -75,9 +75,9 @@ function manage_player_update(s, player) {
     } else {
         // --- FERMO ---
         PP.physics.set_velocity_x(player, 0);
-        
+
         if (player.sparo_attivo) {
-            next_anim = "sparo"; 
+            next_anim = "sparo";
         } else {
             next_anim = "idle";
         }
@@ -132,4 +132,53 @@ function manage_player_update(s, player) {
         PP.assets.sprite.animation_play(player, next_anim);
         curr_anim = next_anim;
     }
+
+
+
+    //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
+    // Offset in pixel sopra il centro del player
+    const Y_OFFSET_SPARO = 25;
+
+    /*
+  if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
+
+    let time_now = Date.now();
+    let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
+
+    // Offset in pixel sopra il centro del player
+    const Y_OFFSET_SPARO = 25;
+
+    // Se è passato abbastanza tempo dall'ultimo sparo
+    if (time_now > last_fired) {
+
+      // 1. Calcola posizione di partenza (con offset Y corretto)
+      let spawn_x = player.ph_obj.x;
+      let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
+
+      // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
+      let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+
+      // 3. Imposta la scala 
+      b.setScale(0.1);
+      b.body.setAllowGravity(false);
+
+      // 4. Gestione Direzione (Destra/Sinistra)
+      let velocita_proiettile = 600;
+      if (player.geometry.flip_x) {
+        b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
+        b.setFlipX(true);
+      } else {
+        b.setVelocityX(velocita_proiettile);  // Spara a Destra
+        b.setFlipX(false);
+      }
+
+      // 5. Autodistruzione dopo 2 secondi
+      s.time.delayedCall(2000, () => {
+        if (b.active) b.destroy();
+      });
+
+      // Aggiorna il tempo dell'ultimo sparo
+      last_fired = time_now + fire_rate;
+    }
+  } */
 }
