@@ -22,7 +22,6 @@ function configure_player_animations(s, player) {
 
     // HITBOX 
     PP.physics.set_collision_rectangle(player, 20, 44, -10, 30);
-    PP.physics.set_friction_y(player, 0);
 
     // Per centrare la hitbox
     player.ph_obj.body.setOffset(14, 8);
@@ -135,9 +134,26 @@ function manage_player_update(s, player) {
 
 
 
+    // STRUMENTO DEBUG COORDINATE (Tasto P)
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
+        
+        // Arrotondiamo i numeri per non avere virgole inutili
+        let coord_x = Math.round(player.ph_obj.x);
+        let coord_y = Math.round(player.ph_obj.y);
+
+        console.clear(); // Pulisce la console per leggere meglio
+        console.log("%c--- COORDINATE COPIABILI ---", "color: #00ff00; font-weight: bold; font-size: 14px;");
+        console.log(`X: ${coord_x}`);
+        console.log(`Y: ${coord_y}`);
+        console.log(`Codice pronto: let pos_x = ${coord_x}; let pos_y = ${coord_y};`);
+        console.log("------------------------------");
+    }
+
+
+
     //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
     // Offset in pixel sopra il centro del player
-    const Y_OFFSET_SPARO = 25;
+    // const Y_OFFSET_SPARO = 25;
 
     /*
   if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {

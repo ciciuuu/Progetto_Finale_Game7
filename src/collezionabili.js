@@ -13,12 +13,9 @@ function collision_blueprint(s, player, blueprint_collezionabile) {
 
 function create_blueprint(s, player) {
 
-    // Creazione di UN SOLO blueprint
-    let pos_x = -200;
-    let pos_y = -200;
-
     // Creo l'oggetto usando l'immagine caricata
-    let blueprint_collezionabile = PP.assets.image.add(s, img_blueprint_item, pos_x, pos_y, 0, 0);
+    let blueprint_collezionabile = PP.assets.image.add(s, img_blueprint_item, -200, -50, 0, 0);
+    
     
     // Aggiungo la fisica (STATICA, così non cade e non viene spinto)
     PP.physics.add(s, blueprint_collezionabile, PP.physics.type.STATIC);
