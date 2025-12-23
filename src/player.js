@@ -59,6 +59,7 @@ function manage_player_update(s, player) {
         }
 
     }
+    
     else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
         // --- SINISTRA ---
         PP.physics.set_velocity_x(player, - player_speed);
@@ -84,7 +85,6 @@ function manage_player_update(s, player) {
     }
 
     // 3. LOGICA DI SALTO
-
 
     // Controlla se il corpo del player è bloccato verso il basso
     let is_on_solid_ground = player.ph_obj.body.blocked.down;

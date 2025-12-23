@@ -2,6 +2,8 @@ let img_blueprint;
 let img_cuore;
 let img_ingranaggio;
 
+// Variabile globale per contare quanti ne hai presi
+let contatore_raccolti = 0; 
 
 function preload_blueprint(s) {
   // Load dell'immagine del blueprint
@@ -13,13 +15,14 @@ function preload_blueprint(s) {
 }
 
 function collision_blueprint(s, player, blueprint_collezionabile) {
-  // In caso di collisione distruggo il blueprint
-  let ingranaggio_coll = 0;
-  PP.assets.destroy(blueprint_collezionabile);
+  // Aumento il contatore di 1
+  contatore_raccolti = contatore_raccolti + 1;
 
-  if (PP.assets.destroy(blueprint_collezionabile)) {
-    ingranaggio_coll = ingranaggio_coll + 1;
-  }
+  // Scrivo in console quale numero ho preso
+  console.log("collezionabile " + contatore_raccolti + " preso");
+
+  // In caso di collisione distruggo il blueprint
+  PP.assets.destroy(blueprint_collezionabile);
 }
 
 function create_blueprint(s, player) {
@@ -41,10 +44,10 @@ function create_blueprint(s, player) {
   PP.physics.add(s, blueprint_collezionabile3, PP.physics.type.STATIC);
 
   // Imposto la collisione (Overlap) tra player e blueprint
-  PP.physics.add_overlap_f(s, player, (blueprint_collezionabile), collision_blueprint);
-  PP.physics.add_overlap_f(s, player, (blueprint_collezionabile1), collision_blueprint);
-  PP.physics.add_overlap_f(s, player, (blueprint_collezionabile2), collision_blueprint);
-  PP.physics.add_overlap_f(s, player, (blueprint_collezionabile3), collision_blueprint);
+  PP.physics.add_overlap_f(s, player, blueprint_collezionabile, collision_blueprint);
+  PP.physics.add_overlap_f(s, player, blueprint_collezionabile1, collision_blueprint);
+  PP.physics.add_overlap_f(s, player, blueprint_collezionabile2, collision_blueprint);
+  PP.physics.add_overlap_f(s, player, blueprint_collezionabile3, collision_blueprint);
 }
 
 function update_blueprint(s) {

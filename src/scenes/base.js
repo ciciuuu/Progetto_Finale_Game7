@@ -32,6 +32,7 @@ let proiettile; // Gruppo fisico per i proiettili
 let last_fired = 0; // Per gestire il tempo tra uno sparo e l'altro
 let può_sparare = false; // Semaforo per il cooldown
 
+let gruppo_trappole;
 
 function preload(s) {
     //HUD
@@ -41,7 +42,7 @@ function preload(s) {
     asset_ingranaggio_2 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/2_ingranaggio.png");
     asset_ingranaggio_3 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/3_ingranaggio.png");
 
-    
+
     //blueprint
     asset_blueprint = PP.assets.image.load(s, "assets/images/HUD/Blueprint/BP_boh.png");
 
@@ -62,8 +63,7 @@ function preload(s) {
     }
 
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
-    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2.png");
-    parallasse3 = PP.assets.image.load(s, "assets/images/parallax/parallasse_3.png");
+    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
 
     // Caricamento asset standard
@@ -78,31 +78,28 @@ function preload(s) {
 function create(s) {
 
 
-    const PARALLAX_WIDTH = 12800;
-    const PARALLAX_HEIGHT = 23000;
-
+    const PARALLAX_WIDTH = 15800;
+    const PARALLAX_HEIGHT = 3000;
 
 
     // TS 1: Immagine più vicina
-    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 0, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.45);
+    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
 
     // CORREZIONE: Applica la scala al Tilesprite ORA
-    ts_background_1.geometry.scale_x = 0.3;
-    ts_background_1.geometry.scale_y = 0.3;
+    ts_background_1.geometry.scale_x = 0.6;
+    ts_background_1.geometry.scale_y = 0.6;
 
     // TS 2: Immagine media
-    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, -100, 0, 0, 0, 0.22);
+    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 550  , PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
 
     // CORREZIONE: Applica la scala anche al secondo Tilesprite (esempio)
-    ts_background_2.geometry.scale_x = 0.3;
-    ts_background_2.geometry.scale_y = 0.3;
+    ts_background_2.geometry.scale_x = 0.6;
+    ts_background_2.geometry.scale_y = 0.6;
 
     // TS 3: Immagine più lontana (Non ha bisogno di scala in questo esempio)
-    ts_background_3 = PP.assets.tilesprite.add(s, parallasse3, 0, 0, 1280, 800, 0, 0);
 
     ts_background_1.tile_geometry.scroll_factor_x = 0;
     ts_background_2.tile_geometry.scroll_factor_x = 0;
-    ts_background_3.tile_geometry.scroll_factor_x = 0;
 
 
     //ZOOM IN PHASER
@@ -163,7 +160,19 @@ function create(s) {
         });
     }
 
-}
+
+
+    // --- TRAPPOLE MANUALI ---
+    gruppo_trappole = s.physics.add.staticGroup();
+
+    // ESEMPIO: Aggiungi una trappola (s, X, Y, Larghezza, Altezza)
+    // Usa il tasto P per trovare le coordinate giuste
+    aggiungi_trappola_manuale(s, -4, 6, 64, 50); 
+
+    // Attiva la collisione mortale
+    s.physics.add.overlap(player.ph_obj, gruppo_trappole, function() {
+        morte_player(s, player, null);})
+    }
 
 
 function update(s) {
@@ -176,17 +185,17 @@ function update(s) {
     }
 
 
-   /*  if (ingranaggio_coll = 1){
-        asset_ingranaggio_0 = asset_ingranaggio_1
-    }
-
-    if (ingranaggio_coll = 2){
-        asset_ingranaggio_1 = asset_ingranaggio_2
-    }
-
-    if (ingranaggio_coll = 3){
-        asset_ingranaggio_2 = asset_ingranaggio_3
-    } */
+    /*  if (ingranaggio_coll = 1){
+         asset_ingranaggio_0 = asset_ingranaggio_1
+     }
+ 
+     if (ingranaggio_coll = 2){
+         asset_ingranaggio_1 = asset_ingranaggio_2
+     }
+ 
+     if (ingranaggio_coll = 3){
+         asset_ingranaggio_2 = asset_ingranaggio_3
+     } */
 
 
     // PROIETTILE
@@ -224,43 +233,43 @@ function update(s) {
     } */
 
 
-     /* if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
+    /* if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
 
-        let offset_sparo = 25;
-        let spawn_x = player.geometry.x;
-        let spawn_y = player.geometry.y - altezza_sparo;
+       let offset_sparo = 25;
+       let spawn_x = player.geometry.x;
+       let spawn_y = player.geometry.y - altezza_sparo;
 
-        // 2. Creazione corretta usando il gruppo fisico
-        let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+       // 2. Creazione corretta usando il gruppo fisico
+       let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
 
-        // Impostazioni fisiche
-        colpo.setScale(0.1); // Scala
-        colpo.body.setAllowGravity(false); // Niente gravità
+       // Impostazioni fisiche
+       colpo.setScale(0.1); // Scala
+       colpo.body.setAllowGravity(false); // Niente gravità
 
-        let velocita = 600;
+       let velocita = 600;
 
-        // 3. Direzione
-        if (player.geometry.flip_x == true) {
-            colpo.setVelocityX(-velocita); // Sinistra
-            colpo.setFlipX(true);
-        } else {
-            colpo.setVelocityX(velocita);  // Destra
-            colpo.setFlipX(false);
-        }
+       // 3. Direzione
+       if (player.geometry.flip_x == true) {
+           colpo.setVelocityX(-velocita); // Sinistra
+           colpo.setFlipX(true);
+       } else {
+           colpo.setVelocityX(velocita);  // Destra
+           colpo.setFlipX(false);
+       }
 
-        // 4. Timer Ricarica (Cooldown) - AGGIUNTO 'false' per evitare loop
-        PP.timers.add_timer(s, 500, function () {
-            sparo = false;
-        }, false);
+       // 4. Timer Ricarica (Cooldown) - AGGIUNTO 'false' per evitare loop
+       PP.timers.add_timer(s, 500, function () {
+           sparo = false;
+       }, false);
 
-        // 5. Timer Distruzione - AGGIUNTO 'false' per evitare loop
-        PP.timers.add_timer(s, 2000, function () {
-            if (colpo.active) {
-                colpo.destroy();
-            }
-        }, false);
-    } */
- 
+       // 5. Timer Distruzione - AGGIUNTO 'false' per evitare loop
+       PP.timers.add_timer(s, 2000, function () {
+           if (colpo.active) {
+               colpo.destroy();
+           }
+       }, false);
+   } */
+
 
 
 
@@ -328,8 +337,8 @@ function update(s) {
         })
     } */
 
-     //  SPARO PROIETTILE (Tasto N)
-   
+    //  SPARO PROIETTILE (Tasto N)
+
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
 
 
@@ -371,7 +380,7 @@ function update(s) {
             // Aggiorna il tempo dell'ultimo sparo
             last_fired = time_now + fire_rate;
         }
-    } 
+    }
 
 
     /* //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
@@ -451,23 +460,46 @@ function update(s) {
 
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
-    ts_background_3.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.1;
 
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.15;
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.5;
-    ts_background_3.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.01;
+
+    
+
+
 
     if (player) manage_player_update(s, player);
+
+
+
 
     update_enemy(s);
     update_blueprint(s);
 
 }
 
+
+
+
 function destroy(s) {
 
     destroy_enemy(s);
 
 }
+
+// Crea il rettangolo invisibile mortale
+function aggiungi_trappola_manuale(s, x, y, w, h) {
+    let zona = s.add.zone(x, y, w, h);
+    zona.setOrigin(0, 0);
+    s.physics.add.existing(zona, true); // true = Statico
+    gruppo_trappole.add(zona);
+}
+
+// Funzione che scatta quando muori
+function morte_player(s, player, trappola) {
+    console.log("SEI MORTO!");
+    // Qui puoi aggiungere il codice per il respawn
+}
+
 
 PP.scenes.add("base", preload, create, update, destroy);
