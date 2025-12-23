@@ -27,7 +27,7 @@ let pistola;
 let asset_proiettile;
 let proiettile; // Gruppo fisico per i proiettili
 let last_fired = 0; // Per gestire il tempo tra uno sparo e l'altro
-let sparo = false; // Semaforo per il cooldown
+let può_sparare = false; // Semaforo per il cooldown
 
 
 function preload(s) {
@@ -48,6 +48,7 @@ function preload(s) {
     proiettile = asset_proiettile = PP.assets.image.load(s, "assets/images/PLAYER/Proiettile.png");
 
 
+
     // CARICAMENTO TILESET DI GODOT
     if (window.godot_preload) {
         window.godot_preload(s);
@@ -64,6 +65,7 @@ function preload(s) {
 
     preload_enemy(s)
     preload_player(s);
+    preload_blueprint(s);
 }
 
 function create(s) {
@@ -141,6 +143,7 @@ function create(s) {
 
 
     create_enemy(s, player, muri_livello);
+    create_blueprint(s, player);
 
 
     // PROIETTILI 
@@ -166,24 +169,57 @@ function update(s) {
     }
 
 
-    // --- PROIETTILE (CODICE CORRETTO) ---
-    
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo == false) {
 
-        // 1. Assegnazione corretta (non ==)
-        sparo = true;
 
-        let altezza_sparo = 25; 
+
+    // PROIETTILE
+
+    /* if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && può_sparare) {
+
+        può_sparare = false;
+
+        let offset_sparo = 25;
+        let velocità = 600;
+        let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
+
+        colpo.setScale(1); // Scala
+        colpo.body.setAllowGravity(false); // Niente gravità
+
+
+        if (player.geometry.flip_x == true) {
+            colpo.setVelocityX(-velocità); // Sinistra
+            colpo.setFlipX(true);
+        } else {
+            colpo.setVelocityX(velocità);  // Destra
+            colpo.setFlipX(false);
+        }
+
+        // Timer
+         PP.timers.add_timer(s, 500, function () {
+            sparo = false;
+        }, false);
+
+        PP.timers.add_timer(s, 2000, function () {
+            if (colpo.active) {
+                colpo.destroy();
+            }
+        }, false); 
+    } */
+
+
+     /* if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
+
+        let offset_sparo = 25;
         let spawn_x = player.geometry.x;
         let spawn_y = player.geometry.y - altezza_sparo;
 
         // 2. Creazione corretta usando il gruppo fisico
         let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-        
+
         // Impostazioni fisiche
         colpo.setScale(0.1); // Scala
         colpo.body.setAllowGravity(false); // Niente gravità
-        
+
         let velocita = 600;
 
         // 3. Direzione
@@ -196,21 +232,21 @@ function update(s) {
         }
 
         // 4. Timer Ricarica (Cooldown) - AGGIUNTO 'false' per evitare loop
-        PP.timers.add_timer(s, 500, function() {
-             sparo = false; 
+        PP.timers.add_timer(s, 500, function () {
+            sparo = false;
         }, false);
 
         // 5. Timer Distruzione - AGGIUNTO 'false' per evitare loop
-        PP.timers.add_timer(s, 2000, function() {
+        PP.timers.add_timer(s, 2000, function () {
             if (colpo.active) {
                 colpo.destroy();
             }
         }, false);
-    }
-    
-    
-    
-    
+    } */
+ 
+
+
+
     /* // --- SPARO PROIETTILE (Tasto N) ---
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
         sparo = false;
@@ -275,7 +311,7 @@ function update(s) {
         })
     } */
 
-    /* //  SPARO PROIETTILE (Tasto N)
+     //  SPARO PROIETTILE (Tasto N)
    
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
 
@@ -318,7 +354,7 @@ function update(s) {
             // Aggiorna il tempo dell'ultimo sparo
             last_fired = time_now + fire_rate;
         }
-    } */
+    } 
 
 
     /* //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
@@ -364,44 +400,36 @@ function update(s) {
          }
      } */
 
-         
-   /*  // DEBUG: Premi 'L' per vedere la distanza in console
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
 
-        // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
-        let OGGETTO_TARGET = ingranaggio; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
-
-
-        // 2. Otteniamo gli oggetti nativi
-        let p_obj = player.ph_obj;
-        let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
-        let cam = s.cameras.main;
-
-        // 3. Calcolo Posizione "Mondo" Intelligente
-        // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
-        // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
-        let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
-        let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
-
-        // 4. Calcolo Distanza
-        let dist_x = Math.abs(p_obj.x - target_world_x);
-        let dist_y = Math.abs(p_obj.y - target_world_y);
-
-        console.clear();
-        console.log("--- DEBUG DISTANZA ---");
-        console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
-        console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
-        console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
-        console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
-    } */
-
-    // DEBUG: Premi 'P' per vedere SOLO le coordinate del Player
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
-        console.clear();
-        console.log("%c--- PLAYER POS ---", "color: #00ff00; font-weight: bold;");
-        console.log("X: " + player.ph_obj.x.toFixed(0));
-        console.log("Y: " + player.ph_obj.y.toFixed(0));
-    }
+    /*  // DEBUG: Premi 'L' per vedere la distanza in console
+     if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
+ 
+         // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
+         let OGGETTO_TARGET = ingranaggio; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
+ 
+ 
+         // 2. Otteniamo gli oggetti nativi
+         let p_obj = player.ph_obj;
+         let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
+         let cam = s.cameras.main;
+ 
+         // 3. Calcolo Posizione "Mondo" Intelligente
+         // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
+         // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
+         let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
+         let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
+ 
+         // 4. Calcolo Distanza
+         let dist_x = Math.abs(p_obj.x - target_world_x);
+         let dist_y = Math.abs(p_obj.y - target_world_y);
+ 
+         console.clear();
+         console.log("--- DEBUG DISTANZA ---");
+         console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
+         console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
+         console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
+         console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
+     } */
 
 
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
@@ -415,7 +443,7 @@ function update(s) {
     if (player) manage_player_update(s, player);
 
     update_enemy(s);
-
+    update_blueprint(s);
 
 }
 
