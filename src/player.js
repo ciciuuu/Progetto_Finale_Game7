@@ -27,8 +27,9 @@ function configure_player_animations(s, player) {
     player.ph_obj.body.setOffset(14, 8);
 
     // --- VARIABILI DI STATO (MEMORIA) ---
-    player.sparo_attivo = false;
-    // player.c_rilasciato non serve più con la logica "tieni premuto"
+    player.sparo_attivo = false;    
+    
+    player.coyote_counter = 0;
 }
 
 function manage_player_update(s, player) {
@@ -88,7 +89,34 @@ function manage_player_update(s, player) {
     // Controlla se il corpo del player è bloccato verso il basso
     let is_on_solid_ground = player.ph_obj.body.blocked.down;
 
+
+    // --- GESTIONE COYOTE TIME ---
     if (is_on_solid_ground) {
+        // Se siamo a terra, ricarichiamo il "tempo di grazia"
+        // 10 frame = circa 0.16 secondi (a 60 FPS). Modifica questo numero se vuoi più/meno tempo.
+        player.coyote_counter = 10; 
+        
+        mid_jump = true; // Resetta il doppio salto
+    } else {
+        // Se siamo in aria, consumiamo il tempo di grazia
+        if (player.coyote_counter > 0) {
+            player.coyote_counter = player.coyote_counter - 1;
+        }
+    }
+
+
+    if (player.coyote_counter > 0) {
+        
+        if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
+            space_pressed = true;
+            PP.physics.set_velocity_y(player, -jump_init_speed);
+            
+            // IMPORTANTE: Azzero subito il contatore per non poter risaltare a mezz'aria
+            player.coyote_counter = 0; 
+        }
+    }
+
+   /*  if (is_on_solid_ground) {
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
@@ -97,7 +125,7 @@ function manage_player_update(s, player) {
             space_pressed = false;
         }
         mid_jump = true;
-    }
+    } */
 
     // Logica Animazioni Salto (Sovrascrive run/sparo se in aria)
     if (!is_on_solid_ground) {
