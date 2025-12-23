@@ -16,6 +16,9 @@ let ts_background_3;
 
 //HUD
 let asset_ingranaggio_0;
+let asset_ingranaggio_1;
+let asset_ingranaggio_2;
+let asset_ingranaggio_3;
 let ingranaggio;
 
 let asset_blueprint;
@@ -34,7 +37,11 @@ function preload(s) {
     //HUD
     //ingranaggio
     asset_ingranaggio_0 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/0_ingranaggio.png");
+    asset_ingranaggio_1 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/1_ingranaggio.png");
+    asset_ingranaggio_2 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/2_ingranaggio.png");
+    asset_ingranaggio_3 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/3_ingranaggio.png");
 
+    
     //blueprint
     asset_blueprint = PP.assets.image.load(s, "assets/images/HUD/Blueprint/BP_boh.png");
 
@@ -169,7 +176,17 @@ function update(s) {
     }
 
 
+   /*  if (ingranaggio_coll = 1){
+        asset_ingranaggio_0 = asset_ingranaggio_1
+    }
 
+    if (ingranaggio_coll = 2){
+        asset_ingranaggio_1 = asset_ingranaggio_2
+    }
+
+    if (ingranaggio_coll = 3){
+        asset_ingranaggio_2 = asset_ingranaggio_3
+    } */
 
 
     // PROIETTILE
