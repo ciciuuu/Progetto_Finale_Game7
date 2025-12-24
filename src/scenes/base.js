@@ -7,12 +7,9 @@ let parallasse1;
 let parallasse2;
 let parallasse3;
 
-
 let ts_background_1;
 let ts_background_2;
 let ts_background_3;
-
-
 
 //HUD
 let asset_ingranaggio_0;
@@ -109,9 +106,13 @@ function create(s) {
     // 2. COSTRUIONE MAPPA
     // Eseguiamo la creazione e salviamo il gruppo di muri restituito
     if (window.godot_create) {
-        muri_livello = window.godot_create(s);
+        // LIV1 viene dal file livello_dati.js
+        if(typeof LIV1 !== 'undefined') {
+            muri_livello = window.godot_create(s, LIV1);
+        } else {
+            console.error("LIV1 non trovato. Hai caricato livello_dati.js?");
+        }
     }
-
     // 3. RECUPERO SPAWN POINT E CREAZIONE PLAYER
     let startX = PP.game_state.get_variable("spawn_x") || 150;
     let startY = PP.game_state.get_variable("spawn_y") || 620;
@@ -196,159 +197,6 @@ function update(s) {
 
     }
 
-
-    /*  if (ingranaggio_coll = 1){
-         asset_ingranaggio_0 = asset_ingranaggio_1
-     }
- 
-     if (ingranaggio_coll = 2){
-         asset_ingranaggio_1 = asset_ingranaggio_2
-     }
- 
-     if (ingranaggio_coll = 3){
-         asset_ingranaggio_2 = asset_ingranaggio_3
-     } */
-
-
-    // PROIETTILE
-
-    /* if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && può_sparare) {
-
-        può_sparare = false;
-
-        let offset_sparo = 25;
-        let velocità = 600;
-        let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-
-        colpo.setScale(1); // Scala
-        colpo.body.setAllowGravity(false); // Niente gravità
-
-
-        if (player.geometry.flip_x == true) {
-            colpo.setVelocityX(-velocità); // Sinistra
-            colpo.setFlipX(true);
-        } else {
-            colpo.setVelocityX(velocità);  // Destra
-            colpo.setFlipX(false);
-        }
-
-        // Timer
-         PP.timers.add_timer(s, 500, function () {
-            sparo = false;
-        }, false);
-
-        PP.timers.add_timer(s, 2000, function () {
-            if (colpo.active) {
-                colpo.destroy();
-            }
-        }, false); 
-    } */
-
-
-    /* if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
-
-       let offset_sparo = 25;
-       let spawn_x = player.geometry.x;
-       let spawn_y = player.geometry.y - altezza_sparo;
-
-       // 2. Creazione corretta usando il gruppo fisico
-       let colpo = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-
-       // Impostazioni fisiche
-       colpo.setScale(0.1); // Scala
-       colpo.body.setAllowGravity(false); // Niente gravità
-
-       let velocita = 600;
-
-       // 3. Direzione
-       if (player.geometry.flip_x == true) {
-           colpo.setVelocityX(-velocita); // Sinistra
-           colpo.setFlipX(true);
-       } else {
-           colpo.setVelocityX(velocita);  // Destra
-           colpo.setFlipX(false);
-       }
-
-       // 4. Timer Ricarica (Cooldown) - AGGIUNTO 'false' per evitare loop
-       PP.timers.add_timer(s, 500, function () {
-           sparo = false;
-       }, false);
-
-       // 5. Timer Distruzione - AGGIUNTO 'false' per evitare loop
-       PP.timers.add_timer(s, 2000, function () {
-           if (colpo.active) {
-               colpo.destroy();
-           }
-       }, false);
-   } */
-
-
-
-
-    /* // --- SPARO PROIETTILE (Tasto N) ---
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N) && sparo) {
-        sparo = false;
-
-        let altezza_sparo_dal_terreno = 25;
-        let spawn_x = player.ph_obj.x;
-        let spawn_y = player.ph_obj.y - altezza_sparo_dal_terreno;
-
-        let crea_proiettile = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-
-        let velocita_proiettile = 600;
-        crea_proiettile.body.setAllowGravity(false);
-
-        if (player.geometry.flip_x) {
-            crea_proiettile.setVelocityX(-velocita_proiettile);
-            crea_proiettile.setFlipX(true);
-        } else {
-            crea_proiettile.setVelocityX(velocita_proiettile);
-            crea_proiettile.setFlipX(false);
-        }
-
-        // TIMER
-        PP.timers.add_timer(s, 200, function () {
-            if (crea_proiettile) {
-                crea_proiettile.destroy();
-            }
-        }, false);
-
-        // --- CORREZIONE TIMER 2 (Ricarica) ---
-        // Aggiunto 'false' alla fine (parametro loop)
-        PP.timers.add_timer(s, 500, function () {
-            sparo = true;
-        }, false);
-    } */
-
-
-    /* // PROIETTILE
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
-
-        let sparo = true;
-        let altezza_sparo_dal_terreno = 25
-        let spawn_x = player.ph_obj.x;
-        let spawn_y = player.ph_obj.y - altezza_sparo_dal_terreno;
-
-        let crea_proiettile = proiettile.create(spawn_x, spawn_y, proiettile);
-
-        let velocita_proiettile = 100;
-        // crea_proiettile.setScale(1);
-        crea_proiettile.body.setAllowGravity(false);
-
-        if (player.geometry.flip_x) {
-            crea_proiettile.setVelocityX(-velocita_proiettile); // Spara a Sinistra
-
-        } else {
-            crea_proiettile.setVelocityX(velocita_proiettile);  // Spara a Destra
-        }
-
-        PP.timers.add_timer(s, 2000, function() {
-            if(sparo.active) {
-                crea_proiettile.destroy();
-            }
-        })
-    } */
-
     //  SPARO PROIETTILE (Tasto N)
 
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
@@ -394,82 +242,6 @@ function update(s) {
         }
     }
 
-
-    /* //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
-     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
- 
-         let time_now = Date.now();
-         let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
- 
-         // Offset in pixel sopra il centro del player
-         const Y_OFFSET_SPARO = 25;
- 
-         // Se è passato abbastanza tempo dall'ultimo sparo
-         if (time_now > last_fired) {
- 
-             // 1. Calcola posizione di partenza (con offset Y corretto)
-             let spawn_x = player.ph_obj.x;
-             let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
- 
-             // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
-             let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
- 
-             // 3. Imposta la scala 
-             b.setScale(0.1);
-             b.body.setAllowGravity(false);
- 
-             // 4. Gestione Direzione (Destra/Sinistra)
-             let velocita_proiettile = 600;
-             if (player.geometry.flip_x) {
-                 b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
-                 b.setFlipX(true);
-             } else {
-                 b.setVelocityX(velocita_proiettile);  // Spara a Destra
-                 b.setFlipX(false);
-             }
- 
-             // 5. Autodistruzione dopo 2 secondi
-             s.time.delayedCall(2000, () => {
-                 if (b.active) b.destroy();
-             });
- 
-             // Aggiorna il tempo dell'ultimo sparo
-             last_fired = time_now + fire_rate;
-         }
-     } */
-
-
-    /*  // DEBUG: Premi 'L' per vedere la distanza in console
-     if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
- 
-         // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
-         let OGGETTO_TARGET = ingranaggio; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
- 
- 
-         // 2. Otteniamo gli oggetti nativi
-         let p_obj = player.ph_obj;
-         let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
-         let cam = s.cameras.main;
- 
-         // 3. Calcolo Posizione "Mondo" Intelligente
-         // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
-         // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
-         let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
-         let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
- 
-         // 4. Calcolo Distanza
-         let dist_x = Math.abs(p_obj.x - target_world_x);
-         let dist_y = Math.abs(p_obj.y - target_world_y);
- 
-         console.clear();
-         console.log("--- DEBUG DISTANZA ---");
-         console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
-         console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
-         console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
-         console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
-     } */
-
-
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4;
 
@@ -477,21 +249,22 @@ function update(s) {
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
 
-
+    // LOGICA CAMBIO LIVELLO
+    // Se supero la X 3000 (o quella che vuoi tu), passo a base_2
+    if (player.ph_obj.x > 3000) { 
+        console.log("Fine Livello 1! Caricamento Livello 2...");
+        
+        // Passaggio alla scena successiva (base_2.js)
+        PP.scenes.start("base_2"); 
+    }
 
 
     if (player) manage_player_update(s, player);
-
-
-
 
     update_enemy(s);
     update_blueprint(s);
 
 }
-
-
-
 
 function destroy(s) {
 
@@ -523,8 +296,9 @@ function morte_player(s, player, trappola) {
     // Sintassi: PP.timers.add_timer(scena, millisecondi, funzione_da_fare_dopo, loop?)
     PP.timers.add_timer(s, 1000, function(s) {
         
-        // Tutto ciò che scriviamo qui dentro accadrà tra 2 secondi
-        PP.scenes.start("game_over");
+        // Tutto ciò che scriviamo qui dentro accadrà tra 1 secondo
+        // Riavvia il livello corrente (per ora) o vai al Game Over
+        PP.scenes.start("base"); 
 
     }, false);
 }
