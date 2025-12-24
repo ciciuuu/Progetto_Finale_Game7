@@ -175,7 +175,7 @@ function create(s) {
     aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
     aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
     aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
-    aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 70, 160);
+    aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 32*2 , 160);
     aggiungi_trappola_manuale(s, 4102 - 5, 0 + 16, 32 * 12, 32 * 5);
     aggiungi_trappola_manuale(s, 4806 - 5, 0 + 16, 32 * 32, 32 * 8);
     aggiungi_trappola_manuale(s, 6374 - 5, -352 + 16, 32 * 6, 32 * 15);
@@ -298,7 +298,7 @@ function morte_player(s, player, trappola) {
         
         // Tutto ciò che scriviamo qui dentro accadrà tra 1 secondo
         // Riavvia il livello corrente (per ora) o vai al Game Over
-        PP.scenes.start("base"); 
+        PP.scenes.start("game_over"); 
 
     }, false);
 }

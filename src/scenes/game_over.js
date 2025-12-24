@@ -19,6 +19,18 @@ function create_game_over(s) {
         0.5,
         0.5);
 
+        PP.shapes.text_styled_add(s,
+            PP.game.config.canvas_width / 2,
+            PP.game.config.canvas_height / 1.4,
+            "Premi spazio per continuare",
+            75,
+            "Helvetica",
+            "normal",
+            "0xFFFFFF",
+            null,
+            0.5,
+            0.5);
+
 }
 
 function update_game_over(s) {
