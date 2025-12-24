@@ -251,7 +251,7 @@ function update(s) {
 
     // LOGICA CAMBIO LIVELLO
     // Se supero la X 3000 (o quella che vuoi tu), passo a base_2
-    if (player.ph_obj.x > 3000) { 
+    if (player.ph_obj.x > 6800 ) { 
         console.log("Fine Livello 1! Caricamento Livello 2...");
         
         // Passaggio alla scena successiva (base_2.js)
