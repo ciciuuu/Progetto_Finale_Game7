@@ -83,14 +83,14 @@ function create(s) {
 
 
     // TS 1: Immagine più vicina
-    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
+    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
 
     // CORREZIONE: Applica la scala al Tilesprite ORA
     ts_background_1.geometry.scale_x = 0.6;
     ts_background_1.geometry.scale_y = 0.6;
 
     // TS 2: Immagine media
-    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 550  , PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
+    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
 
     // CORREZIONE: Applica la scala anche al secondo Tilesprite (esempio)
     ts_background_2.geometry.scale_x = 0.6;
@@ -167,12 +167,24 @@ function create(s) {
 
     // ESEMPIO: Aggiungi una trappola (s, X, Y, Larghezza, Altezza)
     // Usa il tasto P per trovare le coordinate giuste
-    aggiungi_trappola_manuale(s, -4, 6, 64, 50); 
+
+    // Scrivo -5 perché uso il player per vedere le coordinate e lei ha un pivot centrale (quindi spostato di 5 pixel)
+    // dove invece moltiplico *32 è perché faccio la dimensione dei blocchi (32px) * il numero di blocchi
+    // Dove invece faccio +16 è per non far morire il giocatore immediatamente appena tocca la "lava" ma solo se ci entra almeno con metà corpo
+    aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
+    aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
+    aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
+    aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 70, 160);
+    aggiungi_trappola_manuale(s, 4102 - 5, 0 + 16, 32 * 12, 32 * 5);
+    aggiungi_trappola_manuale(s, 4806 - 5, 0 + 16, 32 * 32, 32 * 8);
+    aggiungi_trappola_manuale(s, 6374 - 5, -352 + 16, 32 * 6, 32 * 15);
+
 
     // Attiva la collisione mortale
-    s.physics.add.overlap(player.ph_obj, gruppo_trappole, function() {
-        morte_player(s, player, null);})
-    }
+    s.physics.add.overlap(player.ph_obj, gruppo_trappole, function () {
+        morte_player(s, player, null);
+    })
+}
 
 
 function update(s) {
@@ -458,13 +470,13 @@ function update(s) {
      } */
 
 
-    ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
-    ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
+    ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
+    ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4;
 
-    ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.15;
-    ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.5;
+    ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
+    ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
-    
+
 
 
 
@@ -498,7 +510,23 @@ function aggiungi_trappola_manuale(s, x, y, w, h) {
 // Funzione che scatta quando muori
 function morte_player(s, player, trappola) {
     console.log("SEI MORTO!");
-    // Qui puoi aggiungere il codice per il respawn
+
+    // 1. (Opzionale) Fermiamo o nascondiamo il player subito,
+    // altrimenti nei 2 secondi di attesa il giocatore può ancora muoversi!
+    if(player && player.ph_obj.active) {
+        player.ph_obj.setVisible(false); // Nasconde il personaggio
+        // PP.physics.set_immovable(player, true) // il comando Immobile non funziona
+        player.ph_obj.body.enable = false; // Disattiva la fisica (non cade, non collide)
+    }
+
+    // 2. Impostiamo il timer
+    // Sintassi: PP.timers.add_timer(scena, millisecondi, funzione_da_fare_dopo, loop?)
+    PP.timers.add_timer(s, 1000, function(s) {
+        
+        // Tutto ciò che scriviamo qui dentro accadrà tra 2 secondi
+        PP.scenes.start("game_over");
+
+    }, false);
 }
 
 

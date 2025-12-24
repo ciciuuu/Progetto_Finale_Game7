@@ -1,4 +1,6 @@
 let player_speed = 300;
+let player_speed2 = 600;
+
 let jump_init_speed = 500;
 
 let space_pressed = false;
@@ -58,11 +60,34 @@ function manage_player_update(s, player) {
             next_anim = "run";
         }
 
-    }
-    
-    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
+    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
         // --- SINISTRA ---
         PP.physics.set_velocity_x(player, - player_speed);
+        player.geometry.flip_x = true;
+        player.ph_obj.body.setOffset(20, 8); // Offset per specchiamento
+
+        // Decidiamo l'animazione in base alla modalità
+        if (player.sparo_attivo) {
+            next_anim = "sparo";
+        } else {
+            next_anim = "run";
+        }
+    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
+        // --- DESTRA ---
+        PP.physics.set_velocity_x(player, + player_speed2);
+        player.geometry.flip_x = false;
+        player.ph_obj.body.setOffset(14, 8);
+
+        // Decidiamo l'animazione in base alla modalità
+        if (player.sparo_attivo) {
+            next_anim = "sparo";
+        } else {
+            next_anim = "run";
+        }
+
+    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.Z)) {
+        // --- SINISTRA ---
+        PP.physics.set_velocity_x(player, - player_speed2);
         player.geometry.flip_x = true;
         player.ph_obj.body.setOffset(20, 8); // Offset per specchiamento
 
@@ -83,6 +108,9 @@ function manage_player_update(s, player) {
             next_anim = "idle";
         }
     }
+
+
+    
 
     // 3. LOGICA DI SALTO
 
