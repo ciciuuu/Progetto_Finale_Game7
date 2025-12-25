@@ -11,6 +11,7 @@ function preload(s) {
     if (window.godot_preload) window.godot_preload(s);
     preload_player(s);
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png"); 
+    preload_hud(s)
 }
 
 function create(s) {
@@ -43,6 +44,7 @@ function create(s) {
 
     configure_player_animations(s, player);
     PP.camera.start_follow(s, player, 0, 50);
+    create_hud(s)
 }
 
 function update(s) {
@@ -55,6 +57,7 @@ function update(s) {
         // Qui potresti mandare a una scena "credits" o "menu"
         // PP.scenes.start("menu"); 
     }
+    update_hud(s)
 }
 
 function destroy(s) {}

@@ -11,18 +11,7 @@ let ts_background_1;
 let ts_background_2;
 let ts_background_3;
 
-//HUD
-let asset_ingranaggio_0;
-let asset_ingranaggio_1;
-let asset_ingranaggio_2;
-let asset_ingranaggio_3;
-let ingranaggio;
-
-let asset_blueprint;
-let blueprint;
-
-let asset_pistola;
-let pistola;
+// Nota: Le variabili dell'HUD sono ora gestite in HUD.js
 
 let asset_proiettile;
 let proiettile; // Gruppo fisico per i proiettili
@@ -32,27 +21,13 @@ let può_sparare = false; // Semaforo per il cooldown
 let gruppo_trappole;
 
 function preload(s) {
-    //HUD
-    //ingranaggio
-    asset_ingranaggio_0 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/0_ingranaggio.png");
-    asset_ingranaggio_1 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/1_ingranaggio.png");
-    asset_ingranaggio_2 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/2_ingranaggio.png");
-    asset_ingranaggio_3 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/3_ingranaggio.png");
-
-
-    //blueprint
-    asset_blueprint = PP.assets.image.load(s, "assets/images/HUD/Blueprint/BP_boh.png");
-
-    //pistola
-    asset_pistola = PP.assets.image.load(s, "assets/images/HUD/Pistola/Pistola_buona.png");
-
+    
+    // RICHIESTA HUD ESTERNA
+    preload_hud(s);
 
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
 
-
     proiettile = asset_proiettile = PP.assets.image.load(s, "assets/images/PLAYER/Proiettile.png");
-
-
 
     // CARICAMENTO TILESET DI GODOT
     if (window.godot_preload) {
@@ -65,7 +40,6 @@ function preload(s) {
 
     // Caricamento asset standard
     // Aggiungi i layer dal più “profondo”
-
 
     preload_enemy(s)
     preload_player(s);
@@ -132,20 +106,8 @@ function create(s) {
     // 5. CAMERA
     PP.camera.start_follow(s, player, 0, 50);
 
-
-
-    // 6. HUD
-    //ingranaggio
-    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 210, 0, 0, 0, 0);
-    ingranaggio.ph_obj.setScrollFactor(0);
-    //Blueprint
-    blueprint = PP.assets.image.add(s, asset_blueprint, 885, 255, 0, 0, 0, 0);
-    blueprint.ph_obj.setScrollFactor(0);
-    //Pistola
-    pistola = PP.assets.image.add(s, asset_pistola, 332, 210, 0, 0, 0, 0);
-    pistola.ph_obj.setScrollFactor(0);
-
-
+    // 6. HUD (CREAZIONE DA FILE ESTERNO)
+    create_hud(s);
 
     create_enemy(s, player, muri_livello);
     create_blueprint(s, player);
@@ -175,7 +137,7 @@ function create(s) {
     aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
     aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
     aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
-    aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 32*2 , 160);
+    aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 70, 160);
     aggiungi_trappola_manuale(s, 4102 - 5, 0 + 16, 32 * 12, 32 * 5);
     aggiungi_trappola_manuale(s, 4806 - 5, 0 + 16, 32 * 32, 32 * 8);
     aggiungi_trappola_manuale(s, 6374 - 5, -352 + 16, 32 * 6, 32 * 15);
@@ -263,6 +225,7 @@ function update(s) {
 
     update_enemy(s);
     update_blueprint(s);
+    update_hud(s); // Opzionale: aggiorna HUD se c'è logica dinamica
 
 }
 

@@ -15,6 +15,7 @@ function preload(s) {
     window.godot_preload(s);
   }
   preload_player(s);
+  preload_hud(s)
 
   // Eventuale sfondo diverso per livello 2
   parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
@@ -58,6 +59,7 @@ function create(s) {
 
   configure_player_animations(s, player);
   PP.camera.start_follow(s, player, 0, 50);
+  create_hud(s)
 }
 
 function update(s) {
@@ -73,6 +75,7 @@ function update(s) {
     console.log("Fine Livello 2! Caricamento Livello 3...");
     PP.scenes.start("base_3");
   }
+  update_hud(s)
 }
 
 function destroy(s) {
