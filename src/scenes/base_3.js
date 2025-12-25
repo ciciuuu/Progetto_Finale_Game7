@@ -1,16 +1,19 @@
 let img_player;
 let player;
-let muri_livello; 
+let muri_livello;
 
 // Variabili Sfondo
 let parallasse1;
 let ts_background_1;
 
 function preload(s) {
+    s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
+    s.load.image("proiettile_inquinante_asset", "assets/images/PLAYER/Proiettile_inquinante.png");
+
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
     if (window.godot_preload) window.godot_preload(s);
     preload_player(s);
-    parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png"); 
+    parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
     preload_hud(s)
 }
 
@@ -52,7 +55,7 @@ function update(s) {
     if (player) manage_player_update(s, player);
 
     // FINE GIOCO
-    if (player.ph_obj.x > 3000) { 
+    if (player.ph_obj.x > 3000) {
         console.log("HAI VINTO IL GIOCO!");
         // Qui potresti mandare a una scena "credits" o "menu"
         // PP.scenes.start("menu"); 
@@ -60,6 +63,6 @@ function update(s) {
     update_hud(s)
 }
 
-function destroy(s) {}
+function destroy(s) { }
 
 PP.scenes.add("base_3", preload, create, update, destroy);

@@ -1,5 +1,9 @@
 let img_enemy;
 let img_enemy2;
+
+// GRUPPO GLOBALE PER I RAGNI (Così i proiettili li vedono)
+let gruppo_ragni;
+
 let enemy;
 let enemy2;
 
@@ -27,24 +31,39 @@ function set_vulnerable() {
 } */
 
 
-function create_enemy(s, enemy, muri) {
+function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le globali
 
-    if (muri) {
-        s.physics.add.collider(enemy.ph_obj, muri);
-    }
+    // 1. Creiamo il GRUPPO FISICO
+    gruppo_ragni = s.physics.add.group();
 
+    // 2. Creiamo il PRIMO NEMICO (coordinate tue: -200, -400)
     enemy = PP.assets.sprite.add(s, img_enemy, -200, -400, 0.5, 1);
-   
-        PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
-
-        if (muri) {
-            s.physics.add.collider(enemy.ph_obj, muri);
-        }
-        enemy.geometry.scale_x = 1.3;
-        enemy.geometry.scale_y = 1.3;
-   
-    /*  
     PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
+    
+    enemy.geometry.scale_x = 1.3;
+    enemy.geometry.scale_y = 1.3;
+
+    // Lo aggiungiamo al gruppo
+    gruppo_ragni.add(enemy.ph_obj);
+
+
+    // 3. Creiamo il SECONDO NEMICO (coordinate tue: 5, 0)
+    enemy2 = PP.assets.sprite.add(s, img_enemy, 5, 0, 0.5, 1);
+    PP.physics.add(s, enemy2, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+    
+    enemy2.geometry.scale_x = 1.3;
+    enemy2.geometry.scale_y = 1.3;
+
+    // Lo aggiungiamo al gruppo
+    gruppo_ragni.add(enemy2.ph_obj);
+
+
+    // 4. Collisione tra TUTTI i ragni e i muri
+    if (muri) {
+        s.physics.add.collider(gruppo_ragni, muri);
+    }
+   
+    /* PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
     
     // Velocità iniziale del nemico (verso dx)
     PP.physics.set_velocity_x(enemy, 100);
@@ -60,19 +79,7 @@ function create_enemy(s, enemy, muri) {
     enemy.geometry.scale_x = 2;
     enemy.geometry.scale_y = 2;
  */
-
-
-
-
-    enemy2 = PP.assets.sprite.add(s, img_enemy, 5, 0, 0.5, 1);
-
-
-
 }
-
-
-
-
 
 
 /* function create_enemy(s, player) {
@@ -106,9 +113,6 @@ function create_enemy(s, enemy, muri) {
 
 
 function update_enemy(s) {
-
-
-
 
     /* function create_enemy(s, player) {
     enemy = PP.assets.sprite.add(s, img_enemy, 800, 500, 0.5, 1);
@@ -180,5 +184,3 @@ function update_enemy(s) {
         console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
     } */
 }
-
-

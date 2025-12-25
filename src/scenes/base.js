@@ -14,36 +14,41 @@ let ts_background_3;
 // Nota: Le variabili dell'HUD sono ora gestite in HUD.js
 
 let asset_proiettile;
-let proiettile; // Gruppo fisico per i proiettili
-let last_fired = 0; // Per gestire il tempo tra uno sparo e l'altro
-let può_sparare = false; // Semaforo per il cooldown
+// Nota: La logica di sparo (tasto N) e il gruppo proiettili sono ora gestiti in player.js
 
 let gruppo_trappole;
 
 function preload(s) {
     
-    // RICHIESTA HUD ESTERNA
+    // 1. RICHIESTA HUD ESTERNA
     preload_hud(s);
 
+    // Caricamento Player
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
 
-    proiettile = asset_proiettile = PP.assets.image.load(s, "assets/images/PLAYER/Proiettile.png");
+    // Carichiamo l'asset del proiettile con un nome chiave che userà player.js
+    s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
+    s.load.image("proiettile_inquinante_asset", "assets/images/PLAYER/Proiettile_inquinante.png");
+    
 
     // CARICAMENTO TILESET DI GODOT
     if (window.godot_preload) {
         window.godot_preload(s);
     }
 
-    parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
-    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
+        parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
+        parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
 
-    // Caricamento asset standard
-    // Aggiungi i layer dal più “profondo”
+        // Caricamento asset standard
+        // Aggiungi i layer dal più “profondo”
+        // (Nota: hai già caricato proiettile sopra, questa riga è ridondante ma la lascio per rispetto dei commenti)
+        s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
 
-    preload_enemy(s)
-    preload_player(s);
-    preload_blueprint(s);
+
+        preload_enemy(s);
+        preload_player(s);
+        preload_blueprint(s);
 }
 
 function create(s) {
@@ -87,14 +92,19 @@ function create(s) {
             console.error("LIV1 non trovato. Hai caricato livello_dati.js?");
         }
     }
+
     // 3. RECUPERO SPAWN POINT E CREAZIONE PLAYER
     let startX = PP.game_state.get_variable("spawn_x") || 150;
     let startY = PP.game_state.get_variable("spawn_y") || 620;
 
     player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
     PP.physics.add(s, player, PP.physics.type.DYNAMIC);
+    
+    // Inizializza stato morte
+    player.is_dead = false;
 
     s.physics.world.TILE_BIAS = 32;
+
     // 4. COLLISIONI: Player contro i Muri di Godot
     if (muri_livello) {
         // [PHASER NATIVO] Colleghiamo il player nativo (.ph_obj) al gruppo di muri
@@ -109,20 +119,10 @@ function create(s) {
     // 6. HUD (CREAZIONE DA FILE ESTERNO)
     create_hud(s);
 
-    create_enemy(s, player, muri_livello);
+    // --- MODIFICA IMPORTANTE: Passiamo i muri ai nemici ---
+    create_enemy(s, muri_livello);
+    
     create_blueprint(s, player);
-
-
-    // PROIETTILI 
-    proiettile = s.physics.add.group(); // 'proiettile' è il GRUPPO FISICO
-
-    // Collisione Proiettili contro Muri (si distruggono se toccano il muro)
-    if (muri_livello) {
-        s.physics.add.collider(proiettile, muri_livello, function (b, m) {
-            b.destroy(); // Distruggi il proiettile
-        });
-    }
-
 
 
     // --- TRAPPOLE MANUALI ---
@@ -159,51 +159,7 @@ function update(s) {
 
     }
 
-    //  SPARO PROIETTILE (Tasto N)
-
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
-
-
-        let time_now = Date.now();
-        let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
-
-        // Offset in pixel sopra il centro del player
-        const Y_OFFSET_SPARO = 25;
-
-        // Se è passato abbastanza tempo dall'ultimo sparo
-        if (time_now > last_fired) {
-
-            // 1. Calcola posizione di partenza (con offset Y corretto)
-            let spawn_x = player.ph_obj.x;
-            let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
-
-            // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
-            let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-
-            // 3. Imposta la scala 
-            b.setScale(0.1);
-            b.body.setAllowGravity(false);
-
-            // 4. Gestione Direzione (Destra/Sinistra)
-            let velocita_proiettile = 600;
-            if (player.geometry.flip_x) {
-                b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
-                b.setFlipX(true);
-            } else {
-                b.setVelocityX(velocita_proiettile);  // Spara a Destra
-                b.setFlipX(false);
-            }
-
-            // 5. Autodistruzione dopo 2 secondi
-            s.time.delayedCall(2000, () => {
-                if (b.active) b.destroy();
-            });
-
-            // Aggiorna il tempo dell'ultimo sparo
-            last_fired = time_now + fire_rate;
-        }
-    }
-
+    // Gestione Parallasse
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4;
 
@@ -212,7 +168,7 @@ function update(s) {
 
 
     // LOGICA CAMBIO LIVELLO
-    // Se supero la X 3000 (o quella che vuoi tu), passo a base_2
+    // Se supero la X 6800 (Fine livello 1), passo a base_2
     if (player.ph_obj.x > 6800 ) { 
         console.log("Fine Livello 1! Caricamento Livello 2...");
         
@@ -220,8 +176,8 @@ function update(s) {
         PP.scenes.start("base_2"); 
     }
 
-
-    if (player) manage_player_update(s, player);
+    // MODIFICA: Passiamo muri_livello a manage_player_update così il player può passare i muri al proiettile
+    if (player) manage_player_update(s, player, muri_livello);
 
     update_enemy(s);
     update_blueprint(s);
@@ -245,22 +201,26 @@ function aggiungi_trappola_manuale(s, x, y, w, h) {
 
 // Funzione che scatta quando muori
 function morte_player(s, player, trappola) {
+    
+    // Controllo sicurezza: se è già morto, esci
+    if (player.is_dead) return;
+    
+    player.is_dead = true;
     console.log("SEI MORTO!");
 
-    // 1. (Opzionale) Fermiamo o nascondiamo il player subito,
-    // altrimenti nei 2 secondi di attesa il giocatore può ancora muoversi!
+    // 1. Fermiamo o nascondiamo il player subito
     if(player && player.ph_obj.active) {
         player.ph_obj.setVisible(false); // Nasconde il personaggio
-        // PP.physics.set_immovable(player, true) // il comando Immobile non funziona
-        player.ph_obj.body.enable = false; // Disattiva la fisica (non cade, non collide)
+        player.ph_obj.body.enable = false; // Disattiva la fisica
+        player.ph_obj.body.setVelocity(0,0); // Blocca movimento
     }
 
-    // 2. Impostiamo il timer
-    // Sintassi: PP.timers.add_timer(scena, millisecondi, funzione_da_fare_dopo, loop?)
-    PP.timers.add_timer(s, 1000, function(s) {
+    // 2. Impostiamo il timer per il Game Over
+    // Usa function() vuota per mantenere il riferimento corretto alle scene
+    PP.timers.add_timer(s, 1000, function() {
         
         // Tutto ciò che scriviamo qui dentro accadrà tra 1 secondo
-        // Riavvia il livello corrente (per ora) o vai al Game Over
+        // Passa alla scena Game Over
         PP.scenes.start("game_over"); 
 
     }, false);

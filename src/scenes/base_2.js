@@ -10,6 +10,9 @@ function preload(s) {
   // Caricamento Player (se non è già in cache)
   img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
 
+  s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
+  s.load.image("proiettile_inquinante_asset", "assets/images/PLAYER/Proiettile_inquinante.png");
+
   // Caricamento Tileset e pre-caricamenti generali
   if (window.godot_preload) {
     window.godot_preload(s);

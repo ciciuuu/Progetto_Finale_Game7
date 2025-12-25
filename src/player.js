@@ -5,11 +5,11 @@ let jump_init_speed = 500;
 
 let space_pressed = false;
 let mid_jump = true;
-// Variabile obsoleta: floor_height = 620;
 
 let curr_anim = "stop";
 
 function preload_player(s) {
+    //s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
 }
 
 function configure_player_animations(s, player) {
@@ -19,238 +19,211 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "jump_up", 3, 4, 10, 0);
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
+    
+    // Animazione Sparo Normale
     PP.assets.sprite.animation_add_list(player, "sparo", [20, 21, 22, 23, 24, 25, 26, 27, 28], 13, -1);
-    PP.assets.sprite.animation_play(player, "stop");
+    // Animazione Sparo Inquinante (Nota: assicurati che gli indici siano corretti per la tua sprite)
+    PP.assets.sprite.animation_add_list(player, "sparo_inquinante", [20, 21, 22, 23, 24, 25, 26, 27, 28], 15, -1); // Messo a 20fps per farlo sembrare più veloce
 
     // HITBOX 
     PP.physics.set_collision_rectangle(player, 20, 44, -10, 30);
-
-    // Per centrare la hitbox
     player.ph_obj.body.setOffset(14, 8);
 
-    // --- VARIABILI DI STATO (MEMORIA) ---
-    player.sparo_attivo = false;    
-    
+    // --- VARIABILI DI STATO ---
+    player.sparo_attivo = false;
     player.coyote_counter = 0;
+
+    // --- VARIABILI PER LO SPARO ---
+    player.last_fired = 0;      
+    
+    // --- GESTIONE CAMBIO ARMA ---
+    player.modalita_inquinante = false; // False = Normale, True = Veloce/Inquinante
+    player.tasto_L_rilasciato = true;   // Serve per evitare che il cambio avvenga 60 volte al secondo
+    
+    // Impostiamo i valori iniziali
+    player.fire_rate = 500;     // Lento
+    player.anim_sparo_corrente = "sparo"; 
 }
 
-function manage_player_update(s, player) {
+function manage_player_update(s, player, muri_livello) {
     let next_anim = curr_anim;
 
-    // 1. GESTIONE MODALITÀ SPARO (TASTO N - HOLD)
-    // Se N è premuto = TRUE. Se N non è premuto = FALSE.
+    // 1. LOGICA CAMBIO ARMA (Rimane uguale a prima)
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
+        if (player.tasto_L_rilasciato) {
+            player.modalita_inquinante = !player.modalita_inquinante;
+            if (player.modalita_inquinante) {
+                console.log("Arma: INQUINANTE");
+                player.fire_rate = 150; 
+                player.anim_sparo_corrente = "sparo_inquinante";
+            } else {
+                console.log("Arma: NORMALE");
+                player.fire_rate = 500; 
+                player.anim_sparo_corrente = "sparo";
+            }
+            player.tasto_L_rilasciato = false;
+        }
+    } else {
+        player.tasto_L_rilasciato = true;
+    }
+
+    // 2. GESTIONE SPARO
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
         player.sparo_attivo = true;
+        
+        // ORA CHIAMIAMO LA FUNZIONE ESTERNA!
+        // Non serve più 'try_fire_bullet' interna.
+        gestisci_sparo(s, player, muri_livello); 
+
     } else {
         player.sparo_attivo = false;
     }
 
-    // 2. GESTIONE MOVIMENTO (Unificata)
+    // =========================================================
+    // 3. GESTIONE MOVIMENTO (Unificata)
+    // =========================================================
+    
+    // Determiniamo quale animazione di sparo usare se stiamo sparando
+    let anim_se_spara = player.sparo_attivo ? player.anim_sparo_corrente : "run";
+    let anim_se_fermo = player.sparo_attivo ? player.anim_sparo_corrente : "idle";
 
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
         // --- DESTRA ---
         PP.physics.set_velocity_x(player, + player_speed);
         player.geometry.flip_x = false;
         player.ph_obj.body.setOffset(14, 8);
-
-        // Decidiamo l'animazione in base alla modalità
-        if (player.sparo_attivo) {
-            next_anim = "sparo";
-        } else {
-            next_anim = "run";
-        }
-
-    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
+        next_anim = anim_se_spara;
+    } 
+    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
         // --- SINISTRA ---
         PP.physics.set_velocity_x(player, - player_speed);
         player.geometry.flip_x = true;
-        player.ph_obj.body.setOffset(20, 8); // Offset per specchiamento
-
-        // Decidiamo l'animazione in base alla modalità
-        if (player.sparo_attivo) {
-            next_anim = "sparo";
-        } else {
-            next_anim = "run";
-        }
-    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
-        // --- DESTRA ---
+        player.ph_obj.body.setOffset(20, 8);
+        next_anim = anim_se_spara;
+    } 
+    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
+        // --- CORSA VELOCE ---
         PP.physics.set_velocity_x(player, + player_speed2);
         player.geometry.flip_x = false;
         player.ph_obj.body.setOffset(14, 8);
-
-        // Decidiamo l'animazione in base alla modalità
-        if (player.sparo_attivo) {
-            next_anim = "sparo";
-        } else {
-            next_anim = "run";
-        }
-
-    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.Z)) {
-        // --- SINISTRA ---
+        next_anim = anim_se_spara;
+    } 
+    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.Z)) {
+        // --- CORSA VELOCE INDIETRO ---
         PP.physics.set_velocity_x(player, - player_speed2);
         player.geometry.flip_x = true;
-        player.ph_obj.body.setOffset(20, 8); // Offset per specchiamento
-
-        // Decidiamo l'animazione in base alla modalità
-        if (player.sparo_attivo) {
-            next_anim = "sparo";
-        } else {
-            next_anim = "run";
-        }
-
-    } else {
+        player.ph_obj.body.setOffset(20, 8);
+        next_anim = anim_se_spara;
+    } 
+    else {
         // --- FERMO ---
         PP.physics.set_velocity_x(player, 0);
-
-        if (player.sparo_attivo) {
-            next_anim = "sparo";
-        } else {
-            next_anim = "idle";
-        }
+        next_anim = anim_se_fermo;
     }
 
-
-    
-
-    // 3. LOGICA DI SALTO
-
-    // Controlla se il corpo del player è bloccato verso il basso
+    // =========================================================
+    // 4. LOGICA DI SALTO E COYOTE TIME
+    // =========================================================
     let is_on_solid_ground = player.ph_obj.body.blocked.down;
 
-
-    // --- GESTIONE COYOTE TIME ---
     if (is_on_solid_ground) {
-        // Se siamo a terra, ricarichiamo il "tempo di grazia"
-        // 10 frame = circa 0.16 secondi (a 60 FPS). Modifica questo numero se vuoi più/meno tempo.
-        player.coyote_counter = 10; 
-        
-        mid_jump = true; // Resetta il doppio salto
+        player.coyote_counter = 10;
+        mid_jump = true;
     } else {
-        // Se siamo in aria, consumiamo il tempo di grazia
-        if (player.coyote_counter > 0) {
-            player.coyote_counter = player.coyote_counter - 1;
-        }
+        if (player.coyote_counter > 0) player.coyote_counter--;
     }
-
 
     if (player.coyote_counter > 0) {
-        
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
-            
-            // IMPORTANTE: Azzero subito il contatore per non poter risaltare a mezz'aria
-            player.coyote_counter = 0; 
+            player.coyote_counter = 0;
         }
     }
 
-   /*  if (is_on_solid_ground) {
-        if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
-            space_pressed = true;
-            PP.physics.set_velocity_y(player, -jump_init_speed);
-        }
-        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true) {
-            space_pressed = false;
-        }
-        mid_jump = true;
-    } */
+    if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE)) {
+        space_pressed = false;
+    }
 
-    // Logica Animazioni Salto (Sovrascrive run/sparo se in aria)
+    // Animazioni in aria
     if (!is_on_solid_ground) {
-
-        // Se stiamo sparando in aria, diamo priorità all'animazione di sparo
         if (player.sparo_attivo) {
-            next_anim = "sparo";
+            next_anim = player.anim_sparo_corrente; // Usa l'animazione corretta in aria
         } else {
-            // Altrimenti animazioni di salto normali
-            if (PP.physics.get_velocity_y(player) < 0) {
-                next_anim = "jump_up";
-            }
-            else if (PP.physics.get_velocity_y(player) > 0) {
-                next_anim = "jump_down";
-            }
+            if (PP.physics.get_velocity_y(player) < 0) next_anim = "jump_up";
+            else if (PP.physics.get_velocity_y(player) > 0) next_anim = "jump_down";
         }
 
-        // Doppio salto / Salto in aria
+        // Doppio Salto
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
             mid_jump = false;
         }
-        if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE) && space_pressed == true) {
-            space_pressed = false;
-        }
     }
 
-    // Applica animazione se è cambiata
+    // Applica animazione
     if (next_anim != curr_anim) {
         PP.assets.sprite.animation_play(player, next_anim);
         curr_anim = next_anim;
     }
 
-
-
-    // STRUMENTO DEBUG COORDINATE (Tasto P)
+    // DEBUG
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
-        
-        // Arrotondiamo i numeri per non avere virgole inutili
         let coord_x = Math.round(player.ph_obj.x);
         let coord_y = Math.round(player.ph_obj.y);
-
-        console.clear(); // Pulisce la console per leggere meglio
-        console.log("%c--- COORDINATE COPIABILI ---", "color: #00ff00; font-weight: bold; font-size: 14px;");
-        console.log(`X: ${coord_x}`);
-        console.log(`Y: ${coord_y}`);
-        console.log(`Codice pronto: let pos_x = ${coord_x}; let pos_y = ${coord_y};`);
-        console.log("------------------------------");
+        console.clear();
+        console.log(`POS: ${coord_x}, ${coord_y}`);
     }
-
-
-
-    //  SPARO PROIETTILE (Tasto N) -- RENDERE TUTTO IN PHASER
-    // Offset in pixel sopra il centro del player
-    // const Y_OFFSET_SPARO = 25;
-
-    /*
-  if (PP.interactive.kb.is_key_down(s, PP.key_codes.N)) {
-
-    let time_now = Date.now();
-    let fire_rate = 500; // Millisecondi tra uno sparo e l'altro (0.5 secondi)
-
-    // Offset in pixel sopra il centro del player
-    const Y_OFFSET_SPARO = 25;
-
-    // Se è passato abbastanza tempo dall'ultimo sparo
-    if (time_now > last_fired) {
-
-      // 1. Calcola posizione di partenza (con offset Y corretto)
-      let spawn_x = player.ph_obj.x;
-      let spawn_y = player.ph_obj.y - Y_OFFSET_SPARO; // Sposta in alto
-
-      // 2. Crea il proiettile usando il GRUPPO FISICO 'proiettile'
-      let b = proiettile.create(spawn_x, spawn_y, asset_proiettile);
-
-      // 3. Imposta la scala 
-      b.setScale(0.1);
-      b.body.setAllowGravity(false);
-
-      // 4. Gestione Direzione (Destra/Sinistra)
-      let velocita_proiettile = 600;
-      if (player.geometry.flip_x) {
-        b.setVelocityX(-velocita_proiettile); // Spara a Sinistra
-        b.setFlipX(true);
-      } else {
-        b.setVelocityX(velocita_proiettile);  // Spara a Destra
-        b.setFlipX(false);
-      }
-
-      // 5. Autodistruzione dopo 2 secondi
-      s.time.delayedCall(2000, () => {
-        if (b.active) b.destroy();
-      });
-
-      // Aggiorna il tempo dell'ultimo sparo
-      last_fired = time_now + fire_rate;
-    }
-  } */
 }
+
+
+
+
+
+
+
+
+
+
+// --- FUNZIONE SPARO ---
+/* function try_fire_bullet(s, player) {
+    let time_now = Date.now();
+
+    // Verifica Cooldown (usa player.fire_rate che cambia premendo L)
+    if (time_now > player.last_fired + player.fire_rate) {
+
+        player.last_fired = time_now;
+
+        let Y_OFFSET_SPARO = 25;
+        let velocita = 600;
+
+        let colpo = s.physics.add.sprite(player.geometry.x, player.geometry.y - Y_OFFSET_SPARO, "proiettile_asset");
+
+        //colpo.setScale(0.1);
+        colpo.body.allowGravity = false;
+
+        // Se siamo in modalità inquinante, magari coloriamo il proiettile di verde
+        if (player.modalita_inquinante) {
+            colpo.setTint(0x00ff00); // Verde
+        }
+
+        if (player.geometry.flip_x) {
+            colpo.setVelocityX(-velocita);
+            colpo.setFlipX(true);
+        } else {
+            colpo.setVelocityX(velocita);
+            colpo.setFlipX(false);
+        }
+
+        s.time.delayedCall(2000, () => {
+            if (colpo.active) colpo.destroy();
+        });
+
+        if (typeof muri_livello !== 'undefined' && muri_livello) {
+            s.physics.add.collider(colpo, muri_livello, function (b, m) {
+                b.destroy();
+            });
+        }
+    }
+} */
