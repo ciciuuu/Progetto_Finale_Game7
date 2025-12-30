@@ -42,6 +42,7 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
     
     enemy.geometry.scale_x = 1.3;
     enemy.geometry.scale_y = 1.3;
+    
 
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy.ph_obj);
