@@ -58,6 +58,33 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy2.ph_obj);
 
+      // 3. Creiamo il TERZO NEMICO (coordinate tue: 1231, 467)
+    enemy3 = PP.assets.sprite.add(s, img_enemy, 1231, 467, 0.5, 1);
+    PP.physics.add(s, enemy3, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+    
+    enemy3.geometry.scale_x = 1.3;
+    enemy3.geometry.scale_y = 1.3;
+    // Lo aggiungiamo al gruppo
+    gruppo_ragni.add(enemy3.ph_obj);
+
+
+    // 3. Creiamo il QUARTO NEMICO (coordinate tue: 2052, -87)
+    enemy4 = PP.assets.sprite.add(s, img_enemy, 2052, -87, 0.5, 1);
+    PP.physics.add(s, enemy4, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+    
+    enemy4.geometry.scale_x = 1.3;
+    enemy4.geometry.scale_y = 1.3;
+    // Lo aggiungiamo al gruppo
+    gruppo_ragni.add(enemy4.ph_obj);
+
+    // 3. Creiamo il QUINTO NEMICO (coordinate tue: 3742, -141)
+    enemy5 = PP.assets.sprite.add(s, img_enemy, 3742, -141, 0.5, 1);
+    PP.physics.add(s, enemy5, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+    
+    enemy5.geometry.scale_x = 1.3;
+    enemy5.geometry.scale_y = 1.3;
+    // Lo aggiungiamo al gruppo
+    gruppo_ragni.add(enemy5.ph_obj);
 
     // 4. Collisione tra TUTTI i ragni e i muri
     if (muri) {
