@@ -6,6 +6,9 @@ let gruppo_ragni;
 
 let enemy;
 let enemy2;
+let enemy3;
+let enemy4;
+let enemy5;
 
 let vulnerable = true;
 
@@ -42,11 +45,14 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
     
     enemy.geometry.scale_x = 1.3;
     enemy.geometry.scale_y = 1.3;
+
+    PP.physics.set_velocity_x(enemy, 100);
     
 
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy.ph_obj);
 
+    //FINE ENEMY 1_____________________________________________________________________________________________________________________________
 
     // 3. Creiamo il SECONDO NEMICO (coordinate tue: 5, 0)
     enemy2 = PP.assets.sprite.add(s, img_enemy, 5, 0, 0.5, 1);
@@ -57,18 +63,29 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
 
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy2.ph_obj);
+    //FINE ENEMY 2_____________________________________________________________________________________________________________________________
 
-      // 3. Creiamo il TERZO NEMICO (coordinate tue: 1231, 467)
+    
+    // 3. Creiamo il TERZO NEMICO (coordinate tue: 1231, 467)
     enemy3 = PP.assets.sprite.add(s, img_enemy, 1231, 467, 0.5, 1);
     PP.physics.add(s, enemy3, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
     
     enemy3.geometry.scale_x = 1.3;
     enemy3.geometry.scale_y = 1.3;
+
+    // --- FIX FISICA ---
+    // Azzeriamo l'attrito così non rallenta strusciando a terra
+    enemy3.ph_obj.body.setDrag(0); 
+    enemy3.ph_obj.body.setFriction(0); 
+    enemy3.ph_obj.body.setBounce(0);
+
+    PP.physics.set_velocity_x(enemy3, 30);
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy3.ph_obj);
 
+    //FINE ENEMY 3_____________________________________________________________________________________________________________________________
 
-    // 3. Creiamo il QUARTO NEMICO (coordinate tue: 2052, -87)
+     // 3. Creiamo il QUARTO NEMICO (coordinate tue: 2052, -87)
     enemy4 = PP.assets.sprite.add(s, img_enemy, 2052, -87, 0.5, 1);
     PP.physics.add(s, enemy4, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
     
@@ -76,6 +93,8 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
     enemy4.geometry.scale_y = 1.3;
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy4.ph_obj);
+
+    //FINE ENEMY 4_____________________________________________________________________________________________________________________________
 
     // 3. Creiamo il QUINTO NEMICO (coordinate tue: 3742, -141)
     enemy5 = PP.assets.sprite.add(s, img_enemy, 3742, -141, 0.5, 1);
@@ -85,6 +104,9 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
     enemy5.geometry.scale_y = 1.3;
     // Lo aggiungiamo al gruppo
     gruppo_ragni.add(enemy5.ph_obj);
+
+    //FINE ENEMY 5_____________________________________________________________________________________________________________________________
+
 
     // 4. Collisione tra TUTTI i ragni e i muri
     if (muri) {
