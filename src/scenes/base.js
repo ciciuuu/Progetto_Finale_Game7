@@ -105,7 +105,7 @@ function create(s) {
     // --- TRAPPOLE MANUALI ---
     gruppo_trappole = s.physics.add.staticGroup();
 
-    // ESEMPIO: Aggiungi una trappola (s, X, Y, Larghezza, Altezza)
+    // per aggiungere una trappola (s, X, Y, Larghezza, Altezza)
     aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
     aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
     aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
