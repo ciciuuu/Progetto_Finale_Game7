@@ -47,6 +47,8 @@ function create_hud(s) {
     // 1. Creiamo lo sprite
     pistola = PP.assets.sprite.add(s, asset_pistole, 332, 210, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
+    
+    // DA SISTEMARE ASSOLUTAMENTE PERCHÈ fa schifo la pixel art ingrandita
     pistola.geometry.scale_x = 1.3;
     pistola.geometry.scale_y = 1.3;
 
