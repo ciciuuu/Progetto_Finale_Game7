@@ -55,9 +55,9 @@ function create_hud(s) {
     pistola = PP.assets.sprite.add(s, asset_pistole, 332, 210, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
 
-    health_bar = PP.assets.image.add(s, asset_health_bar, 340, 550, 0, 0);
+    health_bar = PP.assets.image.add(s, asset_health_bar, 332, 550, 0, 0);
     health_bar.ph_obj.setScrollFactor(0);
-    health_bar.geometry.scale_x = 2;
+    
 
 
     // DA SISTEMARE ASSOLUTAMENTE PERCHÈ fa schifo la pixel art ingrandita
