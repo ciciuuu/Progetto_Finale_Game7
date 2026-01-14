@@ -5,6 +5,9 @@ let asset_ingranaggio_1;
 let asset_ingranaggio_2;
 let asset_ingranaggio_3;
 let ingranaggio;
+let asset_health_bar;
+
+let health_bar;
 
 let asset_blueprint;
 let blueprint;
@@ -29,6 +32,10 @@ function preload_hud(s) {
 
     // Pistola
     asset_pistole = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/Pistola/Pistole_sheet.png", 50, 40);
+
+    //Health_bar
+    asset_health_bar = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/health_bar.png");
+
 }
 
 
@@ -47,7 +54,12 @@ function create_hud(s) {
     // 1. Creiamo lo sprite
     pistola = PP.assets.sprite.add(s, asset_pistole, 332, 210, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
-    
+
+    health_bar = PP.assets.image.add(s, asset_health_bar, 340, 550, 0, 0);
+    health_bar.ph_obj.setScrollFactor(0);
+    health_bar.geometry.scale_x = 2;
+
+
     // DA SISTEMARE ASSOLUTAMENTE PERCHÈ fa schifo la pixel art ingrandita
     pistola.geometry.scale_x = 1.3;
     pistola.geometry.scale_y = 1.3;
