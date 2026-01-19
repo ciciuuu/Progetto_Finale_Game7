@@ -13,7 +13,14 @@ function preload_proiettili(s) {
 function gestisci_sparo(s, entita, muri_livello) {
 
 
-  // ----- FARE IN POLIPHASER ----- 
+  //-----------------------------------
+  //-----------------------------------
+  //-----------------------------------
+  // ----- FARE IN POLIPHASER ---------
+  //-----------------------------------
+  //----------------------------------- 
+  //-----------------------------------
+
 
   let time_now = Date.now(); 
 
@@ -23,7 +30,7 @@ function gestisci_sparo(s, entita, muri_livello) {
     // Aggiorna tempo ultimo sparo
     entita.last_fired = time_now;
 
-    let Y_OFFSET_SPARO = 25;
+    let Y_OFFSET_SPARO = 36;
     let velocita = 600;
 
     // --- SELEZIONE ASSET (POLIPHASER) ---

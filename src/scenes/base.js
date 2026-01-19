@@ -1,4 +1,5 @@
 let img_player;
+let img_player_sparo;
 
 let player;
 let muri_livello; // Variabile per ricevere i muri da Godot
@@ -26,6 +27,7 @@ function preload(s) {
     // Caricamento Player
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
 
+    
     // s.load.image("sfondo_caverna_asset", "assets/images/sfondo_caverna.png");
    //  sfondo_caverna = PP.assets.sprite.load(s, "assets/images/sfondo_caverna ")
 
@@ -60,7 +62,36 @@ function create(s) {
     ts_background_1.tile_geometry.scroll_factor_x = 0;
     ts_background_2.tile_geometry.scroll_factor_x = 0;
 
-    s.cameras.main.setZoom(2);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // s.cameras.main.setZoom(2); --- RIMETTERLO QUANDO ANDIAMO A TOGLIERE IL TASTO M
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // 2. COSTRUZIONE MAPPA
     if (window.godot_create) {
@@ -92,7 +123,7 @@ function create(s) {
     configure_player_animations(s, player);
 
     // 5. CAMERA
-    PP.camera.start_follow(s, player, 0, 50);
+    PP.camera.start_follow(s, player, 0, 75);
 
     // 6. HUD
     create_hud(s);
