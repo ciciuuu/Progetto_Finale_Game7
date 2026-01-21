@@ -64,13 +64,10 @@ function create_hud(s) {
     pistola.geometry.scale_x = 1.3;
     pistola.geometry.scale_y = 1.3;
 
-    // 2. Definiamo le animazioni (ORA che 'pistola' esiste)
-    // Creiamo due "stati":
-    // "anim_normale": usa solo il frame [0]
-    // "anim_inquinante": usa solo il frame [1]
+    // 2. Definiamo le animazioni
 
-    PP.assets.sprite.animation_add_list(pistola, "anim_normale", [0], 1, 0);
-    PP.assets.sprite.animation_add_list(pistola, "anim_inquinante", [1], 1, 0);
+    PP.assets.sprite.animation_add_list(pistola, "anim_normale", [1], 1, 0);
+    PP.assets.sprite.animation_add_list(pistola, "anim_inquinante", [0], 1, 0);
 
     // Avviamo con quella normale
     PP.assets.sprite.animation_play(pistola, "anim_normale");

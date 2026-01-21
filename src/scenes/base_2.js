@@ -2,87 +2,91 @@ let img_player;
 let player;
 let muri_livello;
 
-// Variabili Sfondo (puoi cambiarle per il livello 2)
+// Variabili Sfondo
 let parallasse1;
 let ts_background_1;
 
 function preload(s) {
-  // Caricamento Player (se non è già in cache)
-  img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
+    
+    // 1. CARICAMENTO MODULI ESTERNI
+    preload_hud(s);
+    preload_proiettili(s); 
 
-  s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
-  s.load.image("proiettile_inquinante_asset", "assets/images/PLAYER/Proiettile_inquinante.png");
+    // 2. CARICAMENTO PLAYER LOCALE
+    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
 
-  // Caricamento Tileset e pre-caricamenti generali
-  if (window.godot_preload) {
-    window.godot_preload(s);
-  }
-  preload_player(s);
-  preload_hud(s)
+    // Caricamento Tileset
+    if (window.godot_preload) {
+        window.godot_preload(s);
+    }
 
-  // Eventuale sfondo diverso per livello 2
-  parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
+    // Eventuale sfondo diverso per livello 2
+    parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
 }
 
 function create(s) {
-  // 1. Sfondo
-  const PARALLAX_WIDTH = 15800;
-  const PARALLAX_HEIGHT = 3000;
-  ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
-  ts_background_1.geometry.scale_x = 0.6;
-  ts_background_1.geometry.scale_y = 0.6;
-  ts_background_1.tile_geometry.scroll_factor_x = 0;
+    // 1. Sfondo
+    const PARALLAX_WIDTH = 15800;
+    const PARALLAX_HEIGHT = 3000;
+    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
+    ts_background_1.geometry.scale_x = 0.6;
+    ts_background_1.geometry.scale_y = 0.6;
+    ts_background_1.tile_geometry.scroll_factor_x = 0;
 
-  s.cameras.main.setZoom(2);
+    s.cameras.main.setZoom(2);
 
-  // 2. COSTRUZIONE MAPPA - LIVELLO 2
-  // Passiamo esplicitamente LIV2 (che deve trovarsi in livello_2.js)
-  if (window.godot_create) {
-    if (typeof LIV2 !== 'undefined') {
-      muri_livello = window.godot_create(s, LIV2);
-    } else {
-      console.error("ERRORE: LIV2 non trovato. Hai caricato livello_2.js nell'HTML?");
+    // 2. COSTRUZIONE MAPPA - LIVELLO 2
+    if (window.godot_create) {
+        if (typeof LIV2 !== 'undefined') {
+            muri_livello = window.godot_create(s, LIV2);
+        } else {
+            console.error("ERRORE: LIV2 non trovato. Hai caricato livello_2.js nell'HTML?");
+        }
     }
-  }
 
-  // 3. RECUPERO SPAWN POINT (Impostato da godot_create leggendo LIV2)
-  // Se non trova lo spawn nel file Godot, usa coordinate di default
-  let startX = PP.game_state.get_variable("spawn_x") || 100;
-  let startY = PP.game_state.get_variable("spawn_y") || 100;
+    // 3. RECUPERO SPAWN POINT
+    let startX = PP.game_state.get_variable("spawn_x") || 100;
+    let startY = PP.game_state.get_variable("spawn_y") || 100;
 
-  // Creazione Player
-  player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
-  PP.physics.add(s, player, PP.physics.type.DYNAMIC);
-  s.physics.world.TILE_BIAS = 32;
+    // 4. CREAZIONE PLAYER
+    // Ora img_player esiste sicuramente perché l'abbiamo dichiarata e caricata sopra
+    player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
+    
+    PP.physics.add(s, player, PP.physics.type.DYNAMIC);
+    s.physics.world.TILE_BIAS = 32;
 
-  // Collisioni
-  if (muri_livello) {
-    s.physics.add.collider(player.ph_obj, muri_livello);
-  }
+    // Collisioni
+    if (muri_livello) {
+        s.physics.add.collider(player.ph_obj, muri_livello);
+    }
 
-  configure_player_animations(s, player);
-  PP.camera.start_follow(s, player, 0, 50);
-  create_hud(s)
+    // Configurazione Animazioni
+    configure_player_animations(s, player);
+    
+    // Camera e HUD
+    PP.camera.start_follow(s, player, 0, 50);
+    create_hud(s);
 }
 
 function update(s) {
-  // Gestione Parallasse Semplice
-  ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
+    // Gestione Parallasse Semplice
+    ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.3;
 
-  // Update Player
-  if (player) manage_player_update(s, player);
+    // Update Player
+    // Passiamo muri_livello per far funzionare i proiettili
+    if (player) manage_player_update(s, player, muri_livello);
 
-  // LOGICA CAMBIO LIVELLO -> Verso Livello 3
-  // Sostituisci 3000 con la coordinata X di fine livello 2
-  if (player.ph_obj.x > 176 * 32) {
-    console.log("Fine Livello 2! Caricamento Livello 3...");
-    PP.scenes.start("base_3");
-  }
-  update_hud(s)
+    // LOGICA CAMBIO LIVELLO -> Verso Livello 3
+    if (player.ph_obj.x > 176 * 32) {
+        console.log("Fine Livello 2! Caricamento Livello 3...");
+        PP.scenes.start("base_3");
+    }
+    
+    update_hud(s);
 }
 
 function destroy(s) {
-  // Pulizia
+    // Pulizia
 }
 
 // Registriamo la scena con nome "base_2"

@@ -22,11 +22,17 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
 
-    PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile", [41, 42, 43, 36, 37, 38], 8, -1);
-    PP.assets.sprite.animation_add_list(player, "sparo_inquinante", [51, 52, 53, 46, 47, 48], 11, -1);
+    PP.assets.sprite.animation_add_list(player, "sparo_inquinante", [41, 42, 43, 36, 37, 38], 8, -1);
+    PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile", [51, 52, 53, 46, 47, 48], 11, -1);
 
-    PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_fermo", [61, 62, 63, 56, 57, 58], 8, -1);
-    PP.assets.sprite.animation_add_list(player, "sparo_inquinante_fermo", [71, 72, 73, 66, 67, 68], 11, -1);
+    PP.assets.sprite.animation_add_list(player, "sparo_inquinante_fermo", [61, 62, 63, 56, 57, 58], 8, -1);
+    PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_fermo", [71, 72, 73, 66, 67, 68], 11, -1);
+
+    PP.assets.sprite.animation_add_list(player, "sparo_inquinante_salto_su", [16, 17, 18], 8, 0);
+    PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_salto_su", [26, 27, 28], 11, 0);
+
+    PP.assets.sprite.animation_add_list(player, "sparo_inquinante_salto_giu", [21, 22, 23], 8, 0);
+    PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_salto_giu", [31, 32, 33], 11, 0);
 
     // HITBOX 
     PP.physics.set_collision_rectangle(player, 20, 44, -10, 30);
@@ -65,10 +71,10 @@ function manage_player_update(s, player, muri_livello) {
             player.modalita_inquinante = hud_modalita_inquinante;
 
             if (player.modalita_inquinante) {
-                player.fire_rate = 545;
+                player.fire_rate = 545; // Calcolo: 6 frame / 11 FPS * 1000 = 545ms
                 player.anim_sparo_corrente = "sparo_inquinante";
             } else {
-                player.fire_rate = 750;
+                player.fire_rate = 750; // Calcolo: 6 frame / 8 FPS * 1000 = 750ms
                 player.anim_sparo_corrente = "sparo_rinnovabile";
             }
         }
@@ -162,30 +168,45 @@ function manage_player_update(s, player, muri_livello) {
 
     // 5. GESTIONE ANIMAZIONI
 
-    let anim_sparo_corsa = player.anim_sparo_corrente; // "sparo" o "sparo_inquinante"
+    let anim_sparo_corsa = player.anim_sparo_corrente; 
     let anim_sparo_fermo;
+    let anim_sparo_salto_su;  // [NUOVO] Variabile per salto in alto
+    let anim_sparo_salto_giu; // [NUOVO] Variabile per salto in basso
 
-    // Decido quale animazione "fermo" usare in base alla modalità arma
     if (player.modalita_inquinante == true) {
         anim_sparo_fermo = "sparo_inquinante_fermo";
+        anim_sparo_salto_su = "sparo_inquinante_salto_su";
+        anim_sparo_salto_giu = "sparo_inquinante_salto_giu";
     } else {
         anim_sparo_fermo = "sparo_rinnovabile_fermo";
+        anim_sparo_salto_su = "sparo_rinnovabile_salto_su";
+        anim_sparo_salto_giu = "sparo_rinnovabile_salto_giu";
     }
 
     if (!is_on_solid_ground) {
         // --- IN ARIA ---
+        
+        // Controllo velocità verticale per sapere se va SU o GIÙ
+        let v_y = PP.physics.get_velocity_y(player);
+
         if (player.sparo_attivo) {
-            // Se sparo in aria -> Uso quella di corsa (o potresti farne una specifica per il salto)
-            next_anim = anim_sparo_corsa;
+            // [NUOVO] LOGICA SALTO CON SPARO
+            if (v_y < 0) {
+                next_anim = anim_sparo_salto_su;  // Sta salendo e sparando
+            } else {
+                next_anim = anim_sparo_salto_giu; // Sta scendendo e sparando
+            }
+
         } else {
-            // Se NON sparo in aria
-            if (PP.physics.get_velocity_y(player) < 0) {
+            // LOGICA SALTO NORMALE (SENZA SPARO)
+            if (v_y < 0) {
                 next_anim = "jump_up";
-            } else if (PP.physics.get_velocity_y(player) > 0) {
+            } else if (v_y > 0) {
                 next_anim = "jump_down";
             }
         }
 
+        // Doppio Salto
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
@@ -195,14 +216,12 @@ function manage_player_update(s, player, muri_livello) {
     } else {
         // --- A TERRA ---
         if (player.sparo_attivo) {
-            // SE SPARO
             if (is_moving) {
-                next_anim = anim_sparo_corsa; // Sparo mentre corro
+                next_anim = anim_sparo_corsa; 
             } else {
-                next_anim = anim_sparo_fermo;  // Sparo da fermo
+                next_anim = anim_sparo_fermo;  
             }
         } else {
-            // SE NON SPARO
             if (is_moving) {
                 next_anim = "run";
             } else {
