@@ -12,17 +12,15 @@ function preload_proiettili(s) {
 
 function gestisci_sparo(s, entita, muri_livello) {
 
-
   //-----------------------------------
   //-----------------------------------
   //-----------------------------------
-  // ----- FARE IN POLIPHASER ---------
+  // ----- FARE IN POLIPHASER --------- (anche la collisione in fondo)
   //-----------------------------------
   //----------------------------------- 
   //-----------------------------------
 
-
-  let time_now = Date.now(); 
+  let time_now = Date.now();
 
   // Verifica Cooldown
   if (time_now > entita.last_fired + entita.fire_rate) {
@@ -83,13 +81,25 @@ function gestisci_sparo(s, entita, muri_livello) {
     if (typeof gruppo_ragni !== 'undefined' && gruppo_ragni) {
       s.physics.add.overlap(colpo.ph_obj, gruppo_ragni, function (bullet_native, enemy_native) {
 
-        // Distruggi il proiettile (usiamo il riferimento PP)
+        // 1. Distruggi il proiettile (usiamo il riferimento PP)
         PP.assets.destroy(colpo);
 
-        // Distruggi il ragno (enemy_native è lo sprite nativo del gruppo)
-        enemy_native.destroy();
+        // 2. Gestione RAGNO
+        // Disabilitiamo il corpo fisico del ragno così smette di muoversi e non fa danno
+        enemy_native.body.enable = false;
+        
+        // Avviamo l'animazione "morte" sul ragno colpito
+        enemy_native.anims.play("morte", true);
 
-        console.log("Nemico eliminato!");
+        // 3. Timer per distruggere definitivamente il ragno dopo 1 secondo (tempo per l'animazione)
+        PP.timers.add_timer(s, 1000, function() {
+            // Controlliamo se esiste ancora per evitare errori
+            if(enemy_native.active) {
+                enemy_native.destroy();
+                console.log("Nemico rimosso dopo animazione morte.");
+            }
+        }, false);
+
       });
     }
   }

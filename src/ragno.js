@@ -12,7 +12,7 @@ let enemy5;
 let vulnerable = true;
 
 function preload_enemy(s) {
-    img_enemy = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/camminata_danno 36x36.png", 36, 36);
+    img_enemy = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/Morte e camminata.png", 36, 36);
     img_enemy2 = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/attacco 59x59.png", 59, 59);
 }
 
@@ -36,7 +36,8 @@ function spawna_ragno(s, x, y) {
     let nuovo_ragno = PP.assets.sprite.add(s, img_enemy, x, y, 0.5, 1);
 
     // 2. Aggiunge le animazioni
-    PP.assets.sprite.animation_add_list(nuovo_ragno, "camminata", [0, 1, 2, 3], 12, -1);
+    PP.assets.sprite.animation_add(nuovo_ragno, "camminata", 8, 11, 12, -1);
+    PP.assets.sprite.animation_add(nuovo_ragno, "morte", 0, 7, 12, 0);
 
     // 3. Attiva la fisica PoliPhaser
     PP.physics.add(s, nuovo_ragno, PP.physics.type.DYNAMIC);
@@ -92,7 +93,7 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
     }
 
 }
-    // --- NUOVA LOGICA MOVIMENTO ---
+// --- NUOVA LOGICA MOVIMENTO ---
 // Questa funzione prende un ragno e lo muove in base ai SUOI parametri personali
 function muovi_singolo_ragno(ragno) {
     // Se il ragno non esiste o non ha pattuglia impostata, esci
@@ -112,12 +113,12 @@ function muovi_singolo_ragno(ragno) {
     // Tocco il limite destro -> Vado a sinistra
     if (ragno.geometry.x >= limite_dx) {
         ragno.direzione_corrente = -1;
-        ragno.geometry.flip_x = false; 
+        ragno.geometry.flip_x = false;
     }
     // Tocco il limite sinistro -> Vado a destra
     else if (ragno.geometry.x <= limite_sx) {
         ragno.direzione_corrente = 1;
-        ragno.geometry.flip_x = true; 
+        ragno.geometry.flip_x = true;
     }
 
     PP.physics.set_velocity_x(ragno, 100 * ragno.direzione_corrente);
@@ -125,93 +126,93 @@ function muovi_singolo_ragno(ragno) {
 
 
 
-    /* //copia_incollare per creare un nuovo nemico:
-    enemy = PP.assets.sprite.add(s, img_enemy, -8, 0, 0.5, 1);  // 1. dici dove devi spawnarlo - troviamo le coordinate col tasto P del player
-    PP.assets.sprite.animation_add_list(enemy, "camminata", [0, 1, 2, 3], 12, -1); // 2. diciamo che animazione deve avere (anche se penso che possiamo comprimerlo in qualche modo)
-    PP.physics.add(s, enemy, PP.physics.type.DYNAMIC); // 3. aggiunta di fisica
-    
-    enemy.geometry.scale_x = 1.3; // 4. aggiunta della scala
-    enemy.geometry.scale_y = 1.3;
+/* //copia_incollare per creare un nuovo nemico:
+enemy = PP.assets.sprite.add(s, img_enemy, -8, 0, 0.5, 1);  // 1. dici dove devi spawnarlo - troviamo le coordinate col tasto P del player
+PP.assets.sprite.animation_add_list(enemy, "camminata", [0, 1, 2, 3], 12, -1); // 2. diciamo che animazione deve avere (anche se penso che possiamo comprimerlo in qualche modo)
+PP.physics.add(s, enemy, PP.physics.type.DYNAMIC); // 3. aggiunta di fisica
+ 
+enemy.geometry.scale_x = 1.3; // 4. aggiunta della scala
+enemy.geometry.scale_y = 1.3;
 
-    gruppo_ragni.add(enemy.ph_obj); // 5. aggiungiamo il nemico al gruppo_ragni (per le collisioni)
+gruppo_ragni.add(enemy.ph_obj); // 5. aggiungiamo il nemico al gruppo_ragni (per le collisioni)
 
-    PP.assets.sprite.animation_play(enemy, "camminata"); // 6. avvii l'animazione */
-
-
-
-    
-    
-    
-    
-    /* // 3. Creiamo il SECONDO NEMICO (coordinate tue: 5, 0)
-    enemy2 = PP.assets.sprite.add(s, img_enemy, 5, 0, 0.5, 1);
-    PP.physics.add(s, enemy2, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
-
-    enemy2.geometry.scale_x = 1.3;
-    enemy2.geometry.scale_y = 1.3;
-
-    gruppo_ragni.add(enemy2.ph_obj);
-
-    //FINE ENEMY 2_____________________________________________________________________________________________________________________________
+PP.assets.sprite.animation_play(enemy, "camminata"); // 6. avvii l'animazione */
 
 
-    // 3. Creiamo il TERZO NEMICO (coordinate tue: 1231, 467)
-    enemy3 = PP.assets.sprite.add(s, img_enemy, 1231, 467, 0.5, 1);
-    PP.physics.add(s, enemy3, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
 
-    enemy3.geometry.scale_x = 1.3;
-    enemy3.geometry.scale_y = 1.3;
 
-    // --- FIX FISICA ---
-    // Azzeriamo l'attrito così non rallenta strusciando a terra
-    enemy3.ph_obj.body.setDrag(0);
-    enemy3.ph_obj.body.setFriction(0);
-    enemy3.ph_obj.body.setBounce(0);
 
-    PP.physics.set_velocity_x(enemy3, 30);
-    // Lo aggiungiamo al gruppo
-    gruppo_ragni.add(enemy3.ph_obj);
 
-    //FINE ENEMY 3_____________________________________________________________________________________________________________________________
 
-    // 3. Creiamo il QUARTO NEMICO (coordinate tue: 2052, -87)
-    enemy4 = PP.assets.sprite.add(s, img_enemy, 2052, -87, 0.5, 1);
-    PP.physics.add(s, enemy4, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+/* // 3. Creiamo il SECONDO NEMICO (coordinate tue: 5, 0)
+enemy2 = PP.assets.sprite.add(s, img_enemy, 5, 0, 0.5, 1);
+PP.physics.add(s, enemy2, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
 
-    enemy4.geometry.scale_x = 1.3;
-    enemy4.geometry.scale_y = 1.3;
-    // Lo aggiungiamo al gruppo
-    gruppo_ragni.add(enemy4.ph_obj);
+enemy2.geometry.scale_x = 1.3;
+enemy2.geometry.scale_y = 1.3;
 
-    //FINE ENEMY 4_____________________________________________________________________________________________________________________________
+gruppo_ragni.add(enemy2.ph_obj);
 
-    // 3. Creiamo il QUINTO NEMICO (coordinate tue: 3742, -141)
-    enemy5 = PP.assets.sprite.add(s, img_enemy, 3742, -141, 0.5, 1);
-    PP.physics.add(s, enemy5, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+//FINE ENEMY 2_____________________________________________________________________________________________________________________________
 
-    enemy5.geometry.scale_x = 1.3;
-    enemy5.geometry.scale_y = 1.3;
-    // Lo aggiungiamo al gruppo
-    gruppo_ragni.add(enemy5.ph_obj);
 
-    //FINE ENEMY 5_____________________________________________________________________________________________________________________________ */
+// 3. Creiamo il TERZO NEMICO (coordinate tue: 1231, 467)
+enemy3 = PP.assets.sprite.add(s, img_enemy, 1231, 467, 0.5, 1);
+PP.physics.add(s, enemy3, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
 
-    /* PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
-    
-    // Velocità iniziale del nemico (verso dx)
-    PP.physics.set_velocity_x(enemy, 100);
+enemy3.geometry.scale_x = 1.3;
+enemy3.geometry.scale_y = 1.3;
 
-    // Aggiungo le animazioni walk dx/sx
-    PP.assets.sprite.animation_add(enemy, "walk_left", 0, 3, 15, -1);
-    PP.assets.sprite.animation_add(enemy, "walk_right", 0, 3, 15, -1);
+// --- FIX FISICA ---
+// Azzeriamo l'attrito così non rallenta strusciando a terra
+enemy3.ph_obj.body.setDrag(0);
+enemy3.ph_obj.body.setFriction(0);
+enemy3.ph_obj.body.setBounce(0);
 
-    // Iniziamo andando a destra
-    PP.assets.sprite.animation_play(enemy, "walk_right");
+PP.physics.set_velocity_x(enemy3, 30);
+// Lo aggiungiamo al gruppo
+gruppo_ragni.add(enemy3.ph_obj);
 
-    // Qui imposto la scala del personaggio
-    enemy.geometry.scale_x = 2;
-    enemy.geometry.scale_y = 2;
- */
+//FINE ENEMY 3_____________________________________________________________________________________________________________________________
+
+// 3. Creiamo il QUARTO NEMICO (coordinate tue: 2052, -87)
+enemy4 = PP.assets.sprite.add(s, img_enemy, 2052, -87, 0.5, 1);
+PP.physics.add(s, enemy4, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+
+enemy4.geometry.scale_x = 1.3;
+enemy4.geometry.scale_y = 1.3;
+// Lo aggiungiamo al gruppo
+gruppo_ragni.add(enemy4.ph_obj);
+
+//FINE ENEMY 4_____________________________________________________________________________________________________________________________
+
+// 3. Creiamo il QUINTO NEMICO (coordinate tue: 3742, -141)
+enemy5 = PP.assets.sprite.add(s, img_enemy, 3742, -141, 0.5, 1);
+PP.physics.add(s, enemy5, PP.physics.type.DYNAMIC); // Assicuriamoci che abbia fisica dinamica
+
+enemy5.geometry.scale_x = 1.3;
+enemy5.geometry.scale_y = 1.3;
+// Lo aggiungiamo al gruppo
+gruppo_ragni.add(enemy5.ph_obj);
+
+//FINE ENEMY 5_____________________________________________________________________________________________________________________________ */
+
+/* PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
+ 
+// Velocità iniziale del nemico (verso dx)
+PP.physics.set_velocity_x(enemy, 100);
+
+// Aggiungo le animazioni walk dx/sx
+PP.assets.sprite.animation_add(enemy, "walk_left", 0, 3, 15, -1);
+PP.assets.sprite.animation_add(enemy, "walk_right", 0, 3, 15, -1);
+
+// Iniziamo andando a destra
+PP.assets.sprite.animation_play(enemy, "walk_right");
+
+// Qui imposto la scala del personaggio
+enemy.geometry.scale_x = 2;
+enemy.geometry.scale_y = 2;
+*/
 
 
 
@@ -253,23 +254,21 @@ function update_enemy(s) {
 
 
 
-
-
-  /*   if (!enemy) return;
-
-
-    if (enemy.geometry.x >= -13) {
-        enemy_direzione = -1;
-        enemy.geometry.flip_x = false; // O true, dipende dal disegno
-    }
-    // Se supero il limite SINISTRO (-234) -> Vado a Destra (1)
-    else if (enemy.geometry.x <= -234) {
-        enemy_direzione = 1;
-        enemy.geometry.flip_x = true; // O false
-    }
-
-    PP.physics.set_velocity_x(enemy, 100 * enemy_direzione); //---FONDAMENTALE, senza questo non funziona nulla
- */
+    /*   if (!enemy) return;
+  
+  
+      if (enemy.geometry.x >= -13) {
+          enemy_direzione = -1;
+          enemy.geometry.flip_x = false; // O true, dipende dal disegno
+      }
+      // Se supero il limite SINISTRO (-234) -> Vado a Destra (1)
+      else if (enemy.geometry.x <= -234) {
+          enemy_direzione = 1;
+          enemy.geometry.flip_x = true; // O false
+      }
+  
+      PP.physics.set_velocity_x(enemy, 100 * enemy_direzione); //---FONDAMENTALE, senza questo non funziona nulla
+   */
 
 
     /* if (enemy.geometry.x >= -13) {
