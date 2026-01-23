@@ -135,11 +135,13 @@ function create(s) {
 
     // 7. NEMICI E OGGETTI
 
-    // --- CONFIGURAZIONE RAGNI LIVELLO 1 ---
+    // --- CONFIGURAZIONE RAGNI LIVELLO 1 --- 
+    //{ x: spawn_x, y: spawn_y, pattuglia: [LIMITE_SINISTRO, LIMITE_DESTRO] }
     let ragni_liv1 = [
         { x: -8, y: 0, pattuglia: [-234, -15] },
         { x: 182, y: -64, pattuglia: [70, 180] },
-        { x: -30, y: 0, pattuglia: [-200, -50] }
+        { x: -30, y: 0, pattuglia: [-200, -50] },
+        { x: 3142, y: 0, pattuglia: [3000, 3447] },
     ];
     
     create_enemy(s, muri_livello, ragni_liv1, player);

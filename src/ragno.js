@@ -6,7 +6,7 @@ let gruppo_ragni;
 // Variabili globali mantenute
 let enemy;
 let enemy2;
-let enemy3;
+
 
 let vulnerable = true;
 
@@ -17,14 +17,13 @@ function preload_enemy(s) {
 
 // --- GESTIONE DANNO E VULNERABILITÀ ---
 
-// MODIFICA: Ora accetta 's' (la scena) come primo parametro
 function set_vulnerable(s, val) {
     if (typeof val !== 'undefined') {
         vulnerable = val;
     } else {
         vulnerable = true;
     }
-    
+
     // Togliamo il rosso dal player
     // Usiamo 's.player_locale' che abbiamo salvato in create_enemy
     if (s && s.player_locale && s.player_locale.ph_obj) {
@@ -35,15 +34,15 @@ function set_vulnerable(s, val) {
 function take_damage(s) {
     if (vulnerable) {
         vulnerable = false;
-        
+
         // 1. Togli vita
         let hp_attuali = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_player", hp_attuali - 1);
-        
+
         console.log("Danno subito! HP rimanenti: " + (hp_attuali - 1));
 
         // 2. Feedback visivo (Rosso)
-        if(s.player_locale && s.player_locale.ph_obj) {
+        if (s.player_locale && s.player_locale.ph_obj) {
             s.player_locale.ph_obj.setTint(0xFF0000);
         }
 
@@ -51,9 +50,9 @@ function take_damage(s) {
         if (PP.game_state.get_variable("HP_player") <= 0) {
             PP.scenes.start("game_over");
         }
-        
+
         // 4. Invulnerabilità per 1 secondo
-        PP.timers.add_timer(s, 1000, function() {
+        PP.timers.add_timer(s, 1000, function () {
             // Passiamo 's' alla funzione corretta
             set_vulnerable(s, true);
         }, false);
@@ -92,7 +91,7 @@ function spawna_ragno(s, x, y) {
 
 // --- FUNZIONE UNICA DI CREAZIONE ---
 function create_enemy(s, muri, spawn_list, player) {
-    
+
     if (!gruppo_ragni || !gruppo_ragni.scene) {
         gruppo_ragni = s.physics.add.group();
     }
@@ -102,7 +101,7 @@ function create_enemy(s, muri, spawn_list, player) {
         for (let i = 0; i < spawn_list.length; i++) {
             let dati = spawn_list[i];
             let nemico = spawna_ragno(s, dati.x, dati.y);
-            
+
             if (dati.pattuglia) {
                 imposta_pattuglia(nemico, dati.pattuglia[0], dati.pattuglia[1]);
             }
@@ -118,11 +117,11 @@ function create_enemy(s, muri, spawn_list, player) {
     // 3. Collisione Danno col Player
     if (player && player.ph_obj) {
         // SALVIAMO IL PLAYER NELLA SCENA PER USARLO DOPO IN TAKE_DAMAGE
-        s.player_locale = player; 
+        s.player_locale = player;
 
         s.physics.add.overlap(player.ph_obj, gruppo_ragni, function (player_obj, enemy_obj) {
             // Se il ragno è vivo e attivo
-            if(enemy_obj.active && enemy_obj.body.enable) {
+            if (enemy_obj.active && enemy_obj.body.enable) {
                 take_damage(s);
             }
         });
@@ -135,7 +134,7 @@ function update_enemy(s) {
     let children = gruppo_ragni.getChildren();
 
     for (let i = 0; i < children.length; i++) {
-        let singolo_ragno = children[i]; 
+        let singolo_ragno = children[i];
 
         if (singolo_ragno.active && singolo_ragno.body && singolo_ragno.body.enable) {
             muovi_singolo_ragno(singolo_ragno);
@@ -143,7 +142,7 @@ function update_enemy(s) {
     }
 
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.K)) {
-        take_damage(s); 
+        take_damage(s);
     }
 }
 
@@ -153,7 +152,19 @@ function muovi_singolo_ragno(ragno_nativo) {
     let limite_sx = Math.min(ragno_nativo.pattuglia_min, ragno_nativo.pattuglia_max);
     let limite_dx = Math.max(ragno_nativo.pattuglia_min, ragno_nativo.pattuglia_max);
 
-    if (ragno_nativo.x >= limite_dx) {
+
+    // Se tocca un muro a destra, forziamo la direzione a Sinistra
+    if (ragno_nativo.body.blocked.right) {
+        ragno_nativo.direzione_corrente = -1;
+        ragno_nativo.flipX = false;
+    }
+    // Se tocca un muro a sinistra, forziamo la direzione a Destra
+    else if (ragno_nativo.body.blocked.left) {
+        ragno_nativo.direzione_corrente = 1;
+        ragno_nativo.flipX = true;
+    } 
+    
+    else if (ragno_nativo.x >= limite_dx) {
         ragno_nativo.direzione_corrente = -1;
         ragno_nativo.flipX = false;
     }
@@ -166,5 +177,5 @@ function muovi_singolo_ragno(ragno_nativo) {
 }
 
 function destroy_enemy(s) {
-    // Pulizia
+
 }
