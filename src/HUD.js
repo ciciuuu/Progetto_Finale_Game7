@@ -6,6 +6,7 @@ let asset_ingranaggio_2;
 let asset_ingranaggio_3;
 let ingranaggio;
 let asset_health_bar;
+let asset_healthbar_sheet;
 
 let health_bar;
 
@@ -35,6 +36,7 @@ function preload_hud(s) {
 
     //Health_bar
     asset_health_bar = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/health_bar.png");
+    asset_healthbar_sheet = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/HEALTHBAR/healthbar_sheet.png", 195, 32);
 
 }
 
@@ -55,7 +57,7 @@ function create_hud(s) {
     pistola = PP.assets.sprite.add(s, asset_pistole, 332, 210, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
 
-    health_bar = PP.assets.image.add(s, asset_health_bar, 332, 550, 0, 0);
+    health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 332, 550, 0, 0);
     health_bar.ph_obj.setScrollFactor(0);
     
 
@@ -71,6 +73,19 @@ function create_hud(s) {
 
     // Avviamo con quella normale
     PP.assets.sprite.animation_play(pistola, "anim_normale");
+
+    // Animazioni Healthbar
+    PP.assets.sprite.animation_add_list(health_bar, "health_10", [0], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_9", [1], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_8", [2], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_7", [3], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_6", [4], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_5", [5], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_4", [6], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_3", [7], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_2", [8], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_1", [9], 1, 0);
+    PP.assets.sprite.animation_add_list(health_bar, "health_0", [10], 1, 0);
 }
 
 
@@ -100,6 +115,8 @@ function update_hud(s, player) {
         hud_tasto_R_rilasciato = true;
     }
 
+    // Cambi di health bar in base alla vita del player
+    
     // Qui puoi mettere la logica per cambiare l'ingranaggio se serve
     /* if (ingranaggio_coll = 1){
          asset_ingranaggio_0 = asset_ingranaggio_1

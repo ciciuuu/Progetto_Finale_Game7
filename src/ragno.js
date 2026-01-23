@@ -9,6 +9,8 @@ let enemy3;
 let enemy4;
 let enemy5;
 
+let player;
+
 let vulnerable = true;
 
 function preload_enemy(s) {
@@ -20,6 +22,17 @@ function set_vulnerable() {
     vulnerable = true;
 }
 
+// --- FUNZIONE PER TOGLIERE VITA AL PLAYER ---
+function take_damage(s) {
+    if (vulnerable) {
+        vulnerable = false;
+        PP.game_state.set_variable("HP_player", PP.game_state.get_variable("HP_player") - 1);
+        if (PP.game_state.get_variable("HP_player") <= 0) {
+            PP.scenes.start("game_over");
+        }
+        PP.timers.add_timer(s, 500, set_vulnerable, false);
+    }
+}
 
 function imposta_pattuglia(ragno, min_x, max_x) {
     ragno.pattuglia_min = min_x;     // Salviamo il limite sinistro
@@ -52,19 +65,10 @@ function spawna_ragno(s, x, y) {
     return nuovo_ragno;
 }
 
-/* function take_damage(s, p1, p2) {
-    if (vulnerable) {
-        vulnerable = false;
-        PP.game_state.set_variable("HP", PP.game_state.get_variable("HP") - 1);
-        if (PP.game_state.get_variable("HP") <= 0) {
-            PP.scenes.start("game_over");
-        }
-        PP.timers.add_timer(s, 500, set_vulnerable, false);
-    }
-} */
 
 
-function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le globali
+
+function create_enemy(s, muri, player_riferimento) { // Ho tolto 'enemy' dai parametri, usiamo le globali
 
     gruppo_ragni = s.physics.add.group();
 
@@ -92,6 +96,14 @@ function create_enemy(s, muri) { // Ho tolto 'enemy' dai parametri, usiamo le gl
         s.physics.add.collider(gruppo_ragni, muri);
     }
 
+    // --- COLLISIONE CON IL PLAYER (VERSIONE SICURA) ---
+    // Invece di 'enemy', usiamo 'gruppo_ragni'. 
+    // Invece della variabile globale 'player', usiamo quella passata come parametro.
+    if (player_riferimento && player_riferimento.ph_obj) {
+        s.physics.add_overlap_f(gruppo_ragni, player_riferimento.ph_obj, function(enemy, player_obj) {
+            take_damage(s);
+        });
+    }
 }
 // --- NUOVA LOGICA MOVIMENTO ---
 // Questa funzione prende un ragno e lo muove in base ai SUOI parametri personali
@@ -251,6 +263,11 @@ function update_enemy(s) {
     muovi_singolo_ragno(enemy);
     muovi_singolo_ragno(enemy2);
     muovi_singolo_ragno(enemy3);
+
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.K)) {
+    console.log("Tasto K premuto: forzo take_damage");
+    take_damage(s);
+}
 
 
 

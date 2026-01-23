@@ -14,6 +14,8 @@ function create(s) {
 
     // aggiungo lo sfondo
     img_sfondo_menu = PP.assets.image.add(s, img_sfondo_menu, 0, 0, 0, 0);
+
+    PP.game_state.set_variable("HP_player", 2);
     
     
     
