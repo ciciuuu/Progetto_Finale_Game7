@@ -5,9 +5,9 @@ let asset_ingranaggio_1;
 let asset_ingranaggio_2;
 let asset_ingranaggio_3;
 let ingranaggio;
+
 let asset_health_bar;
 let asset_healthbar_sheet;
-
 let health_bar;
 
 let asset_blueprint;
@@ -86,6 +86,7 @@ function create_hud(s) {
     PP.assets.sprite.animation_add_list(health_bar, "health_2", [8], 1, 0);
     PP.assets.sprite.animation_add_list(health_bar, "health_1", [9], 1, 0);
     PP.assets.sprite.animation_add_list(health_bar, "health_0", [10], 1, 0);
+    PP.assets.sprite.animation_play(health_bar, "health_10");
 }
 
 
@@ -116,7 +117,20 @@ function update_hud(s, player) {
     }
 
     // Cambi di health bar in base alla vita del player
+    let vita_attuale = PP.game_state.get_variable("HP_player");
+
+    // 2. Controllo di sicurezza: se la variabile esiste, cambiamo animazione
+    if (vita_attuale !== undefined) {
+        
+        // Componiamo il nome dell'animazione (es: se vita è 10, diventa "health_10")
+        let nome_anim = "health_" + vita_attuale;
+        
+        // Eseguiamo l'animazione corrispondente
+        PP.assets.sprite.animation_play(health_bar, nome_anim);
+    }
+
     
+
     // Qui puoi mettere la logica per cambiare l'ingranaggio se serve
     /* if (ingranaggio_coll = 1){
          asset_ingranaggio_0 = asset_ingranaggio_1
