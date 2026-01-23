@@ -22,34 +22,20 @@ function gestisci_sparo(s, entita, muri_livello) {
 
   let time_now = Date.now();
 
-  // Verifica Cooldown
   if (time_now > entita.last_fired + entita.fire_rate) {
-
-    // Aggiorna tempo ultimo sparo
     entita.last_fired = time_now;
-
     let Y_OFFSET_SPARO = 36;
     let velocita = 600;
 
-    // --- SELEZIONE ASSET (POLIPHASER) ---
-    // Scegliamo quale variabile asset usare
     let img_da_usare = asset_proiettile_normale;
     if (entita.modalita_inquinante) {
       img_da_usare = asset_proiettile_inquinante;
     }
 
-    // --- CREAZIONE (POLIPHASER) ---
-    // Usiamo PP per aggiungere l'immagine alla scena
     let colpo = PP.assets.image.add(s, img_da_usare, entita.geometry.x, entita.geometry.y - Y_OFFSET_SPARO, 0.5, 0.5);
-
-    // --- FISICA (POLIPHASER) ---
-    // Aggiungiamo la fisica dinamica
     PP.physics.add(s, colpo, PP.physics.type.DYNAMIC);
-
-    // Disabilitiamo la gravità (accesso diretto al body nativo per sicurezza)
     colpo.ph_obj.body.allowGravity = false;
 
-    // --- DIREZIONE E VELOCITÀ (POLIPHASER) ---
     if (entita.geometry.flip_x) {
       PP.physics.set_velocity_x(colpo, -velocita);
       colpo.geometry.flip_x = true;
@@ -58,21 +44,18 @@ function gestisci_sparo(s, entita, muri_livello) {
       colpo.geometry.flip_x = false;
     }
 
-    // --- TIMER DISTRUZIONE (POLIPHASER) ---
     PP.timers.add_timer(s, 2000, function () {
-      // Controlliamo se esiste ancora prima di distruggerlo
       if (colpo.ph_obj.active) {
         PP.assets.destroy(colpo);
       }
     }, false);
 
+
     // --- COLLISIONI ---
 
     // 1. COLLISIONE CON I MURI
-    // Usiamo la fisica nativa per il check, ma distruggiamo l'oggetto PoliPhaser
     if (typeof muri_livello !== 'undefined' && muri_livello) {
       s.physics.add.collider(colpo.ph_obj, muri_livello, function (b, m) {
-        // b è l'oggetto nativo, ma noi distruggiamo il wrapper PP 'colpo'
         PP.assets.destroy(colpo);
       });
     }
@@ -80,26 +63,54 @@ function gestisci_sparo(s, entita, muri_livello) {
     // 2. COLLISIONE CON I NEMICI (RAGNI)
     if (typeof gruppo_ragni !== 'undefined' && gruppo_ragni) {
       s.physics.add.overlap(colpo.ph_obj, gruppo_ragni, function (bullet_native, enemy_native) {
+        
+        // Controllo validità
+        if(!colpo.ph_obj.active || !enemy_native.active) return;
 
-        // 1. Distruggi il proiettile (usiamo il riferimento PP)
         PP.assets.destroy(colpo);
 
-        // 2. Gestione RAGNO
-        // Disabilitiamo il corpo fisico del ragno così smette di muoversi e non fa danno
         enemy_native.body.enable = false;
-        
-        // Avviamo l'animazione "morte" sul ragno colpito
         enemy_native.anims.play("morte", true);
 
-        // 3. Timer per distruggere definitivamente il ragno dopo 1 secondo (tempo per l'animazione)
-        PP.timers.add_timer(s, 1000, function() {
-            // Controlliamo se esiste ancora per evitare errori
-            if(enemy_native.active) {
-                enemy_native.destroy();
-                console.log("Nemico rimosso dopo animazione morte.");
-            }
+        PP.timers.add_timer(s, 1000, function () {
+          if (enemy_native.active) {
+            enemy_native.destroy();
+            console.log("Nemico rimosso dopo animazione morte.");
+          }
         }, false);
+      });
+    }
 
+    // 3. COLLISIONE CON I CACTUS (Nuovo - DEVE ESSERE QUI, NON DENTRO I RAGNI)
+    if (typeof gruppo_cactus !== 'undefined' && gruppo_cactus) {
+      s.physics.add.overlap(colpo.ph_obj, gruppo_cactus, function (bullet_native, enemy_native) {
+
+        // Controllo validità
+        if(!colpo.ph_obj.active || !enemy_native.active) return;
+        
+        // 1. Distruggi il proiettile
+        PP.assets.destroy(colpo);
+
+        // 2. Controllo se è già morto per evitare doppi colpi
+        if (!enemy_native.body.enable) return;
+
+        // 3. Gestione CACTUS
+        enemy_native.body.enable = false; // Disabilita fisica
+
+        // Avviamo animazione morte
+        if (enemy_native.anims.exists("morte")) {
+          enemy_native.anims.play("morte", true);
+        } else {
+          enemy_native.setTint(0xff0000);
+        }
+
+        // 4. Timer distruzione
+        PP.timers.add_timer(s, 1000, function () {
+          if (enemy_native.active) {
+            enemy_native.destroy();
+            console.log("Cactus eliminato.");
+          }
+        }, false);
       });
     }
   }

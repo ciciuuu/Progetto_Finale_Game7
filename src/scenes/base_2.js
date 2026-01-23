@@ -10,7 +10,9 @@ function preload(s) {
     
     // 1. CARICAMENTO MODULI ESTERNI
     preload_hud(s);
-    preload_proiettili(s); 
+    preload_proiettili(s);
+    preload_cactus(s);
+    preload_enemy(s); 
 
     // 2. CARICAMENTO PLAYER LOCALE
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
@@ -66,6 +68,24 @@ function create(s) {
     // Camera e HUD
     PP.camera.start_follow(s, player, 0, 50);
     create_hud(s);
+
+
+
+    let ragni_liv2 = [
+        { x: 2052, y: -87, pattuglia: [2000, 2100] },
+        { x: 3742, y: -141, pattuglia: [3700, 3800] }
+    ];
+    create_enemy(s, muri_livello, ragni_liv2);
+
+
+    // --- CONFIGURAZIONE CACTUS LIVELLO 2 ---
+    let cactus_liv2 = [
+        { x: 2500, y: 100 },
+        { x: 3000, y: 200 },
+        { x: 3200, y: 200 }
+    ];
+    create_cactus(s, muri_livello, cactus_liv2);
+
 }
 
 function update(s) {
@@ -82,7 +102,11 @@ function update(s) {
         PP.scenes.start("base_3");
     }
     
+    // --- AGGIORNAMENTO NEMICI ---
+    // [CITE: Logic logic missing in original base_2.js]
     update_hud(s);
+    update_enemy(s); // Muove i ragni
+    update_cactus(s, player, muri_livello); // Gestisce sparo cactus
 }
 
 function destroy(s) {

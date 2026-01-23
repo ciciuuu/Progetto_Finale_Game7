@@ -23,6 +23,7 @@ function preload(s) {
     // 1. PRELOAD ESTERNI
     preload_hud(s);
     preload_proiettili(s);
+    
 
     // Caricamento Player
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
@@ -40,6 +41,7 @@ function preload(s) {
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
     preload_enemy(s);
+    preload_cactus(s);
     preload_player(s);
     preload_blueprint(s);
 }
@@ -129,7 +131,24 @@ function create(s) {
     create_hud(s);
 
     // 7. NEMICI E OGGETTI
-    create_enemy(s, muri_livello); // Passiamo i muri ai nemici
+
+    // --- CONFIGURAZIONE RAGNI LIVELLO 1 ---
+    let ragni_liv1 = [
+        { x: -8, y: 0, pattuglia: [-234, -15] },
+        { x: 182, y: -64, pattuglia: [70, 180] },
+        { x: -30, y: 0, pattuglia: [-200, -50] }
+    ];
+    create_enemy(s, muri_livello, ragni_liv1);
+
+
+    // --- CONFIGURAZIONE CACTUS LIVELLO 1 ---
+    let cactus_liv1 = [
+        { x: 100, y: 400 },  // Solo coordinate per i cactus
+        { x: 1200, y: 350 }
+    ];
+    create_cactus(s, muri_livello, cactus_liv1);
+   
+   
     create_blueprint(s, player);
 
 
@@ -175,6 +194,7 @@ function update(s) {
     if (player) manage_player_update(s, player, muri_livello);
 
     update_enemy(s);
+    update_cactus(s, player, muri_livello);
     update_blueprint(s);
     update_hud(s);
 }

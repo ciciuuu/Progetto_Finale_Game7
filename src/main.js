@@ -4,8 +4,8 @@ var config = {
     canvas_height: 800,
     canvas_id: "game_area", // Specifica il div contenitore
     background_color: 0xeec877,
-    debug_mode: false,
+    debug_mode: true,
     gravity_value: 1200
 };
 
-PP.game.create(config);
+PP.game.create(config); 
