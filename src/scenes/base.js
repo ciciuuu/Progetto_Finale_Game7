@@ -49,7 +49,7 @@ function preload(s) {
 function create(s) {
 
     PP.game_state.set_variable("HP_player", 10);
-    set_vulnerable(true);
+    set_vulnerable(s, true);
 
     const PARALLAX_WIDTH = 15800;
     const PARALLAX_HEIGHT = 3000;
@@ -141,7 +141,8 @@ function create(s) {
         { x: 182, y: -64, pattuglia: [70, 180] },
         { x: -30, y: 0, pattuglia: [-200, -50] }
     ];
-    create_enemy(s, muri_livello, ragni_liv1);
+    
+    create_enemy(s, muri_livello, ragni_liv1, player);
 
 
     // --- CONFIGURAZIONE CACTUS LIVELLO 1 ---
