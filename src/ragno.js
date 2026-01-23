@@ -24,6 +24,7 @@ function set_vulnerable() {
 
 // --- FUNZIONE PER TOGLIERE VITA AL PLAYER ---
 function take_damage(s) {
+    
     if (vulnerable) {
         vulnerable = false;
         PP.game_state.set_variable("HP_player", PP.game_state.get_variable("HP_player") - 1);
