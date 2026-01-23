@@ -7,6 +7,8 @@ let enemy;
 let enemy2;
 let enemy3; 
 
+let player;
+
 let vulnerable = true;
 
 function preload_enemy(s) {
@@ -25,6 +27,29 @@ function imposta_pattuglia(ragno_wrapper, min_x, max_x) {
     sprite.is_pattuglia = true;      
 }
 
+// --- FUNZIONE PER TOGLIERE VITA AL PLAYER ---
+function take_damage(s) {
+    
+    if (vulnerable) {
+        vulnerable = false;
+        PP.game_state.set_variable("HP_player", PP.game_state.get_variable("HP_player") - 1);
+        if (PP.game_state.get_variable("HP_player") <= 0) {
+            PP.scenes.start("game_over");
+        }
+        PP.timers.add_timer(s, 500, set_vulnerable, false);
+    }
+}
+
+function imposta_pattuglia(ragno, min_x, max_x) {
+    ragno.pattuglia_min = min_x;     // Salviamo il limite sinistro
+    ragno.pattuglia_max = max_x;     // Salviamo il limite destro
+    ragno.direzione_corrente = 1;    // 1 = destra, -1 = sinistra
+    ragno.is_pattuglia = true;       // Attiviamo l'etichetta
+}
+
+
+
+// --- FUNZIONE DI SUPPORTO (HELPER) ---
 function spawna_ragno(s, x, y) {
     let nuovo_ragno = PP.assets.sprite.add(s, img_enemy, x, y, 0.5, 1);
 
@@ -68,47 +93,211 @@ function create_enemy(s, muri, spawn_list) {
         gruppo_ragni.add(nemico.ph_obj);
     }
 
+
+
+
+function create_enemy(s, muri, player_riferimento) { // Ho tolto 'enemy' dai parametri, usiamo le globali
+
+    gruppo_ragni = s.physics.add.group();
+
+    // NEMICO 1
+    enemy = spawna_ragno(s, -8, 0); //punto spawn iniziale (s, posizione_x, posizione_y)
+    imposta_pattuglia(enemy, -234, -15); // funzione (enemy, posizione_x sinistra, posizione_x destra)
+    gruppo_ragni.add(enemy.ph_obj);
+
+    // NEMICO 2
+    enemy2 = spawna_ragno(s, 182, -64); //punto spawn iniziale (s, posizione_x, posizione_y)
+    imposta_pattuglia(enemy2, 180, 70); // funzione (enemy, posizione_x sinistra, posizione_x destra)
+    gruppo_ragni.add(enemy2.ph_obj);
+
+    // NEMICO 3
+    enemy3 = spawna_ragno(s, -30, 0); //punto spawn iniziale (s, posizione_x, posizione_y)
+    imposta_pattuglia(enemy3, -200, -50); // funzione (enemy, posizione_x sinistra, posizione_x destra)
+    gruppo_ragni.add(enemy3.ph_obj);
+
+
+
+
+
+    // 4. Collisione tra TUTTI i ragni e i muri
     if (muri) {
         s.physics.add.collider(gruppo_ragni, muri);
     }
+
+    // --- COLLISIONE CON IL PLAYER (VERSIONE SICURA) ---
+    // Invece di 'enemy', usiamo 'gruppo_ragni'. 
+    // Invece della variabile globale 'player', usiamo quella passata come parametro.
+    if (player_riferimento && player_riferimento.ph_obj) {
+        s.physics.add_overlap_f(gruppo_ragni, player_riferimento.ph_obj, function(enemy, player_obj) {
+            take_damage(s);
+        });
+    }
+}
+// --- NUOVA LOGICA MOVIMENTO ---
+// Questa funzione prende un ragno e lo muove in base ai SUOI parametri personali
+function muovi_singolo_ragno(ragno) {
+    // Se il ragno non esiste o non ha pattuglia impostata, esci
+    // 1. Controllo base: l'oggetto esiste? Ha la pattuglia attivata?
+    if (!ragno || !ragno.is_pattuglia) return;
+
+    // 2. Controlliamo se il ragno ha ancora un corpo fisico (.ph_obj e .body).
+    // Se è stato colpito e distrutto, queste proprietà spariscono.
+    // Se mancano, ci fermiamo subito ("return") per evitare l'errore.
+    if (!ragno.ph_obj || !ragno.ph_obj.body) return;
+
+
+    // --- Da qui in poi è uguale a prima ---  
+    let limite_sx = Math.min(ragno.pattuglia_min, ragno.pattuglia_max);
+    let limite_dx = Math.max(ragno.pattuglia_min, ragno.pattuglia_max);
+
+    // Tocco il limite destro -> Vado a sinistra
+    if (ragno.geometry.x >= limite_dx) {
+        ragno.direzione_corrente = -1;
+        ragno.geometry.flip_x = false;
+    }
+    // Tocco il limite sinistro -> Vado a destra
+    else if (ragno.geometry.x <= limite_sx) {
+        ragno.direzione_corrente = 1;
+        ragno.geometry.flip_x = true;
+    }
+
+    PP.physics.set_velocity_x(ragno, 100 * ragno.direzione_corrente);
 }
 
 function update_enemy(s) {
-    if (!gruppo_ragni) return;
 
-    let children = gruppo_ragni.getChildren();
+    muovi_singolo_ragno(enemy);
+    muovi_singolo_ragno(enemy2);
+    muovi_singolo_ragno(enemy3);
 
-    for (let i = 0; i < children.length; i++) {
-        let singolo_ragno = children[i]; // Questo è lo SPRITE NATIVO di Phaser
-
-        // Controlliamo che esista e che abbia un corpo fisico attivo
-        if (singolo_ragno.active && singolo_ragno.body && singolo_ragno.body.enable) {
-            muovi_singolo_ragno(singolo_ragno);
-        }
-    }
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.K)) {
+    console.log("Tasto K premuto: forzo take_damage");
+    take_damage(s);
 }
 
-function muovi_singolo_ragno(ragno_nativo) {
-    
-    // 1. Controlliamo i dati salvati sullo sprite nativo
-    if (!ragno_nativo.is_pattuglia) return;
 
-    let limite_sx = Math.min(ragno_nativo.pattuglia_min, ragno_nativo.pattuglia_max);
-    let limite_dx = Math.max(ragno_nativo.pattuglia_min, ragno_nativo.pattuglia_max);
 
-    // 2. Logica Rimbalzo
-    // Tocco il limite destro -> Vado a sinistra
-    if (ragno_nativo.x >= limite_dx) {
-        ragno_nativo.direzione_corrente = -1;
-        ragno_nativo.flipX = false; // Sintassi nativa Phaser per girare l'immagine
+    /*   if (!enemy) return;
+  
+  
+      if (enemy.geometry.x >= -13) {
+          enemy_direzione = -1;
+          enemy.geometry.flip_x = false; // O true, dipende dal disegno
+      }
+      // Se supero il limite SINISTRO (-234) -> Vado a Destra (1)
+      else if (enemy.geometry.x <= -234) {
+          enemy_direzione = 1;
+          enemy.geometry.flip_x = true; // O false
+      }
+  
+      PP.physics.set_velocity_x(enemy, 100 * enemy_direzione); //---FONDAMENTALE, senza questo non funziona nulla
+   */
+
+
+    /* if (enemy.geometry.x >= -13) {
+        // Ho toccato il muro a destra, devo andare a SINISTRA
+        PP.physics.set_velocity_x(enemy, -100);
+
+        // Non flippare (o flippa a seconda di come è disegnata la sprite)
+        enemy.geometry.flip_x = false;
+
+        PP.assets.sprite.animation_play(enemy, "camminata");
     }
-    // Tocco il limite sinistro -> Vado a destra
-    else if (ragno_nativo.x <= limite_sx) {
-        ragno_nativo.direzione_corrente = 1;
-        ragno_nativo.flipX = true; 
-    }
+    // 2. Controllo il Limite SINISTRO (Numero più piccolo, -234)
+    else if (enemy.geometry.x <= -234) {
+        // Ho toccato il muro a sinistra, devo andare a DESTRA
+        PP.physics.set_velocity_x(enemy, 100);
 
-    // 3. APPLICAZIONE VELOCITÀ (CORREZIONE ERRORE)
-    // Non usiamo .setVelocityX() direttamente sullo sprite, ma sul suo .body
-    ragno_nativo.body.setVelocityX(100 * ragno_nativo.direzione_corrente);
+        // Flippa la sprite (nota: usa 'enemy', non 'player')
+        enemy.geometry.flip_x = true;
+
+        PP.assets.sprite.animation_play(enemy, "camminata");
+    } */
+
+
+    /*   if(enemy.geometry.x >= 1000) {
+          // Hit right boundary
+          PP.physics.set_velocity_x(enemy, -100);
+          PP.assets.sprite.animation_play(enemy, "walk_left");
+      }
+      else if (enemy.geometry.x <= 600) {
+          // Hit left boundary
+          PP.physics.set_velocity_x(enemy, 100);
+          PP.assets.sprite.animation_play(enemy, "walk_right");
+      }
+   */
+
+
+
+
+
+    /* function create_enemy(s, player) {
+    enemy = PP.assets.sprite.add(s, img_enemy, 800, 500, 0.5, 1);
+    PP.physics.add(s, enemy, PP.physics.type.DYNAMIC);
+    PP.physics.add_collider(s, enemy);
+
+    PP.physics.add_overlap_f(s, enemy, player, take_damage);
+
+    // Velocità iniziale del nemico (verso dx)
+    PP.physics.set_velocity_x(enemy, 100);
+
+    // Aggiungo le animazioni walk dx/sx
+    PP.assets.sprite.animation_add(enemy, "walk_left", 0, 3, 15, -1);
+    PP.assets.sprite.animation_add(enemy, "walk_right", 0, 3, 15, -1);
+
+    // Iniziamo andando a destra
+    PP.assets.sprite.animation_play(enemy, "walk_right");
+
+    // Qui imposto la scala del personaggio
+    enemy.geometry.scale_x = 2;
+    enemy.geometry.scale_y = 2;
+
 }
+
+function update_enemy(s) {
+    if(enemy.geometry.x >= 1000) {
+        // Hit right boundary
+        PP.physics.set_velocity_x(enemy, -100);
+        PP.assets.sprite.animation_play(enemy, "walk_left");
+        enemy.geometry.flip_x = false;
+    }
+    else if (enemy.geometry.x <= 600) {
+        // Hit left boundary
+        PP.physics.set_velocity_x(enemy, 100);
+        PP.assets.sprite.animation_play(enemy, "walk_right");
+        enemy.geometry.flip_x = true;
+    }
+} */
+
+
+
+    /* // DEBUG: Premi 'L' per vedere la distanza in console
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
+
+        // 1. CONFIGURAZIONE: CAMBIA SOLO IL NOME QUI SOTTO
+        let OGGETTO_TARGET = enemy; // <--- Sostituisci 'ingranaggio' con 'enemy1' o altro
+
+
+        // 2. Otteniamo gli oggetti nativi
+        let p_obj = player.ph_obj;
+        let t_obj = OGGETTO_TARGET.ph_obj; // t_obj sta per Target Object
+        let cam = s.cameras.main;
+
+        // 3. Calcolo Posizione "Mondo" Intelligente
+        // Se l'oggetto ha scrollFactor 0 (è un HUD fisso), dobbiamo sommare la camera.
+        // Se l'oggetto è normale (si muove col livello), usiamo la sua coordinata diretta.
+        let target_world_x = (t_obj.scrollFactorX === 0) ? cam.scrollX + t_obj.x : t_obj.x;
+        let target_world_y = (t_obj.scrollFactorY === 0) ? cam.scrollY + t_obj.y : t_obj.y;
+
+        // 4. Calcolo Distanza
+        let dist_x = Math.abs(p_obj.x - target_world_x);
+        let dist_y = Math.abs(p_obj.y - target_world_y);
+
+        console.clear();
+        console.log("--- DEBUG DISTANZA ---");
+        console.log(`Player: x=${p_obj.x.toFixed(0)}, y=${p_obj.y.toFixed(0)}`);
+        console.log(`Target (${OGGETTO_TARGET == ingranaggio ? "HUD" : "World"}): x=${target_world_x.toFixed(0)}, y=${target_world_y.toFixed(0)}`);
+        console.log(`%cDISTANZA X: ${dist_x.toFixed(2)}`, "color: yellow; font-weight: bold;");
+        console.log(`%cDISTANZA Y: ${dist_y.toFixed(2)}`, "color: yellow; font-weight: bold;");
+    } */
+}}
