@@ -213,11 +213,12 @@ const BLOCCHI_SOLIDI = [
     64, 65, 66, 67, 68, 69, 70,
     71, 72, 73, 74, 76, 77, 78,
     81, 82, 83, 84, 86, 87, 88,
-    96, 97, 98
+    91, 92, 93, 94, 96, 97, 98,
+    111, 112, 113
 ];
 
 // --- NUOVO: Blocchi Piattaforma (Hitbox stretta solo in alto) ---
-const BLOCCHI_PIATTAFORMA = [25, 26, 27, 41, 42, 43];
+const BLOCCHI_PIATTAFORMA = [];
 const ALTEZZA_PIATTAFORMA = 15;
 
 const TILESET_KEY = "tiles";

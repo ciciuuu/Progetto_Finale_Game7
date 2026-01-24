@@ -34,7 +34,7 @@ function create_blueprint(s, player) {
 
   let blueprint_collezionabile2 = PP.assets.image.add(s, img_blueprint, 200, -100, 0.5, 0.5);
 
-  let blueprint_collezionabile3 = PP.assets.image.add(s, img_blueprint, 250, -100, 0.5, 0.5);
+  let blueprint_collezionabile3 = PP.assets.image.add(s, img_blueprint, 1820, -165, 0.5, 0.5);
 
 
   // Aggiungo la fisica (STATICA, così non cade e non viene spinto)
