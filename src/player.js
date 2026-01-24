@@ -11,7 +11,7 @@ let curr_anim = "stop";
 let j_pressed = false;
 
 function preload_player(s) {
-    //s.load.image("proiettile_asset", "assets/images/PLAYER/Proiettile.png");
+    
 }
 
 function configure_player_animations(s, player) {
@@ -287,7 +287,6 @@ function manage_player_update(s, player, muri_livello) {
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
         let coord_x = Math.round(player.ph_obj.x);
         let coord_y = Math.round(player.ph_obj.y);
-        console.clear();
         console.log(`POS: ${coord_x}, ${coord_y}`);
     }
 }
