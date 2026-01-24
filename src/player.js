@@ -11,7 +11,7 @@ let curr_anim = "stop";
 let j_pressed = false;
 
 function preload_player(s) {
-    
+
 }
 
 function configure_player_animations(s, player) {
@@ -41,6 +41,7 @@ function configure_player_animations(s, player) {
     // --- VARIABILI DI STATO ---
     player.sparo_attivo = false;
     player.coyote_counter = 0;
+    player.is_frozen = false;
 
     // --- VARIABILI PER LO SPARO ---
     player.last_fired = 0;
@@ -58,6 +59,19 @@ function configure_player_animations(s, player) {
 }
 
 function manage_player_update(s, player, muri_livello) {
+    // [NUOVO] BLOCCO TOTALE SE CONGELATO
+    if (player.is_frozen) {
+        // 1. Ferma ogni movimento orizzontale
+        PP.physics.set_velocity_x(player, 0);
+        
+        // 2. Forza animazione Idle (o quella che preferisci da fermo)
+        // Usiamo un controllo per non resettarla ogni frame
+        if (player.ph_obj.anims.currentAnim && player.ph_obj.anims.currentAnim.key !== "idle") {
+            PP.assets.sprite.animation_play(player, "idle");
+        }
+        return; 
+    }
+
     let next_anim = curr_anim;
 
 

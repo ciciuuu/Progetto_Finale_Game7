@@ -33,6 +33,9 @@ function create_vecchietto(s) {
     // 1. VECCHIETTO
     // ----------------------------------------
     vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -192, 0.5, 1);
+    // vecchietto.geometry.scale_x = 1.1;
+    // vecchietto.geometry.scale_y = 1.1;
+
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
     
     // [MODIFICA Z-INDEX] Mettiamo il vecchietto su un livello medio
@@ -99,85 +102,88 @@ function cambia_animazione_sicura(oggetto, nome_animazione) {
 }
 
 function update_vecchietto(s, player) {
-    if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
+  if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
 
-    // [MODIFICA Z-INDEX] Assicuriamoci che il player sia davanti al vecchietto (Depth > 5)
-    if (player.ph_obj.depth <= 5) {
-        player.ph_obj.setDepth(10);
-    }
+  // [MODIFICA Z-INDEX] Player sempre davanti
+  if (player.ph_obj.depth <= 5) {
+      player.ph_obj.setDepth(10);
+  }
 
-    // --- CASO 1: DIALOGO FINITO ---
-    if (dialogo_finito) {
-         if (tasto_S.ph_obj.visible) tasto_S.ph_obj.setVisible(false);
-         if (testo_schermo.visible) testo_schermo.setVisible(false);
-         if (sfondo_testo.visible) sfondo_testo.setVisible(false);
-         
-         cambia_animazione_sicura(vecchietto, "idle");
-         return; 
-    }
+  // --- CASO 1: DIALOGO FINITO ---
+  if (dialogo_finito) {
+       if (tasto_S.ph_obj.visible) tasto_S.ph_obj.setVisible(false);
+       if (testo_schermo.visible) testo_schermo.setVisible(false);
+       if (sfondo_testo.visible) sfondo_testo.setVisible(false);
+       
+       cambia_animazione_sicura(vecchietto, "idle");
+       
+       // [NUOVO] SCONGELA IL PLAYER
+       player.is_frozen = false;
 
-    // --- CASO 2: DIALOGO IN CORSO ---
-    if (dialogo_iniziato) {
-        
-        // [MODIFICA] Quando parla con noi, attiviamo l'animazione PARLA
-        cambia_animazione_sicura(vecchietto, "parla");
+       return; 
+  }
 
-        let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
-                            PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) || 
-                            PP.interactive.kb.is_key_down(s, PP.key_codes.ENTER);
+  // --- CASO 2: DIALOGO IN CORSO ---
+  if (dialogo_iniziato) {
+      
+      // [NUOVO] CONGELA IL PLAYER
+      player.is_frozen = true;
 
-        if (tasto_premuto) {
-            if (tasto_rilasciato) {
-                tasto_rilasciato = false; 
+      cambia_animazione_sicura(vecchietto, "parla");
 
-                if (indice_frase < frasi_vecchietto.length) {
-                    sfondo_testo.setVisible(true);
-                    testo_schermo.setVisible(true);
-                    testo_schermo.setText(frasi_vecchietto[indice_frase]);
-                    indice_frase++; 
-                } else {
-                    dialogo_finito = true;
-                }
-            }
-        } else {
-            tasto_rilasciato = true;
-        }
-    } 
-    // --- CASO 3: IN ATTESA (Controllo collisione) ---
-    else {
-        let dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo);
+      let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
+                          PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) || 
+                          PP.interactive.kb.is_key_down(s, PP.key_codes.ENTER);
 
-        if (dentro_zona) {
-            // -- DENTRO LA ZONA --
-            
-            // Animazione tasto diventa "tasto" (S)
-            cambia_animazione_sicura(tasto_S, "tasto");
-            
-            // [MODIFICA] Il vecchietto resta IDLE finché non premiamo
-            cambia_animazione_sicura(vecchietto, "idle");
+      if (tasto_premuto) {
+          if (tasto_rilasciato) {
+              tasto_rilasciato = false; 
 
-            if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
-                if (tasto_rilasciato) {
-                    dialogo_iniziato = true;
-                    
-                    tasto_S.ph_obj.setVisible(false);
-                    
-                    sfondo_testo.setVisible(true);
-                    testo_schermo.setVisible(true);
-                    testo_schermo.setText(frasi_vecchietto[0]);
-                    indice_frase = 1;
+              if (indice_frase < frasi_vecchietto.length) {
+                  sfondo_testo.setVisible(true);
+                  testo_schermo.setVisible(true);
+                  testo_schermo.setText(frasi_vecchietto[indice_frase]);
+                  indice_frase++; 
+              } else {
+                  dialogo_finito = true;
+                  // Nota: Lo scongelamento avviene al prossimo frame nel CASO 1
+              }
+          }
+      } else {
+          tasto_rilasciato = true;
+      }
+  } 
+  // --- CASO 3: IN ATTESA ---
+  else {
+      let dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo);
 
-                    tasto_rilasciato = false;
-                }
-            } else {
-                tasto_rilasciato = true;
-            }
+      if (dentro_zona) {
+          cambia_animazione_sicura(tasto_S, "tasto");
+          cambia_animazione_sicura(vecchietto, "idle");
 
-        } else {
-            // -- FUORI DALLA ZONA --
-            
-            cambia_animazione_sicura(vecchietto, "idle");
-            cambia_animazione_sicura(tasto_S, "puntini");
-        }
-    }
+          if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
+              if (tasto_rilasciato) {
+                  dialogo_iniziato = true;
+                  // [NUOVO] CONGELA SUBITO
+                  player.is_frozen = true; 
+                  // [NUOVO] Ferma subito il player visivamente per evitare scivolamenti
+                  PP.physics.set_velocity_x(player, 0);
+
+                  tasto_S.ph_obj.setVisible(false);
+                  sfondo_testo.setVisible(true);
+                  testo_schermo.setVisible(true);
+                  testo_schermo.setText(frasi_vecchietto[0]);
+                  indice_frase = 1;
+
+                  tasto_rilasciato = false;
+              }
+          } else {
+              tasto_rilasciato = true;
+          }
+
+      } else {
+          cambia_animazione_sicura(vecchietto, "idle");
+          cambia_animazione_sicura(tasto_S, "puntini");
+      }
+  }
 }

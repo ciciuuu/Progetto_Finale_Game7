@@ -167,20 +167,42 @@ function aggiungi_trappola_manuale(s, x, y, w, h) {
     gruppo_trappole.add(zona);
 }
 
+// Funzione che scatta quando muori
 function morte_player(s, player, trappola) {
-    if (player.is_dead) return;
+    if (player.is_dead) return; // Evita che la funzione scatti due volte
     player.is_dead = true;
-    console.log("SEI MORTO!");
 
+    // 1. Blocchiamo il player
     if (player && player.ph_obj.active) {
-        player.ph_obj.setVisible(false);
-        player.ph_obj.body.enable = false;
-        player.ph_obj.body.setVelocity(0, 0);
+        player.ph_obj.setTint(0xFF0000); // Diventa rosso
+        player.ph_obj.body.enable = false; // Niente più fisica
+        player.ph_obj.body.setVelocity(0, 0); // Fermo
     }
 
-    PP.timers.add_timer(s, 1000, function () {
-        PP.scenes.start("game_over");
-    }, false);
+    // 2. Creiamo il rettangolo nero (SIPARIO)
+    // Lo posizioniamo a 0,0 e lo facciamo grande come tutto lo schermo
+    let sipario_nero = s.add.rectangle(
+        0, 0, 
+        PP.game.config.canvas_width, 
+        PP.game.config.canvas_height, 
+        0x000000
+    );
+    
+    // Impostazioni fondamentali
+    sipario_nero.setOrigin(0, 0);       // Parte dall'angolo in alto a sinistra
+    sipario_nero.setScrollFactor(0);    // SI INCOLLA ALLO SCHERMO (copre anche se ti muovi)
+    sipario_nero.setDepth(9999);        // Z-INDEX MASSIMO (sopra a tutto, anche all'HUD)
+    sipario_nero.alpha = 0;             // Parte trasparente
+
+    // 3. Animazione Dissolvenza (Tween)
+    s.tweens.add({
+        targets: sipario_nero,
+        alpha: 1,           // Diventa nero totale
+        duration: 400,      // In mezzo secondo (500ms)
+        onComplete: function() {
+            PP.scenes.start("game_over");
+        }
+    });
 }
 
 PP.scenes.add("base", preload, create, update, destroy);
