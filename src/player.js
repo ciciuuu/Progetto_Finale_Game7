@@ -156,6 +156,8 @@ function manage_player_update(s, player, muri_livello) {
             sipario_nero_obj.ph_obj.alpha += 0.02; 
         } else {
             is_fading_death = false;
+
+            PP.game_state.set_variable("ultimo_livello", s.scene.key);
             PP.scenes.start("game_over");
             return;
         }

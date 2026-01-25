@@ -2,7 +2,7 @@ let img_player;
 let img_player_sparo;
 
 let player;
-let muri_livello; 
+let muri_livello;
 
 let parallasse1;
 let parallasse2;
@@ -19,7 +19,7 @@ function preload(s) {
     // 1. PRELOAD ESTERNI
     preload_hud(s);
     preload_proiettili(s);
-    
+
     // NUOVO: Preload Vecchietto
     preload_vecchietto(s);
 
@@ -138,7 +138,14 @@ function update(s) {
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
     if (player.ph_obj.x > 6800) {
+
+        // 2. NUOVO: Salviamo quanta vita ha il player in questo preciso istante
+        let vita_al_passaggio = PP.game_state.get_variable("HP_player");
+        PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
         PP.scenes.start("base_3");
+        PP.game_state.set_variable("spawn_x", 100); //spawn livello 2
+        PP.game_state.set_variable("spawn_y", 100); //spawn livello 2
+
     }
 
     if (player) manage_player_update(s, player, muri_livello);
@@ -162,7 +169,7 @@ function destroy(s) {
 function aggiungi_trappola_manuale(s, x, y, w, h) {
     let zona = s.add.zone(x, y, w, h);
     zona.setOrigin(0, 0);
-    s.physics.add.existing(zona, true); 
+    s.physics.add.existing(zona, true);
     gruppo_trappole.add(zona);
 }
 
@@ -181,12 +188,12 @@ function morte_player(s, player, trappola) {
     // 2. Creiamo il rettangolo nero (SIPARIO)
     // Lo posizioniamo a 0,0 e lo facciamo grande come tutto lo schermo
     let sipario_nero = s.add.rectangle(
-        0, 0, 
-        PP.game.config.canvas_width, 
-        PP.game.config.canvas_height, 
+        0, 0,
+        PP.game.config.canvas_width,
+        PP.game.config.canvas_height,
         0x000000
     );
-    
+
     // Impostazioni fondamentali
     sipario_nero.setOrigin(0, 0);       // Parte dall'angolo in alto a sinistra
     sipario_nero.setScrollFactor(0);    // SI INCOLLA ALLO SCHERMO (copre anche se ti muovi)
@@ -198,7 +205,7 @@ function morte_player(s, player, trappola) {
         targets: sipario_nero,
         alpha: 1,           // Diventa nero totale
         duration: 400,      // In mezzo secondo (500ms)
-        onComplete: function() {
+        onComplete: function () {
             PP.scenes.start("game_over");
         }
     });

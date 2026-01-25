@@ -57,6 +57,7 @@ function create_hud(s) {
     pistola = PP.assets.sprite.add(s, asset_pistole, 332, 210, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
 
+    // --- HEALTH BAR ---
     health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 332, 550, 0, 0);
     health_bar.ph_obj.setScrollFactor(0);
     
