@@ -43,7 +43,6 @@ function preload(s) {
 function create(s) {
 
     PP.game_state.set_variable("HP_player", 10);
-    set_vulnerable(s, true);
 
     const PARALLAX_WIDTH = 15800;
     const PARALLAX_HEIGHT = 3000;
