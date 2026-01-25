@@ -59,13 +59,9 @@ function configure_player_animations(s, player) {
 }
 
 function manage_player_update(s, player, muri_livello) {
-    // [NUOVO] BLOCCO TOTALE SE CONGELATO
+    
     if (player.is_frozen) {
-        // 1. Ferma ogni movimento orizzontale
         PP.physics.set_velocity_x(player, 0);
-        
-        // 2. Forza animazione Idle (o quella che preferisci da fermo)
-        // Usiamo un controllo per non resettarla ogni frame
         if (player.ph_obj.anims.currentAnim && player.ph_obj.anims.currentAnim.key !== "idle") {
             PP.assets.sprite.animation_play(player, "idle");
         }
@@ -76,19 +72,14 @@ function manage_player_update(s, player, muri_livello) {
 
 
     // 1. SINCRONIZZAZIONE ARMA CON HUD
-
-    if (typeof hud_modalita_inquinante !== 'undefined') { // Controlliamo se la variabile globale esiste (per evitare errori se HUD non è caricato)
-
-        // Se c'è una discrepanza tra Player e HUD, aggiorniamo il Player
+    if (typeof hud_modalita_inquinante !== 'undefined') {
         if (player.modalita_inquinante !== hud_modalita_inquinante) {
-
             player.modalita_inquinante = hud_modalita_inquinante;
-
             if (player.modalita_inquinante) {
-                player.fire_rate = 545; // Calcolo: 6 frame / 11 FPS * 1000 = 545ms
+                player.fire_rate = 545; 
                 player.anim_sparo_corrente = "sparo_inquinante";
             } else {
-                player.fire_rate = 750; // Calcolo: 6 frame / 8 FPS * 1000 = 750ms
+                player.fire_rate = 750; 
                 player.anim_sparo_corrente = "sparo_rinnovabile";
             }
         }
@@ -104,12 +95,9 @@ function manage_player_update(s, player, muri_livello) {
 
 
     // 3. GESTIONE MOVIMENTO
-
-    // Variabile per capire se mi sto muovendo
     let is_moving = false;
     let target_velocity_x = 0;
 
-    // Controllo input movimento
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
         target_velocity_x = player_speed;
         player.geometry.flip_x = false;
@@ -135,39 +123,34 @@ function manage_player_update(s, player, muri_livello) {
         is_moving = true;
     }
 
-    // --- GESTIONE VELOCITÀ MENTRE SI SPARA ---
     if (player.sparo_attivo && is_moving) {
-        // Se sto sparando e mi muovo, forzo la velocità a 150
-
         let direzione;
-        // Calcolo direzione esteso (NO ternario)
         if (player.geometry.flip_x == true) {
             direzione = -1;
         } else {
             direzione = 1;
         }
-
         target_velocity_x = 150 * direzione;
     }
 
-    // Applico la velocità calcolata
     PP.physics.set_velocity_x(player, target_velocity_x);
 
 
-
-    // 4. LOGICA DI SALTO E COYOTE TIME
+    // 4. LOGICA DI SALTO E COYOTE TIME (MODIFICATA)
 
     let is_on_solid_ground = player.ph_obj.body.blocked.down;
 
+    // Gestione Coyote Time
     if (is_on_solid_ground) {
         player.coyote_counter = 10;
-        mid_jump = true;
+        mid_jump = true; // Resetta il doppio salto quando tocchi terra
     } else {
         if (player.coyote_counter > 0) {
             player.coyote_counter--;
         }
     }
 
+    // --- SALTO INIZIALE (DA TERRA) ---
     if (player.coyote_counter > 0) {
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
             space_pressed = true;
@@ -176,16 +159,40 @@ function manage_player_update(s, player, muri_livello) {
         }
     }
 
-    if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE)) {
-        space_pressed = false;
+    // --- DOPPIO SALTO ---
+    if (!is_on_solid_ground) {
+        if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
+            space_pressed = true;
+            PP.physics.set_velocity_y(player, -jump_init_speed);
+            mid_jump = false;
+        }
     }
+
+    // --- SALTO VARIABILE (TAGLIO VELOCITÀ AL RILASCIO) ---
+    if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE)) {
+        // Se stavamo premendo spazio (space_pressed true) e ora lo abbiamo rilasciato...
+        if (space_pressed) {
+            let current_vy = PP.physics.get_velocity_y(player);
+            
+            // Se il player sta andando verso l'alto (velocità negativa)
+            // -50 è una soglia di sicurezza per non tagliare se siamo già quasi all'apice
+            if (current_vy < -50) {
+                // Riduciamo la velocità verticale del 50%
+                PP.physics.set_velocity_y(player, current_vy * 0.5);
+            }
+            
+            // Resettiamo il flag
+            space_pressed = false;
+        }
+    }
+
 
     // 5. GESTIONE ANIMAZIONI
 
     let anim_sparo_corsa = player.anim_sparo_corrente; 
     let anim_sparo_fermo;
-    let anim_sparo_salto_su;  // [NUOVO] Variabile per salto in alto
-    let anim_sparo_salto_giu; // [NUOVO] Variabile per salto in basso
+    let anim_sparo_salto_su; 
+    let anim_sparo_salto_giu; 
 
     if (player.modalita_inquinante == true) {
         anim_sparo_fermo = "sparo_inquinante_fermo";
@@ -199,33 +206,22 @@ function manage_player_update(s, player, muri_livello) {
 
     if (!is_on_solid_ground) {
         // --- IN ARIA ---
-        
-        // Controllo velocità verticale per sapere se va SU o GIÙ
         let v_y = PP.physics.get_velocity_y(player);
 
         if (player.sparo_attivo) {
-            // [NUOVO] LOGICA SALTO CON SPARO
             if (v_y < 0) {
-                next_anim = anim_sparo_salto_su;  // Sta salendo e sparando
+                next_anim = anim_sparo_salto_su;  
             } else {
-                next_anim = anim_sparo_salto_giu; // Sta scendendo e sparando
+                next_anim = anim_sparo_salto_giu; 
             }
-
         } else {
-            // LOGICA SALTO NORMALE (SENZA SPARO)
             if (v_y < 0) {
                 next_anim = "jump_up";
             } else if (v_y > 0) {
                 next_anim = "jump_down";
             }
         }
-
-        // Doppio Salto
-        if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
-            space_pressed = true;
-            PP.physics.set_velocity_y(player, -jump_init_speed);
-            mid_jump = false;
-        }
+        // Nota: Il blocco del doppio salto qui era ridondante, l'ho spostato sopra nella sezione logica salto
 
     } else {
         // --- A TERRA ---
@@ -244,15 +240,12 @@ function manage_player_update(s, player, muri_livello) {
         }
     }
 
-    // Applica animazione
     if (next_anim != curr_anim) {
         PP.assets.sprite.animation_play(player, next_anim);
         curr_anim = next_anim;
     }
 
-    // =========================================================
     // GOD MODE (Tasto J)
-    // =========================================================
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.J)) {
         if (j_pressed == false) {
             player.god_mode = !player.god_mode;
@@ -275,8 +268,6 @@ function manage_player_update(s, player, muri_livello) {
 
     if (player.god_mode == true) {
         let speed_fly = 700;
-
-        // Orizzontale
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
             PP.physics.set_velocity_x(player, speed_fly);
         } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
@@ -285,7 +276,6 @@ function manage_player_update(s, player, muri_livello) {
             PP.physics.set_velocity_x(player, 0);
         }
 
-        // Verticale
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.W) || PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
             PP.physics.set_velocity_y(player, -speed_fly);
         } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
@@ -293,65 +283,6 @@ function manage_player_update(s, player, muri_livello) {
         } else {
             PP.physics.set_velocity_y(player, 0);
         }
-
         return;
     }
-
-    // DEBUG
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
-        let coord_x = Math.round(player.ph_obj.x);
-        let coord_y = Math.round(player.ph_obj.y);
-        console.log(`POS: ${coord_x}, ${coord_y}`);
-    }
 }
-
-
-
-
-
-
-
-
-
-
-// --- FUNZIONE SPARO ---
-/* function try_fire_bullet(s, player) {
-    let time_now = Date.now();
-
-    // Verifica Cooldown (usa player.fire_rate che cambia premendo L)
-    if (time_now > player.last_fired + player.fire_rate) {
-
-        player.last_fired = time_now;
-
-        let Y_OFFSET_SPARO = 25;
-        let velocita = 600;
-
-        let colpo = s.physics.add.sprite(player.geometry.x, player.geometry.y - Y_OFFSET_SPARO, "proiettile_asset");
-
-        //colpo.setScale(0.1);
-        colpo.body.allowGravity = false;
-
-        // Se siamo in modalità inquinante, magari coloriamo il proiettile di verde
-        if (player.modalita_inquinante) {
-            colpo.setTint(0x00ff00); // Verde
-        }
-
-        if (player.geometry.flip_x) {
-            colpo.setVelocityX(-velocita);
-            colpo.setFlipX(true);
-        } else {
-            colpo.setVelocityX(velocita);
-            colpo.setFlipX(false);
-        }
-
-        s.time.delayedCall(2000, () => {
-            if (colpo.active) colpo.destroy();
-        });
-
-        if (typeof muri_livello !== 'undefined' && muri_livello) {
-            s.physics.add.collider(colpo, muri_livello, function (b, m) {
-                b.destroy();
-            });
-        }
-    }
-} */
