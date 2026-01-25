@@ -52,7 +52,7 @@ function create(s) {
 function update(s) {
  
   if(PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
-    PP.scenes.start("base");
+    PP.scenes.start("base_3");
   }
   
   if(PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {

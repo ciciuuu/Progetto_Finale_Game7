@@ -138,7 +138,7 @@ function update(s) {
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
     if (player.ph_obj.x > 6800) {
-        PP.scenes.start("base_2");
+        PP.scenes.start("base_3");
     }
 
     if (player) manage_player_update(s, player, muri_livello);

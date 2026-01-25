@@ -29,16 +29,11 @@ function preload_vecchietto(s) {
 }
 
 function create_vecchietto(s) {
-    // ----------------------------------------
     // 1. VECCHIETTO
-    // ----------------------------------------
     vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -192, 0.5, 1);
-    // vecchietto.geometry.scale_x = 1.1;
-    // vecchietto.geometry.scale_y = 1.1;
 
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
     
-    // [MODIFICA Z-INDEX] Mettiamo il vecchietto su un livello medio
     vecchietto.ph_obj.setDepth(5); 
 
     PP.assets.sprite.animation_add_list(vecchietto, "idle", [0, 1, 2, 3], 6, -1);

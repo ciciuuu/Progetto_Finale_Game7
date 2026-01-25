@@ -330,4 +330,13 @@ function manage_player_update(s, player, muri_livello) {
         else if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) PP.physics.set_velocity_y(player, speed_fly);
         else PP.physics.set_velocity_y(player, 0);
     }
+
+
+    // DEBUG
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
+        let coord_x = Math.round(player.ph_obj.x);
+        let coord_y = Math.round(player.ph_obj.y);
+        console.log(`POS: ${coord_x}, ${coord_y}`);
+    }
+    
 }
