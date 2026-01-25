@@ -1,5 +1,5 @@
 let img_go_btn;
-let go_btn_rigioca, go_btn_menu;
+let go_btn_rigioca, go_btn_menu, go_btn_checkpoint;
 let go_mouse_lock = false;
 
 function preload_game_over(s) {
@@ -31,8 +31,9 @@ function create_game_over(s) {
         return b;
     };
 
-    go_btn_rigioca = make_btn(cx - 200, "RIGIOCA");
-    go_btn_menu = make_btn(cx + 200, "MENU");
+    go_btn_rigioca = make_btn(cx - 380, "RIGIOCA");
+    go_btn_checkpoint = make_btn(cx, "CHECKPOINT");
+    go_btn_menu = make_btn(cx + 380, "MENU");
 }
 
 function update_game_over(s) {
@@ -60,6 +61,13 @@ function update_game_over(s) {
     check_click(go_btn_rigioca, () => {
         PP.game_state.set_variable("HP_player", 10);
         PP.scenes.start("base");
+    });
+
+    // 2. BOTTONE CHECKPOINT: Riparte dall'ultimo livello salvato
+    check_click(go_btn_checkpoint, () => {
+        let lv_salvato = PP.game_state.get_variable("ultimo_livello") || "base";
+        //PP.game_state.set_variable("HP_player", 10);
+        PP.scenes.start(lv_salvato);
     });
 
     check_click(go_btn_menu, () => {

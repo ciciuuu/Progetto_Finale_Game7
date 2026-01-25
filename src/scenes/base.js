@@ -139,6 +139,8 @@ function update(s) {
 
     if (player.ph_obj.x > 6800) {
         PP.scenes.start("base_2");
+        PP.game_state.set_variable("spawn_x", 100); //spawn livello 2
+        PP.game_state.set_variable("spawn_y", 100); //spawn livello 2
     }
 
     if (player) manage_player_update(s, player, muri_livello);
