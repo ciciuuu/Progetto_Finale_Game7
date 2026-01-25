@@ -60,13 +60,19 @@ function update_game_over(s) {
 
     check_click(go_btn_rigioca, () => {
         PP.game_state.set_variable("HP_player", 10);
+        PP.game_state.set_variable("HP_checkpoint", 10); // Resettiamo anche il salvataggio
+        PP.game_state.set_variable("spawn_x", 150);
+        PP.game_state.set_variable("spawn_y", 620);
         PP.scenes.start("base");
     });
 
     // 2. BOTTONE CHECKPOINT: Riparte dall'ultimo livello salvato
     check_click(go_btn_checkpoint, () => {
         let lv_salvato = PP.game_state.get_variable("ultimo_livello") || "base";
-        //PP.game_state.set_variable("HP_player", 10);
+        
+        let vita_salvata = PP.game_state.get_variable("HP_checkpoint") || 10;
+        PP.game_state.set_variable("HP_player", vita_salvata);
+
         PP.scenes.start(lv_salvato);
     });
 
