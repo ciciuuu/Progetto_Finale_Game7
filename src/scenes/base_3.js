@@ -6,10 +6,9 @@ let parallasse1; let parallasse2;
 let ts_background_1; let ts_background_2;
 let lista_trappole = [];
 
-// Variabile per evitare loop del finale
 let fine_livello_triggerata = false;
 
-// [CALCOLO] 107 caselle * 32 pixel = 3424
+// 107 caselle * 32 pixel
 const X_FINE_LIVELLO = 3424; 
 
 function preload(s) {
@@ -18,6 +17,8 @@ function preload(s) {
     preload_enemy(s);
     preload_cactus(s);
     preload_player(s);
+
+    if(typeof preload_zone_segrete === "function") preload_zone_segrete(s);
     if(typeof preload_blueprint === "function") preload_blueprint(s);
 
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
@@ -31,7 +32,8 @@ function create(s) {
     let hp_start = PP.game_state.get_variable("HP_checkpoint") || 10;
     PP.game_state.set_variable("HP_player", hp_start);
     
-    // Reset trigger
+
+
     fine_livello_triggerata = false;
 
     if (!s.gruppo_proiettili) {
@@ -74,6 +76,16 @@ function create(s) {
     create_hud(s);
     create_blueprint(s, player);
 
+    // ===============================================
+    // --- CONFIGURAZIONE ZONE SEGRETE (LIV 3) ---
+    // ===============================================
+    let zone_liv3 = []; // Aggiungi zone qui
+    
+    if(typeof create_zone_segrete === "function") {
+        create_zone_segrete(s, player, zone_liv3);
+    }
+    // ===============================================
+
     let ragni_liv3 = [
         { x: 500, y: 100, pattuglia: [400, 600] },
         { x: 1200, y: 100, pattuglia: [1000, 1400] }
@@ -93,7 +105,6 @@ function create(s) {
     if(typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv3, player);
 
     lista_trappole = [];
-
     for (let i = 0; i < lista_trappole.length; i++) {
         let tr = lista_trappole[i];
         PP.physics.add_overlap_f(s, player, tr, function () {
@@ -114,8 +125,6 @@ function update(s) {
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
-    // [TRIGGER FINE LIVELLO]
-    // Se il player supera la X 3424 (107 * 32)
     if (!fine_livello_triggerata && player.ph_obj.x >= X_FINE_LIVELLO) {
         fine_livello_triggerata = true;
         if(typeof check_collezionabili_vittoria === "function") {
@@ -123,12 +132,13 @@ function update(s) {
         }
     }
 
-    // Caduta nel vuoto (di sicurezza)
     if (player.ph_obj.x > 10000) {
         player.ph_obj.x = -9999; 
     }
 
     if (player) manage_player_update(s, player, muri_livello);
+
+    if(typeof update_zone_segrete === "function") update_zone_segrete(s);
 
     update_enemy(s);
     update_cactus(s, player, muri_livello);

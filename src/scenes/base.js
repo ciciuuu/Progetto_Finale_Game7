@@ -14,6 +14,9 @@ function preload(s) {
     preload_enemy(s);
     preload_cactus(s);
     preload_player(s);
+    
+    // Caricamento script esterni
+    if(typeof preload_zone_segrete === "function") preload_zone_segrete(s);
     if(typeof preload_blueprint === "function") preload_blueprint(s);
 
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
@@ -24,13 +27,12 @@ function preload(s) {
 }
 
 function create(s) {
-    // --- RESET STATO DI GIOCO ---
+    // --- SETUP GLOBALE ---
     PP.game_state.set_variable("HP_player", 10);
     PP.game_state.set_variable("arma_sbloccata", false);
-    
-    // Resettiamo i collezionabili all'inizio del gioco
     PP.game_state.set_variable("tot_blueprint", 0);
     PP.game_state.set_variable("tot_ingranaggi", 0);
+    
 
     if (!s.gruppo_proiettili) {
         s.gruppo_proiettili = s.physics.add.group();
@@ -72,6 +74,26 @@ function create(s) {
     create_hud(s);
     create_vecchietto(s);
 
+    // CONFIGURAZIONE ZONE SEGRETE
+    let zone_liv1 = [
+        { 
+            // L'immagine ha di default il pivot in alto a sinistra
+            img_x: 1664, 
+            img_y: -288,
+            
+            // Rettangolo posizioniamo leggermente prima per simulare l'ingresso
+            //per muoversi di diversi blocchi fare + o - 32 px (cioé un blocco intero)
+            trigger_x: 1664-32, 
+            trigger_y: -288+32, 
+            trigger_w: 32*8,  
+            trigger_h: 32*3  
+        }
+    ];
+
+    if(typeof create_zone_segrete === "function") {
+        create_zone_segrete(s, player, zone_liv1);
+    }
+
     let ragni_liv1 = [
         { x: -8, y: 0, pattuglia: [-234, -15] },
         { x: 182, y: -64, pattuglia: [70, 180] },
@@ -93,7 +115,6 @@ function create(s) {
     if(typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player);
 
     lista_trappole = []; 
-    
     aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
     aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
     aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
@@ -132,6 +153,9 @@ function update(s) {
     }
 
     if (player) manage_player_update(s, player, muri_livello);
+
+    // [NUOVO] Update Zone
+    if(typeof update_zone_segrete === "function") update_zone_segrete(s);
 
     update_vecchietto(s, player);
     update_enemy(s);
