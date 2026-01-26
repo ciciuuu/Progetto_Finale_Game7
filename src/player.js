@@ -80,6 +80,22 @@ function damage_player(s, player) {
 
     console.log("Colpito! HP rimasti: " + hp_rimanenti);
 
+    // --- EFFETTO SFUMATURA VIOLA ---
+    if (vignette_danno) {
+        
+        
+        vignette_danno.ph_obj.alpha = 0; // Reset
+
+        s.tweens.add({
+            targets: vignette_danno.ph_obj,
+            alpha: 1,           // Diventa visibile
+            duration: 150,      // Molto veloce
+            yoyo: true,         // Torna indietro (scompare)
+            hold: 100,          // Rimane visibile un istante al massimo dell'intensità
+            ease: 'Power2'
+        });
+    }
+
     // [NATIVO NECESSARIO] Feedback Player
     if (player.ph_obj) {
         player.ph_obj.setTint(0xff523b);

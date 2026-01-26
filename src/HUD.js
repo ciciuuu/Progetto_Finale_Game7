@@ -10,6 +10,9 @@ let asset_health_bar;
 let asset_healthbar_sheet;
 let health_bar;
 
+let asset_bordo_danno;
+let vignette_danno;
+
 let asset_blueprint;
 let blueprint;
 
@@ -43,6 +46,8 @@ function preload_hud(s) {
 
     asset_health_bar = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/health_bar.png");
     asset_healthbar_sheet = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/HEALTHBAR/healthbar_sheet.png", 195, 32);
+
+    asset_bordo_danno = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/bordodannoviola.png");
 }
 
 function create_hud(s) {
@@ -51,6 +56,19 @@ function create_hud(s) {
     livello_HUD = PP.layers.create(s);
     // Z-index alto per stare sopra tutto
     PP.layers.set_z_index(livello_HUD, 1000);
+
+    // --- SFUMATURA VIOLA DANNO ---
+    vignette_danno = PP.assets.image.add(s, asset_bordo_danno, 640, 360, 0.5, 0.5);
+    vignette_danno.geometry.scale_x = 0.5;
+    vignette_danno.geometry.scale_y = 0.5;
+    
+    
+    // Fissiamola allo schermo
+    vignette_danno.tile_geometry.scroll_factor_x = 0;
+    vignette_danno.tile_geometry.scroll_factor_y = 0;
+    
+    // Trasparente all'inizio
+    vignette_danno.ph_obj.alpha = 0;
 
 
 
@@ -94,7 +112,7 @@ function create_hud(s) {
     ingranaggio.tile_geometry.scroll_factor_x = 0;
     ingranaggio.tile_geometry.scroll_factor_y = 0;
     
-    PP.layers.add_to_layer(livello_HUD, ingranaggio);
+    PP.layers.add_to_layer(livello_HUD, ingranaggio, vignette_danno);
 
 
     // --- BLUEPRINT (Alto a Destra - Sotto ingranaggio - Alzato di 20px) ---
