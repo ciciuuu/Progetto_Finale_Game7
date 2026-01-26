@@ -38,6 +38,20 @@ function gestisci_sparo(s, entita, muri_livello) {
 
       console.log("Sparo inquinante usato! HP rimanenti: " + nuovo_hp);
 
+      // --- ATTIVAZIONE VIGNETTA VIOLA ---
+    if (typeof vignette_dannoviola !== 'undefined' && vignette_dannoviola.ph_obj) {
+        s.tweens.killTweensOf(vignette_dannoviola.ph_obj); // Ferma animazioni precedenti
+        vignette_dannoviola.ph_obj.alpha = 0; // Reset
+        s.tweens.add({
+            targets: vignette_dannoviola.ph_obj,
+            alpha: 1,
+            duration: 100,
+            yoyo: true,
+            hold: 50,
+            ease: 'Power2'
+        });
+    }
+
       // Feedback visivo sul player (facoltativo: lo facciamo diventare viola/nero per un istante)
       if (entita.ph_obj) {
           entita.ph_obj.setTint(0x8e44ad); // Un viola scuro per richiamare l'inquinamento

@@ -10,8 +10,10 @@ let asset_health_bar;
 let asset_healthbar_sheet;
 let health_bar;
 
-let asset_bordo_danno;
+let asset_bordo_dannorosso;
 let vignette_dannorosso;
+let asset_bordo_dannoviola;
+let vignette_dannoviola;
 
 let asset_blueprint;
 let blueprint;
@@ -48,6 +50,7 @@ function preload_hud(s) {
     asset_healthbar_sheet = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/HEALTHBAR/healthbar_sheet.png", 195, 32);
 
     asset_bordo_dannorosso = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/bordodannorosso.png");
+    asset_bordo_dannoviola = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/bordodannoviola.png");
 }
 
 function create_hud(s) {
@@ -69,6 +72,18 @@ function create_hud(s) {
     
     // Trasparente all'inizio
     vignette_dannorosso.ph_obj.alpha = 0;
+
+    // --- SFUMATURA VIOLA DANNO ---
+    vignette_dannoviola = PP.assets.image.add(s, asset_bordo_dannoviola, 640, 360, 0.5, 0.5);
+    vignette_dannoviola.geometry.scale_x = 0.5;
+    vignette_dannoviola.geometry.scale_y = 0.5;
+    
+    // Fissiamola allo schermo
+    vignette_dannoviola.tile_geometry.scroll_factor_x = 0;
+    vignette_dannoviola.tile_geometry.scroll_factor_y = 0;
+    
+    // Trasparente all'inizio
+    vignette_dannoviola.ph_obj.alpha = 0;
 
 
 
