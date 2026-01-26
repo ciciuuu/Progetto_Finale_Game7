@@ -20,6 +20,9 @@ let dialogo_finito = false;
 let tasto_rilasciato = true; 
 let indice_frase = 0;
 
+// Variabile di stato per evitare check nativi sull'animazione
+let animazione_corrente_vecchietto = ""; 
+
 // --- FRASI ---
 let frasi_vecchietto = [
     "VECCHIETTO: Ciao viaggiatore! Benvenuto nella caverna.",
@@ -47,92 +50,84 @@ function create_vecchietto(s) {
     // 1. VECCHIETTO
     vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -192, 0.5, 1);
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
-    
-    // [FIX] 2 Parametri: Layer, Oggetto
     PP.layers.add_to_layer(layer_game, vecchietto);
 
     PP.assets.sprite.animation_add_list(vecchietto, "idle", [0, 1, 2, 3], 6, -1);
     PP.assets.sprite.animation_add_list(vecchietto, "parla", [4, 5, 6, 7], 6, -1);
+    
+    // Avvio animazione e tracciamento stato
     PP.assets.sprite.animation_play(vecchietto, "idle");
+    animazione_corrente_vecchietto = "idle";
 
-    // 2. SENSORE DI CONTATTO (Shape)
-    // Colore corretto "0xFF0000", Alpha 0 (invisibile)
+    // 2. SENSORE DI CONTATTO
     sensore_dialogo = PP.shapes.rectangle_add(s, 2849, -192, 250, 200, "0xFF0000", 0);
     PP.physics.add(s, sensore_dialogo, PP.physics.type.STATIC);
+    // Nascondiamo il sensore (PoliPhaser visibility)
+    if(sensore_dialogo.visibility) sensore_dialogo.visibility.alpha = 0;
 
     // 3. TASTO S
     tasto_S = PP.assets.sprite.add(s, img_tasto_S, 2847, -240, 0.5, 1);
-    // [FIX] 2 Parametri
     PP.layers.add_to_layer(layer_game, tasto_S);
 
     PP.assets.sprite.animation_add_list(tasto_S, "puntini", [0, 1], 2, -1);
     PP.assets.sprite.animation_add_list(tasto_S, "tasto", [2, 3], 2, -1);
     PP.assets.sprite.animation_play(tasto_S, "puntini");
 
-    // 4. INTERFACCIA UTENTE
+    // 4. INTERFACCIA UTENTE (UI) - Refactoring PoliPhaser
     
-    // Sfondo (Rettangolo PoliPhaser)
+    // Sfondo Testo
     sfondo_testo = PP.shapes.rectangle_add(s, 640, 360, 800, 150, "0x000000", 0.3);
-    // [FIX] 2 Parametri
     PP.layers.add_to_layer(layer_bg_ui, sfondo_testo);
     
-    // [NATIVO NECESSARIO] ScrollFactor
-    if(sfondo_testo.ph_obj) sfondo_testo.ph_obj.setScrollFactor(0);
+    // [POLIPHASER] Blocco Scroll tramite tile_geometry
+    if (sfondo_testo.tile_geometry) {
+        sfondo_testo.tile_geometry.scroll_factor_x = 0;
+        sfondo_testo.tile_geometry.scroll_factor_y = 0;
+    }
     
-    // Visibilità PoliPhaser
-    sfondo_testo.visibility.hidden = true; 
+    // [POLIPHASER] Nascondi tramite visibility
+    if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = true;
 
-    // Testo (Text Styled PoliPhaser)
-    testo_schermo = PP.shapes.text_styled_add(
-        s, 
-        640, 
-        360, 
-        "", 
-        20, 
-        "Arial", 
-        "bold", 
-        "0xFFFFFF", 
-        null, 
-        0.5, 
-        0.5
-    );
-    // [FIX] 2 Parametri
+    // Testo
+    testo_schermo = PP.shapes.text_styled_add(s, 640, 360, "", 20, "Arial", "bold", "0xFFFFFF", null, 0.5, 0.5);
     PP.layers.add_to_layer(layer_fg_ui, testo_schermo);
     
-    // [NATIVO NECESSARIO] ScrollFactor
-    if(testo_schermo.ph_obj) testo_schermo.ph_obj.setScrollFactor(0);
+    // [POLIPHASER] Blocco Scroll
+    if (testo_schermo.tile_geometry) {
+        testo_schermo.tile_geometry.scroll_factor_x = 0;
+        testo_schermo.tile_geometry.scroll_factor_y = 0;
+    }
     
-    testo_schermo.visibility.hidden = true;
+    // [POLIPHASER] Nascondi
+    if (testo_schermo.visibility) testo_schermo.visibility.hidden = true;
 }
 
-// Helper animazione
-function cambia_animazione_sicura(oggetto, nome_animazione) {
-    // [NATIVO NECESSARIO] Check animazione corrente
-    if (oggetto.ph_obj.anims.currentAnim && oggetto.ph_obj.anims.currentAnim.key === nome_animazione) {
-        return;
-    }
-    PP.assets.sprite.animation_play(oggetto, nome_animazione);
+// Funzione Helper (PoliPhaser Puro: usa variabile di stato)
+function cambia_animazione_vecchietto(nuova_animazione) {
+    if (animazione_corrente_vecchietto === nuova_animazione) return;
+    
+    PP.assets.sprite.animation_play(vecchietto, nuova_animazione);
+    animazione_corrente_vecchietto = nuova_animazione;
 }
 
 function update_vecchietto(s, player) {
   if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
 
-  // [NATIVO NECESSARIO] Gestione Depth dinamica
-  if (player.ph_obj.depth <= 5) {
+  // [NATIVO NECESSARIO] Depth sorting dinamico (Player passa davanti/dietro)
+  if (player.ph_obj && player.ph_obj.depth <= 5) {
       player.ph_obj.setDepth(10);
   }
 
   // --- CASO 1: DIALOGO FINITO ---
   if (dialogo_finito) {
-       tasto_S.visibility.hidden = true;
-       testo_schermo.visibility.hidden = true;
-       sfondo_testo.visibility.hidden = true;
+       // [POLIPHASER] Gestione visibilità
+       if (tasto_S.visibility) tasto_S.visibility.hidden = true;
+       if (testo_schermo.visibility) testo_schermo.visibility.hidden = true;
+       if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = true;
        
-       cambia_animazione_sicura(vecchietto, "idle");
-       
+       cambia_animazione_vecchietto("idle");
        player.is_frozen = false;
        
-       // Sblocco arma
        PP.game_state.set_variable("arma_sbloccata", true);
        return; 
   }
@@ -140,7 +135,7 @@ function update_vecchietto(s, player) {
   // --- CASO 2: DIALOGO IN CORSO ---
   if (dialogo_iniziato) {
       player.is_frozen = true;
-      cambia_animazione_sicura(vecchietto, "parla");
+      cambia_animazione_vecchietto("parla");
 
       let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
                           PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) || 
@@ -151,12 +146,11 @@ function update_vecchietto(s, player) {
               tasto_rilasciato = false; 
 
               if (indice_frase < frasi_vecchietto.length) {
-                  sfondo_testo.visibility.hidden = false;
-                  testo_schermo.visibility.hidden = false;
+                  // [POLIPHASER] Mostra UI
+                  if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
+                  if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
                   
-                  // Cambio Testo PoliPhaser
                   PP.shapes.text_change(testo_schermo, frasi_vecchietto[indice_frase]);
-                  
                   indice_frase++; 
               } else {
                   dialogo_finito = true;
@@ -168,12 +162,16 @@ function update_vecchietto(s, player) {
   } 
   // --- CASO 3: IN ATTESA ---
   else {
-      // [NATIVO NECESSARIO] Check overlap booleano
-      let dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo.ph_obj);
+      // [NATIVO NECESSARIO] Check overlap booleano (non esiste in PP.physics)
+      let dentro_zona = false;
+      if (player.ph_obj && sensore_dialogo.ph_obj) {
+          dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo.ph_obj);
+      }
 
       if (dentro_zona) {
-          cambia_animazione_sicura(tasto_S, "tasto");
-          cambia_animazione_sicura(vecchietto, "idle");
+          // Animazione Tasto S (non tracciamo lo stato del tasto, solo play diretto)
+          PP.assets.sprite.animation_play(tasto_S, "tasto");
+          cambia_animazione_vecchietto("idle");
 
           if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
             if (tasto_rilasciato) {
@@ -181,18 +179,21 @@ function update_vecchietto(s, player) {
                 player.is_frozen = true; 
                 PP.physics.set_velocity_x(player, 0);
 
-                // [NUOVO] Gira il player verso il vecchietto
-                // Se il player è a sinistra del vecchietto, guarda a destra (flip_x = false)
-                // Altrimenti guarda a sinistra (flip_x = true)
+                // [FIX MOONWALK + HITBOX]
                 if (player.ph_obj.x < vecchietto.ph_obj.x) {
                     player.geometry.flip_x = false; 
+                    player.facing_right = true; // Aggiorna stato logico
+                    PP.physics.set_collision_rectangle(player, 20, 44, 14, 8);
                 } else {
                     player.geometry.flip_x = true;
+                    player.facing_right = false; // Aggiorna stato logico
+                    PP.physics.set_collision_rectangle(player, 20, 44, 20, 8);
                 }
 
-                tasto_S.visibility.hidden = true;
-                sfondo_testo.visibility.hidden = false;
-                testo_schermo.visibility.hidden = false;
+                // [POLIPHASER] Nascondi Tasto, Mostra UI
+                if (tasto_S.visibility) tasto_S.visibility.hidden = true;
+                if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
+                if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
                 
                 PP.shapes.text_change(testo_schermo, frasi_vecchietto[0]);
                 
@@ -202,8 +203,9 @@ function update_vecchietto(s, player) {
         }
 
       } else {
-          cambia_animazione_sicura(vecchietto, "idle");
-          cambia_animazione_sicura(tasto_S, "puntini");
+          cambia_animazione_vecchietto("idle");
+          // Animazione puntini tasto S
+          PP.assets.sprite.animation_play(tasto_S, "puntini");
       }
   }
 }
