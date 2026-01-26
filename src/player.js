@@ -80,14 +80,14 @@ function damage_player(s, player) {
 
     console.log("Colpito! HP rimasti: " + hp_rimanenti);
 
-    // --- EFFETTO SFUMATURA VIOLA ---
-    if (vignette_danno) {
+    // --- EFFETTO SFUMATURA ROSSA ---
+    if (vignette_dannorosso) {
         
         
-        vignette_danno.ph_obj.alpha = 0; // Reset
+        vignette_dannorosso.ph_obj.alpha = 0; // Reset
 
         s.tweens.add({
-            targets: vignette_danno.ph_obj,
+            targets: vignette_dannorosso.ph_obj,
             alpha: 1,           // Diventa visibile
             duration: 150,      // Molto veloce
             yoyo: true,         // Torna indietro (scompare)
