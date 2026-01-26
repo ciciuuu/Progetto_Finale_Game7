@@ -90,10 +90,8 @@ function create(s) {
         { 
             // [NUOVO] Passo la variabile dell'immagine caricata nel preload
             asset: img_zona_pietra, 
-
             img_x: 1664, 
             img_y: -288,
-            
             trigger_x: 1664-32, 
             trigger_y: -288+32, 
             trigger_w: 32*8,  
@@ -102,10 +100,8 @@ function create(s) {
         { 
             // [NUOVO] Passo la variabile dell'immagine caricata nel preload
             asset: img_inizio_sinistra, 
-            
-            img_x: 449-64, 
+            img_x: 448-64, 
             img_y: 0,
-            
             trigger_x: 449, 
             trigger_y: 0, 
             trigger_w: 32*15,  
