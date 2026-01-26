@@ -113,14 +113,20 @@ function muovi_singolo_ragno(ragno_nativo) {
     ragno_nativo.body.setVelocityX(100 * ragno_nativo.direzione_corrente);
 }
 
-function damage_ragno(s, ragno_nativo) {
-    // Recuperiamo il wrapper per accedere alla variabile .hp
+function damage_ragno(s, ragno_nativo, valore_danno) {
     let wrapper = ragno_nativo.wrapper;
     if (!wrapper || wrapper.is_dead) return;
 
-    wrapper.hp -= 1;
+    // Se non passiamo nulla, di default fa 1 danno (per sicurezza)
+    let danno = valore_danno || 1;
 
-    // Feedback visivo: lampeggio rosso
+    // Questa riga serve per evitare l'errore se per caso 
+    // valore_danno non viene passato: imposta 1 di default.
+    let danno_effettivo = valore_danno !== undefined ? valore_danno : 1;
+
+    wrapper.hp -= danno;
+
+    // Feedback visivo
     ragno_nativo.setTint(0xff0000);
     s.time.delayedCall(100, () => {
         if (ragno_nativo.active) ragno_nativo.clearTint();

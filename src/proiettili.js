@@ -30,9 +30,34 @@ function gestisci_sparo(s, entita, muri_livello) {
     let img_da_usare = asset_proiettile_normale;
     if (entita.modalita_inquinante) {
       img_da_usare = asset_proiettile_inquinante;
+
+      // --- NUOVA LOGICA: IL PLAYER PRENDE DANNO ---
+      let hp_attuali = PP.game_state.get_variable("HP_player");
+      let nuovo_hp = hp_attuali - 1;
+      PP.game_state.set_variable("HP_player", nuovo_hp);
+
+      console.log("Sparo inquinante usato! HP rimanenti: " + nuovo_hp);
+
+      // Feedback visivo sul player (facoltativo: lo facciamo diventare viola/nero per un istante)
+      if (entita.ph_obj) {
+          entita.ph_obj.setTint(0x8e44ad); // Un viola scuro per richiamare l'inquinamento
+          s.time.delayedCall(100, () => {
+              if(!entita.is_dead) entita.ph_obj.clearTint();
+          });
+      }
+
+      // Se finisce la vita sparando, attiviamo la morte
+      if (nuovo_hp <= 0 && typeof morte_player === "function") {
+          morte_player(s, entita);
+      }
+
     }
 
     let colpo = PP.assets.image.add(s, img_da_usare, entita.geometry.x, entita.geometry.y - Y_OFFSET_SPARO, 0.5, 0.5);
+
+    // Se è inquinante fa 3 danni (morte istantanea), altrimenti 1
+    colpo.punti_danno = entita.modalita_inquinante ? 3 : 1;
+
     PP.physics.add(s, colpo, PP.physics.type.DYNAMIC);
     colpo.ph_obj.body.allowGravity = false;
 
@@ -84,17 +109,16 @@ function gestisci_sparo(s, entita, muri_livello) {
     //Nuovo collisione ragni
     if (typeof gruppo_ragni !== 'undefined' && gruppo_ragni) {
       s.physics.add.overlap(colpo.ph_obj, gruppo_ragni, function (bullet_native, enemy_native) {
-
-        // Controllo validità: se il proiettile è già esploso, esci
         if (!colpo.ph_obj.active) return;
 
-        // 1. Distruggi il proiettile
+        // Prendiamo il valore del danno che abbiamo salvato nel proiettile
+        let danno_da_infliggere = colpo.punti_danno;
+
         PP.assets.destroy(colpo);
 
-        // 2. Applica il danno al ragno (funzione che sta in ragno.js)
-        // Questa funzione ora gestirà il -1 HP, il rosso e la morte finale
         if (typeof damage_ragno === "function") {
-          damage_ragno(s, enemy_native);
+          // Passiamo anche il valore del danno alla funzione
+          damage_ragno(s, enemy_native, danno_da_infliggere);
         }
       });
     }
