@@ -1,18 +1,11 @@
 // zone_segrete.js
 
-let img_zona_segreta_asset;
 let lista_zone_segrete_attive = [];
 
 function preload_zone_segrete(s) {
-    img_zona_segreta_asset = PP.assets.image.load(s, "assets/images/MAPPA/Zona segreta.png");
+    // Ora le immagini vengono caricate nel preload dei singoli livelli (base.js, base_3.js, ecc.)
 }
 
-/**
- * Crea le zone segrete con trigger fisico.
- * @param {object} s - La scena
- * @param {object} player - Il player (serve per la collisione)
- * @param {Array} config_zone - Lista configurazione
- */
 function create_zone_segrete(s, player, config_zone) {
     lista_zone_segrete_attive = [];
 
@@ -27,13 +20,18 @@ function create_zone_segrete(s, player, config_zone) {
     for (let i = 0; i < config_zone.length; i++) {
         let dati = config_zone[i];
 
+        // Controllo sicurezza
+        if (!dati.asset) {
+            console.error("ERRORE: Asset immagine mancante per la zona segreta alle coordinate " + dati.img_x);
+            continue;
+        }
+
         // 1. Immagine di Copertura (Visuale)
-        // Posizionata in base alle coordinate fornite (Top-Left)
-        let zona_obj = PP.assets.image.add(s, img_zona_segreta_asset, dati.img_x, dati.img_y, 0, 0);
+        // [MODIFICA] Usa l'asset passato nella configurazione (dati.asset)
+        let zona_obj = PP.assets.image.add(s, dati.asset, dati.img_x, dati.img_y, 0, 0);
         PP.layers.add_to_layer(layer_segreti, zona_obj);
 
         // 2. Trigger Fisico (Shape Rettangolo)
-        // Calcoliamo il centro perché PP.shapes posiziona dal centro
         let centerX = dati.trigger_x + (dati.trigger_w / 2);
         let centerY = dati.trigger_y + (dati.trigger_h / 2);
 
@@ -44,14 +42,8 @@ function create_zone_segrete(s, player, config_zone) {
         // Aggiungiamo fisica statica (sensore)
         PP.physics.add(s, trigger_shape, PP.physics.type.STATIC);
         
-        // Se debug attivo, aggiungiamo al layer per vederlo muoversi con la camera
-        if (is_debug) {
-            PP.layers.add_to_layer(layer_segreti, trigger_shape);
-        } else {
-            // Se invisibile, lo fissiamo comunque allo scroll del mondo (default)
-            // o lo aggiungiamo al layer per coerenza
-            PP.layers.add_to_layer(layer_segreti, trigger_shape);
-        }
+        // Se debug attivo, o per coerenza, aggiungiamo al layer
+        PP.layers.add_to_layer(layer_segreti, trigger_shape);
 
         // Oggetto di stato per questa zona
         let zona_state = {
@@ -61,7 +53,6 @@ function create_zone_segrete(s, player, config_zone) {
         };
 
         // 3. Callback di Sovrapposizione PoliPhaser
-        // Ogni frame che il player tocca il rettangolo, questa funzione viene eseguita
         PP.physics.add_overlap_f(s, player, trigger_shape, function() {
             zona_state.is_overlapping = true;
         });
@@ -89,8 +80,6 @@ function update_zone_segrete(s) {
         }
 
         // RESET DEL FLAG
-        // Fondamentale: assumiamo che il player sia uscito. 
-        // Se nel prossimo physics step è ancora dentro, l'overlap lo rimetterà a true.
         zona.is_overlapping = false;
     }
 }

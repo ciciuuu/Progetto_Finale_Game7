@@ -50,7 +50,7 @@ function create_vecchietto(s) {
     PP.layers.set_z_index(layer_fg_ui, 101);
 
     // 1. VECCHIETTO
-    vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -192, 0.5, 1);
+    vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -128, 0.5, 1);
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
     PP.layers.add_to_layer(layer_game, vecchietto);
 
