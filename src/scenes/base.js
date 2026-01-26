@@ -123,7 +123,7 @@ function create(s) {
             img_x: 227*32, 
             img_y: -16*32,
             trigger_x: 227*32, 
-            trigger_y: -16*32, 
+            trigger_y: -15*32, 
             trigger_w: 32*3,  
             trigger_h: 32*32   
         },
