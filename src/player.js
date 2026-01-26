@@ -67,6 +67,8 @@ function configure_player_animations(s, player) {
 
     sipario_nero_obj = null;
     is_fading_death = false;
+
+
 }
 
 function damage_player(s, player) {
@@ -81,17 +83,14 @@ function damage_player(s, player) {
     console.log("Colpito! HP rimasti: " + hp_rimanenti);
 
     // --- EFFETTO SFUMATURA ROSSA ---
-    if (vignette_dannorosso) {
-        
-        
+    if (typeof vignette_dannorosso !== 'undefined' && vignette_dannorosso) {
         vignette_dannorosso.ph_obj.alpha = 0; // Reset
-
         s.tweens.add({
             targets: vignette_dannorosso.ph_obj,
-            alpha: 1,           // Diventa visibile
-            duration: 150,      // Molto veloce
-            yoyo: true,         // Torna indietro (scompare)
-            hold: 100,          // Rimane visibile un istante al massimo dell'intensità
+            alpha: 1,           
+            duration: 150,      
+            yoyo: true,         
+            hold: 100,          
             ease: 'Power2'
         });
     }
@@ -141,7 +140,6 @@ function damage_player(s, player) {
 function morte_player(s, player) {
     if (player.is_dead) return; 
     player.is_dead = true;
-    console.log("MORTE DEL PLAYER AVVIATA");
 
     if (player && player.ph_obj.active) {
         player.ph_obj.setTint(0xFF0000); 

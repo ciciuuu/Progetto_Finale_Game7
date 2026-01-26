@@ -13,10 +13,8 @@ let zona_inizio_sinistra;
 let zona_dopo_vecchietto;
 let zona_fine_lvl1;
 
-// Variabili Trappola Muri
-let img_muro_sinistra;
+// Variabili Trappola Muri (Solo Destra rimasto)
 let img_muro_destra;
-let muro_sinistra_obj;
 let muro_destra_obj;
 let trappola_attivata = false;
 
@@ -32,8 +30,7 @@ function preload(s) {
     zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/ZS_dopo_vecchietto.png");
     zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine_lvl1.png");
 
-    // Caricamento Muri
-    img_muro_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine1_sinistra.png");
+    // Caricamento Muro (Solo Destra)
     img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine1_destra.png");
 
     if (typeof preload_zone_segrete === "function") preload_zone_segrete(s);
@@ -101,7 +98,7 @@ function create(s) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
 
-    PP.camera.start_follow(s, player, 0, 75);
+    PP.camera.start_follow(s, player, 0, 60);
     create_hud(s);
     create_vecchietto(s);
 
@@ -109,20 +106,14 @@ function create(s) {
     // --- TRAPPOLA MURI CADENTI ---
     // ===============================================
     
-    // Muro Sinistro (Start: 224, -27)
-    muro_sinistra_obj = PP.assets.image.add(s, img_muro_sinistra, 222 * 32, -27 * 32, 0, 0); 
-    PP.physics.add(s, muro_sinistra_obj, PP.physics.type.DYNAMIC);
-    PP.physics.set_allow_gravity(muro_sinistra_obj, false); 
-    PP.physics.set_immovable(muro_sinistra_obj, true); 
-    
-    // Muro Destro (Start: 230, -27)
-    muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 227 * 32, -27 * 32, 0, 0);
+    // Muro Destro (Start: 227, -27)
+    // Nota: Ho rimosso il blocco del Muro Sinistro come richiesto
+    muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 226 * 32, -27 * 32, 0, 0);
     PP.physics.add(s, muro_destra_obj, PP.physics.type.DYNAMIC);
     PP.physics.set_allow_gravity(muro_destra_obj, false);
     PP.physics.set_immovable(muro_destra_obj, true);
 
-    // [POLIPHASER] Collisione Player - Muri
-    PP.physics.add_collider(s, player, muro_sinistra_obj);
+    // [POLIPHASER] Collisione Player - Muro Destro
     PP.physics.add_collider(s, player, muro_destra_obj);
 
 
@@ -235,16 +226,7 @@ function update(s) {
         
         let targetY = -23 * 32; 
 
-        // Movimento Muro Sinistro
-        if (muro_sinistra_obj.ph_obj.y < targetY) {
-            PP.physics.set_velocity_y(muro_sinistra_obj, velocityY);
-        } else {
-            // Stop e Fix posizione
-            PP.physics.set_velocity_y(muro_sinistra_obj, 0);
-            muro_sinistra_obj.ph_obj.y = targetY; 
-        }
-
-        // Movimento Muro Destro
+        // Movimento Muro Destro (Solo questo rimasto)
         if (muro_destra_obj.ph_obj.y < targetY) {
             PP.physics.set_velocity_y(muro_destra_obj, velocityY);
         } else {

@@ -79,7 +79,7 @@ function create(s) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
 
-    PP.camera.start_follow(s, player, 0, 75);
+    PP.camera.start_follow(s, player, 0, 60);
     create_hud(s);
     create_blueprint(s, player);
 
