@@ -39,30 +39,30 @@ function gestisci_sparo(s, entita, muri_livello) {
       console.log("Sparo inquinante usato! HP rimanenti: " + nuovo_hp);
 
       // --- ATTIVAZIONE VIGNETTA VIOLA ---
-    if (typeof vignette_dannoviola !== 'undefined' && vignette_dannoviola.ph_obj) {
+      if (typeof vignette_dannoviola !== 'undefined' && vignette_dannoviola.ph_obj) {
         s.tweens.killTweensOf(vignette_dannoviola.ph_obj); // Ferma animazioni precedenti
         vignette_dannoviola.ph_obj.alpha = 0; // Reset
         s.tweens.add({
-            targets: vignette_dannoviola.ph_obj,
-            alpha: 1,
-            duration: 100,
-            yoyo: true,
-            hold: 50,
-            ease: 'Power2'
+          targets: vignette_dannoviola.ph_obj,
+          alpha: 1,
+          duration: 100,
+          yoyo: true,
+          hold: 50,
+          ease: 'Power2'
         });
-    }
+      }
 
       // Feedback visivo sul player (facoltativo: lo facciamo diventare viola/nero per un istante)
       if (entita.ph_obj) {
-          entita.ph_obj.setTint(0x8e44ad); // Un viola scuro per richiamare l'inquinamento
-          s.time.delayedCall(100, () => {
-              if(!entita.is_dead) entita.ph_obj.clearTint();
-          });
+        entita.ph_obj.setTint(0x8e44ad); // Un viola scuro per richiamare l'inquinamento
+        s.time.delayedCall(100, () => {
+          if (!entita.is_dead) entita.ph_obj.clearTint();
+        });
       }
 
       // Se finisce la vita sparando, attiviamo la morte
       if (nuovo_hp <= 0 && typeof morte_player === "function") {
-          morte_player(s, entita);
+        morte_player(s, entita);
       }
 
     }
@@ -70,7 +70,7 @@ function gestisci_sparo(s, entita, muri_livello) {
     let colpo = PP.assets.image.add(s, img_da_usare, entita.geometry.x, entita.geometry.y - Y_OFFSET_SPARO, 0.5, 0.5);
 
     // Se è inquinante fa 3 danni (morte istantanea), altrimenti 1
-    colpo.punti_danno = entita.modalita_inquinante ? 3 : 1;
+    colpo.punti_danno = entita.modalita_inquinante ? 5 : 1;
 
     PP.physics.add(s, colpo, PP.physics.type.DYNAMIC);
     colpo.ph_obj.body.allowGravity = false;
@@ -137,36 +137,23 @@ function gestisci_sparo(s, entita, muri_livello) {
       });
     }
 
-    // 3. COLLISIONE CON I CACTUS (Nuovo - DEVE ESSERE QUI, NON DENTRO I RAGNI)
+    // 3. COLLISIONE CON I CACTUS (Aggiornato per HP)
     if (typeof gruppo_cactus !== 'undefined' && gruppo_cactus) {
       s.physics.add.overlap(colpo.ph_obj, gruppo_cactus, function (bullet_native, enemy_native) {
 
-        // Controllo validità
-        if (!colpo.ph_obj.active || !enemy_native.active) return;
+        // Se il proiettile è già stato distrutto in questo frame, esci
+        if (!colpo.ph_obj.active) return;
 
         // 1. Distruggi il proiettile
         PP.assets.destroy(colpo);
 
-        // 2. Controllo se è già morto per evitare doppi colpi
-        if (!enemy_native.body.enable) return;
+        // 2. Applica il danno (1 o 5 a seconda dell'arma)
+        // Usiamo 5 per l'inquinante così killa il cactus (che ha 5 HP) in un colpo
+        let danno_da_infliggere = entita.modalita_inquinante ? 5 : 1;
 
-        // 3. Gestione CACTUS
-        enemy_native.body.enable = false; // Disabilita fisica
-
-        // Avviamo animazione morte
-        if (enemy_native.anims.exists("morte")) {
-          enemy_native.anims.play("morte", true);
-        } else {
-          enemy_native.setTint(0xff0000);
+        if (typeof damage_cactus === "function") {
+          damage_cactus(s, enemy_native, danno_da_infliggere);
         }
-
-        // 4. Timer distruzione
-        PP.timers.add_timer(s, 1000, function () {
-          if (enemy_native.active) {
-            enemy_native.destroy();
-            console.log("Cactus eliminato.");
-          }
-        }, false);
       });
     }
   }
