@@ -60,7 +60,7 @@ function gestisci_sparo(s, entita, muri_livello) {
       });
     }
 
-    // 2. COLLISIONE CON I NEMICI (RAGNI)
+    /* // 2. COLLISIONE CON I NEMICI (RAGNI)
     if (typeof gruppo_ragni !== 'undefined' && gruppo_ragni) {
       s.physics.add.overlap(colpo.ph_obj, gruppo_ragni, function (bullet_native, enemy_native) {
         
@@ -79,6 +79,24 @@ function gestisci_sparo(s, entita, muri_livello) {
           }
         }, false);
       });
+    } */
+
+    //Nuovo collisione ragni
+    if (typeof gruppo_ragni !== 'undefined' && gruppo_ragni) {
+      s.physics.add.overlap(colpo.ph_obj, gruppo_ragni, function (bullet_native, enemy_native) {
+
+        // Controllo validità: se il proiettile è già esploso, esci
+        if (!colpo.ph_obj.active) return;
+
+        // 1. Distruggi il proiettile
+        PP.assets.destroy(colpo);
+
+        // 2. Applica il danno al ragno (funzione che sta in ragno.js)
+        // Questa funzione ora gestirà il -1 HP, il rosso e la morte finale
+        if (typeof damage_ragno === "function") {
+          damage_ragno(s, enemy_native);
+        }
+      });
     }
 
     // 3. COLLISIONE CON I CACTUS (Nuovo - DEVE ESSERE QUI, NON DENTRO I RAGNI)
@@ -86,8 +104,8 @@ function gestisci_sparo(s, entita, muri_livello) {
       s.physics.add.overlap(colpo.ph_obj, gruppo_cactus, function (bullet_native, enemy_native) {
 
         // Controllo validità
-        if(!colpo.ph_obj.active || !enemy_native.active) return;
-        
+        if (!colpo.ph_obj.active || !enemy_native.active) return;
+
         // 1. Distruggi il proiettile
         PP.assets.destroy(colpo);
 

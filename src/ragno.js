@@ -21,6 +21,12 @@ function imposta_pattuglia(ragno_wrapper, min_x, max_x) {
 
 function spawna_ragno(s, x, y) {
     let nuovo_ragno = PP.assets.sprite.add(s, img_enemy, x, y, 0.5, 1);
+
+    // --- AGGIUNTA HP ---
+    nuovo_ragno.hp = 3; 
+    // Facciamo un riferimento comodo per la logica nativa
+    nuovo_ragno.ph_obj.wrapper = nuovo_ragno;
+
     PP.assets.sprite.animation_add(nuovo_ragno, "camminata", 8, 11, 12, -1);
     PP.assets.sprite.animation_add(nuovo_ragno, "morte", 0, 7, 12, 0);
     PP.physics.add(s, nuovo_ragno, PP.physics.type.DYNAMIC);
@@ -31,6 +37,9 @@ function spawna_ragno(s, x, y) {
         nuovo_ragno.ph_obj.body.setFriction(0);
     }
     PP.assets.sprite.animation_play(nuovo_ragno, "camminata");
+
+    PP.physics.add(s, nuovo_ragno, PP.physics.type.DYNAMIC);
+
     return nuovo_ragno;
 }
 
@@ -102,6 +111,41 @@ function muovi_singolo_ragno(ragno_nativo) {
         ragno_nativo.flipX = true;
     }
     ragno_nativo.body.setVelocityX(100 * ragno_nativo.direzione_corrente);
+}
+
+function damage_ragno(s, ragno_nativo) {
+    // Recuperiamo il wrapper per accedere alla variabile .hp
+    let wrapper = ragno_nativo.wrapper;
+    if (!wrapper || wrapper.is_dead) return;
+
+    wrapper.hp -= 1;
+
+    // Feedback visivo: lampeggio rosso
+    ragno_nativo.setTint(0xff0000);
+    s.time.delayedCall(100, () => {
+        if (ragno_nativo.active) ragno_nativo.clearTint();
+    });
+
+    if (wrapper.hp <= 0) {
+        morte_ragno(s, wrapper);
+    }
+}
+
+function morte_ragno(s, ragno_wrapper) {
+    ragno_wrapper.is_dead = true;
+    let sprite = ragno_wrapper.ph_obj;
+
+    // Disabilitiamo collisioni e movimento
+    sprite.body.enable = false;
+    //sprite.setVelocity(0, 0);
+
+    // Eseguiamo animazione morte
+    PP.assets.sprite.animation_play(ragno_wrapper, "morte");
+
+    // Distruggiamo lo sprite dopo l'animazione (durata circa 600ms)
+    s.time.delayedCall(600, () => {
+        sprite.destroy();
+    });
 }
 
 function destroy_enemy(s) {}
