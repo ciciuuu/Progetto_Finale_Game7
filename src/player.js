@@ -14,19 +14,10 @@ let player_vulnerable = true;
 let sipario_nero_obj = null;
 let is_fading_death = false;
 
-// Variabili Effetto Danno (Immagine)
-let asset_bordo_danno; 
-let bordo_danno;       
-
-// --- CONFIGURAZIONE EFFETTO DANNO ---
-let damage_intensity = 1;      
-let damage_fade_speed = 0.01;  
-
 let layer_effetti;
 
 function preload_player(s) {
-    // [POLIPHASER] Caricamento immagine
-    asset_bordo_danno = PP.assets.image.load(s, "assets/images/HUD/bordo_viola_danno.png");
+    // Caricamenti player se servono
 }
 
 function configure_player_animations(s, player) {
@@ -76,18 +67,6 @@ function configure_player_animations(s, player) {
 
     sipario_nero_obj = null;
     is_fading_death = false;
-
-    // [POLIPHASER] Immagine Danno
-    bordo_danno = PP.assets.image.add(s, asset_bordo_danno, 640, 360, 0.5, 0.5);
-    PP.layers.add_to_layer(layer_effetti, bordo_danno);
-    bordo_danno.visibility.alpha = 0;
-
-    // [NATIVO NECESSARIO] ScrollFactor e Reset Scala
-    if (bordo_danno.ph_obj) {
-        bordo_danno.ph_obj.setScrollFactor(0);
-        bordo_danno.scale_x = 1;
-        bordo_danno.scale_y = 1;
-    }
 }
 
 function damage_player(s, player) {
@@ -104,14 +83,6 @@ function damage_player(s, player) {
     // [NATIVO NECESSARIO] Feedback Player
     if (player.ph_obj) {
         player.ph_obj.setTint(0xff523b);
-    }
-
-    // [POLIPHASER] Feedback Schermo
-    if (bordo_danno) {
-        bordo_danno.visibility.alpha = damage_intensity;
-        // Reset posizione (sicurezza)
-        bordo_danno.x = 640;
-        bordo_danno.y = 360;
     }
 
     if (hp_rimanenti <= 0) {
@@ -183,12 +154,7 @@ function morte_player(s, player) {
 
 function manage_player_update(s, player, muri_livello) {
     
-    // --- 1. GESTIONE DISSOLVENZE E STATI GLOBALI ---
-    if (bordo_danno && bordo_danno.visibility.alpha > 0) {
-        bordo_danno.visibility.alpha -= damage_fade_speed;
-        if (bordo_danno.visibility.alpha < 0) bordo_danno.visibility.alpha = 0;
-    }
-
+    // Gestione Fade Morte
     if (is_fading_death && sipario_nero_obj) {
         if (sipario_nero_obj.visibility.alpha < 1) {
             sipario_nero_obj.visibility.alpha += 0.02; 
@@ -211,7 +177,7 @@ function manage_player_update(s, player, muri_livello) {
     
     if (player.is_dead) return;
 
-    // --- 2. GOD MODE TOGGLE (Controllato PRIMA del movimento) ---
+    // --- GOD MODE TOGGLE ---
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.J)) {
         if (j_pressed == false) {
             player.god_mode = !player.god_mode;
@@ -234,11 +200,10 @@ function manage_player_update(s, player, muri_livello) {
         j_pressed = false;
     }
 
-    // --- 3. MOVIMENTO GOD MODE (Se attivo, RETURN ed esce) ---
+    // --- MOVIMENTO GOD MODE ---
     if (player.god_mode) {
         let speed_fly = 700;
         
-        // Movimento X
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
             PP.physics.set_velocity_x(player, speed_fly);
             player.geometry.flip_x = false;
@@ -251,7 +216,6 @@ function manage_player_update(s, player, muri_livello) {
             PP.physics.set_velocity_x(player, 0);
         }
 
-        // Movimento Y
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.W) || PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
             PP.physics.set_velocity_y(player, -speed_fly);
         }
@@ -261,15 +225,10 @@ function manage_player_update(s, player, muri_livello) {
         else {
             PP.physics.set_velocity_y(player, 0);
         }
-
-        // Se in God Mode, fermiamo qui la funzione.
-        // NON eseguiamo la fisica standard sotto.
         return; 
     }
 
-    // =========================================================
-    // --- 4. MOVIMENTO STANDARD (Eseguito solo se GodMode OFF) ---
-    // =========================================================
+    // --- MOVIMENTO STANDARD ---
 
     let next_anim = curr_anim;
 
