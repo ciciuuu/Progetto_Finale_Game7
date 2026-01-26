@@ -1,98 +1,74 @@
 let img_player;
-let img_player_sparo;
-
 let player;
-let muri_livello;
+let muri_livello; 
 
-let parallasse1;
-let parallasse2;
-let parallasse3;
+let parallasse1; let parallasse2;
+let ts_background_1; let ts_background_2;
 
-let ts_background_1;
-let ts_background_2;
-let ts_background_3;
-let sfondo_caverna;
-
-let gruppo_trappole;
+// Usiamo una lista semplice per PoliPhaser
+let lista_trappole = [];
 
 function preload(s) {
-    // 1. PRELOAD ESTERNI
     preload_hud(s);
     preload_proiettili(s);
-
-    // NUOVO: Preload Vecchietto
     preload_vecchietto(s);
-
-    // Caricamento Immagini
-    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
-
-    // CARICAMENTO TILESET DI GODOT
-    if (window.godot_preload) {
-        window.godot_preload(s);
-    }
-
-    parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
-    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
-
     preload_enemy(s);
     preload_cactus(s);
     preload_player(s);
-    preload_blueprint(s);
+    if(typeof preload_blueprint === "function") preload_blueprint(s);
+
+    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
+    parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
+    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
+
+    if (window.godot_preload) window.godot_preload(s);
 }
 
 function create(s) {
-
     PP.game_state.set_variable("HP_player", 10);
+
+    if (!s.gruppo_proiettili) {
+        s.gruppo_proiettili = s.physics.add.group();
+    }
 
     const PARALLAX_WIDTH = 15800;
     const PARALLAX_HEIGHT = 3000;
 
-    // SFONDI PARALLASSE
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
-    ts_background_1.geometry.scale_x = 0.6;
-    ts_background_1.geometry.scale_y = 0.6;
-
+    ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6;
+    
     ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
-    ts_background_2.geometry.scale_x = 0.6;
-    ts_background_2.geometry.scale_y = 0.6;
+    ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6;
 
+    // [NATIVO] Scroll factor
     ts_background_1.tile_geometry.scroll_factor_x = 0;
     ts_background_2.tile_geometry.scroll_factor_x = 0;
 
-    // 2. COSTRUZIONE MAPPA
-    if (window.godot_create) {
-        if (typeof LIV1 !== 'undefined') {
-            muri_livello = window.godot_create(s, LIV1);
-        } else {
-            console.error("LIV1 non trovato.");
-        }
+    if (window.godot_create && typeof LIV1 !== 'undefined') {
+        muri_livello = window.godot_create(s, LIV1); // [NATIVO] TilemapLayer
+    } else {
+        console.error("LIV1 non trovato.");
+        muri_livello = null;
     }
 
-    // 3. CREAZIONE PLAYER
     let startX = PP.game_state.get_variable("spawn_x") || 150;
     let startY = PP.game_state.get_variable("spawn_y") || 620;
 
     player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
     PP.physics.add(s, player, PP.physics.type.DYNAMIC);
-
-    // ------------------------------------------
-    // --- VECCHIETTO (Nuovo File) ---
-    // ------------------------------------------
-    create_vecchietto(s);
-    // ------------------------------------------
-
-    player.is_dead = false;
+    
+    configure_player_animations(s, player);
     s.physics.world.TILE_BIAS = 32;
 
+    // [NATIVO] Collisione Player-Mappa
     if (muri_livello) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
-
-    configure_player_animations(s, player);
+    
     PP.camera.start_follow(s, player, 0, 75);
     create_hud(s);
+    create_vecchietto(s);
 
-    // NEMICI E OGGETTI
     let ragni_liv1 = [
         { x: -8, y: 0, pattuglia: [-234, -15] },
         { x: 182, y: -64, pattuglia: [70, 180] },
@@ -107,22 +83,15 @@ function create(s) {
     ];
     create_cactus(s, muri_livello, cactus_liv1);
 
-    // Lista Blueprint Livello 1
-    let bp_liv1 = [
-        { x: 100, y: -100 },
-        { x: 3684, y: 29 }
-    ];
-    create_blueprint(s, bp_liv1, player);
+    let bp_liv1 = [{ x: 100, y: -100 }, { x: 3684, y: 29 }];
+    if(typeof create_blueprint === "function") create_blueprint(s, bp_liv1, player);
 
-    // Lista Ingranaggi Livello 1
-    let ing_liv1 = [
-        { x: 200, y: -100 },
-        { x: 1820, y: -165 }
-    ];
-    create_ingranaggi(s, ing_liv1, player);
+    let ing_liv1 = [{ x: 200, y: -100 }, { x: 1820, y: -165 }];
+    if(typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player);
 
-    // TRAPPOLE
-    gruppo_trappole = s.physics.add.staticGroup();
+    // --- TRAPPOLE (SISTEMA POLIPHASER) ---
+    lista_trappole = []; 
+    
     aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
     aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
     aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
@@ -131,13 +100,17 @@ function create(s) {
     aggiungi_trappola_manuale(s, 4806 - 5, 0 + 16, 32 * 32, 32 * 8);
     aggiungi_trappola_manuale(s, 6374 - 5, -352 + 16, 32 * 6, 32 * 15);
 
-    s.physics.add.overlap(player.ph_obj, gruppo_trappole, function () {
-        morte_player(s, player, null);
-    })
+    // Loop collisioni
+    for (let i = 0; i < lista_trappole.length; i++) {
+        let tr = lista_trappole[i];
+        PP.physics.add_overlap_f(s, player, tr, function () {
+            morte_player(s, player, null);
+        });
+    }
 }
 
-
 function update(s) {
+    // [NATIVO] Zoom Camera (PoliPhaser non ha questa funzione)
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2);
     } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
@@ -150,77 +123,42 @@ function update(s) {
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
     if (player.ph_obj.x > 6800) {
-
-        // 2. NUOVO: Salviamo quanta vita ha il player in questo preciso istante
         let vita_al_passaggio = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
         PP.scenes.start("base_3");
-        PP.game_state.set_variable("spawn_x", 100); //spawn livello 2
-        PP.game_state.set_variable("spawn_y", 100); //spawn livello 2
-
+        PP.game_state.set_variable("spawn_x", 100); 
+        PP.game_state.set_variable("spawn_y", 100); 
     }
 
     if (player) manage_player_update(s, player, muri_livello);
 
-    // ------------------------------------------
-    // --- VECCHIETTO UPDATE (Nuovo File) ---
-    // ------------------------------------------
     update_vecchietto(s, player);
-    // ------------------------------------------
-
     update_enemy(s);
     update_cactus(s, player, muri_livello);
-    update_blueprint(s);
+    update_blueprint(s); 
     update_hud(s);
 }
 
-function destroy(s) {
-    destroy_enemy(s);
-}
+function destroy(s) { destroy_enemy(s); }
 
+// Helper PoliPhaser per trappole
 function aggiungi_trappola_manuale(s, x, y, w, h) {
-    let zona = s.add.zone(x, y, w, h);
-    zona.setOrigin(0, 0);
-    s.physics.add.existing(zona, true);
-    gruppo_trappole.add(zona);
+    let centerX = x + (w / 2);
+    let centerY = y + (h / 2);
+    let zona = PP.shapes.rectangle_add(s, centerX, centerY, w, h, "0xFF0000", 0);
+    PP.physics.add(s, zona, PP.physics.type.STATIC);
+    lista_trappole.push(zona);
 }
 
-// Funzione che scatta quando muori
 function morte_player(s, player, trappola) {
-    if (player.is_dead) return; // Evita che la funzione scatti due volte
+    if(typeof window.morte_player === "function") { window.morte_player(s, player); return; }
+    if (player.is_dead) return; 
     player.is_dead = true;
-
-    // 1. Blocchiamo il player
     if (player && player.ph_obj.active) {
-        player.ph_obj.setTint(0xFF0000); // Diventa rosso
-        player.ph_obj.body.enable = false; // Niente più fisica
-        player.ph_obj.body.setVelocity(0, 0); // Fermo
+        player.ph_obj.setTint(0xFF0000); 
+        player.ph_obj.body.enable = false; 
     }
-
-    // 2. Creiamo il rettangolo nero (SIPARIO)
-    // Lo posizioniamo a 0,0 e lo facciamo grande come tutto lo schermo
-    let sipario_nero = s.add.rectangle(
-        0, 0,
-        PP.game.config.canvas_width,
-        PP.game.config.canvas_height,
-        0x000000
-    );
-
-    // Impostazioni fondamentali
-    sipario_nero.setOrigin(0, 0);       // Parte dall'angolo in alto a sinistra
-    sipario_nero.setScrollFactor(0);    // SI INCOLLA ALLO SCHERMO (copre anche se ti muovi)
-    sipario_nero.setDepth(9999);        // Z-INDEX MASSIMO (sopra a tutto, anche all'HUD)
-    sipario_nero.alpha = 0;             // Parte trasparente
-
-    // 3. Animazione Dissolvenza (Tween)
-    s.tweens.add({
-        targets: sipario_nero,
-        alpha: 1,           // Diventa nero totale
-        duration: 400,      // In mezzo secondo (500ms)
-        onComplete: function () {
-            PP.scenes.start("game_over");
-        }
-    });
+    PP.scenes.start("game_over");
 }
 
 PP.scenes.add("base", preload, create, update, destroy);

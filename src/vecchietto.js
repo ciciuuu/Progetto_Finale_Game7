@@ -1,13 +1,18 @@
 // --- VARIABILI GLOBALI VECCHIETTO ---
 let img_vecchietto;
 let vecchietto;
-let sensore_dialogo; // Il rettangolo invisibile per la collisione
+let sensore_dialogo; // Ora sarà un oggetto PoliPhaser
 let img_tasto_S;
-let tasto_S;         // Lo sprite del fumetto
+let tasto_S;         
 
-// --- ELEMENTI UI ---
-let testo_schermo;   // Il testo
-let sfondo_testo;    // Il rettangolo nero semitrasparente
+// --- ELEMENTI UI (DEVONO RIMANERE NATIVI PER ORA) ---
+let testo_schermo;   
+let sfondo_testo;    
+
+// --- LAYERS (NUOVO POLIPHASER) ---
+let layer_bg_ui; // Sfondo testo
+let layer_fg_ui; // Testo sopra
+let layer_game;  // Vecchietto e fumetto
 
 // --- STATI DEL DIALOGO ---
 let dialogo_iniziato = false;
@@ -29,66 +34,68 @@ function preload_vecchietto(s) {
 }
 
 function create_vecchietto(s) {
-    // 1. VECCHIETTO
-    vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -192, 0.5, 1);
+    // --- CREAZIONE LAYERS ---
+    layer_game = PP.layers.create(s);
+    PP.layers.set_z_index(layer_game, 5);
 
+    layer_bg_ui = PP.layers.create(s);
+    PP.layers.set_z_index(layer_bg_ui, 100);
+
+    layer_fg_ui = PP.layers.create(s);
+    PP.layers.set_z_index(layer_fg_ui, 101);
+
+    // 1. VECCHIETTO (PoliPhaser)
+    vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -192, 0.5, 1);
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
     
-    vecchietto.ph_obj.setDepth(5); 
+    // Aggiunta al layer invece di setDepth nativo
+    PP.layers.add_to_layer(layer_game, vecchietto);
 
     PP.assets.sprite.animation_add_list(vecchietto, "idle", [0, 1, 2, 3], 6, -1);
     PP.assets.sprite.animation_add_list(vecchietto, "parla", [4, 5, 6, 7], 6, -1);
-    
-    // Parte subito in IDLE
     PP.assets.sprite.animation_play(vecchietto, "idle");
 
-    // ----------------------------------------
-    // 2. SENSORE DI CONTATTO
-    // ----------------------------------------
-    sensore_dialogo = s.add.rectangle(2849, -192, 250, 200, 0xFF0000, 0); 
-    s.physics.add.existing(sensore_dialogo, true); // Statico
+    // 2. SENSORE DI CONTATTO (PoliPhaser)
 
-    // ----------------------------------------
-    // 3. TASTO S (Fumetto)
-    // ----------------------------------------
+    sensore_dialogo = PP.shapes.rectangle_add(s, 2849, -192, 250, 200, "0xFF0000", 0);
+    PP.physics.add(s, sensore_dialogo, PP.physics.type.STATIC);
+
+
+    // 3. TASTO S (PoliPhaser)
+
     tasto_S = PP.assets.sprite.add(s, img_tasto_S, 2847, -240, 0.5, 1);
-    // [MODIFICA Z-INDEX] Il tasto sopra il vecchietto
-    tasto_S.ph_obj.setDepth(6); 
+    // Layer per z-index
+    PP.layers.add_to_layer(layer_game, tasto_S);
 
     PP.assets.sprite.animation_add_list(tasto_S, "puntini", [0, 1], 2, -1);
     PP.assets.sprite.animation_add_list(tasto_S, "tasto", [2, 3], 2, -1);
-    
-    // Parte subito con PUNTINI
     PP.assets.sprite.animation_play(tasto_S, "puntini");
 
-    // ----------------------------------------
-    // 4. INTERFACCIA UTENTE (Testo + Sfondo)
-    // ----------------------------------------
+
+    // 4. INTERFACCIA UTENTE (NATIVO NECESSARIO)
     
-    // Sfondo Nero Opaco al 30% (0.3)
     sfondo_testo = s.add.rectangle(640, 360, 800, 150, 0x000000, 0.3);
     sfondo_testo.setScrollFactor(0); 
-    sfondo_testo.setDepth(100); // UI sempre sopra tutto
+    // Usiamo il layer PoliPhaser per la profondità anche degli oggetti nativi
+    PP.layers.add_to_layer(layer_bg_ui, { ph_obj: sfondo_testo }); // Wrapper manuale per compatibilità
     sfondo_testo.setVisible(false);
 
-    // Testo Bianco al centro
-    // [MODIFICA] Font più piccolo (20px) e larghezza ridotta (600px)
     testo_schermo = s.add.text(640, 360, "", {
         fontSize: '20px', 
         fontFamily: 'Arial',
         fontStyle: 'bold',
         color: '#FFFFFF',
         align: 'center',
-        wordWrap: { width: 600 } // A capo se supera 600px
+        wordWrap: { width: 600 }
     });
     
     testo_schermo.setOrigin(0.5, 0.5); 
     testo_schermo.setScrollFactor(0);  
-    testo_schermo.setDepth(101); // UI sopra sfondo
+    PP.layers.add_to_layer(layer_fg_ui, { ph_obj: testo_schermo }); // Wrapper manuale
     testo_schermo.setVisible(false);
 }
 
-// Funzione Helper per evitare di resettare l'animazione
+// Funzione Helper (Nativo necessario per check animazione corrente)
 function cambia_animazione_sicura(oggetto, nome_animazione) {
     if (oggetto.ph_obj.anims.currentAnim && oggetto.ph_obj.anims.currentAnim.key === nome_animazione) {
         return;
@@ -99,31 +106,22 @@ function cambia_animazione_sicura(oggetto, nome_animazione) {
 function update_vecchietto(s, player) {
   if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
 
-  // [MODIFICA Z-INDEX] Player sempre davanti
-  if (player.ph_obj.depth <= 5) {
-      player.ph_obj.setDepth(10);
-  }
-
   // --- CASO 1: DIALOGO FINITO ---
   if (dialogo_finito) {
+       // [NATIVO] Gestione visibilità
        if (tasto_S.ph_obj.visible) tasto_S.ph_obj.setVisible(false);
        if (testo_schermo.visible) testo_schermo.setVisible(false);
        if (sfondo_testo.visible) sfondo_testo.setVisible(false);
        
        cambia_animazione_sicura(vecchietto, "idle");
        
-       // [NUOVO] SCONGELA IL PLAYER
        player.is_frozen = false;
-
        return; 
   }
 
   // --- CASO 2: DIALOGO IN CORSO ---
   if (dialogo_iniziato) {
-      
-      // [NUOVO] CONGELA IL PLAYER
       player.is_frozen = true;
-
       cambia_animazione_sicura(vecchietto, "parla");
 
       let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
@@ -137,11 +135,11 @@ function update_vecchietto(s, player) {
               if (indice_frase < frasi_vecchietto.length) {
                   sfondo_testo.setVisible(true);
                   testo_schermo.setVisible(true);
+                  // [NATIVO] setText non esiste in PoliPhaser
                   testo_schermo.setText(frasi_vecchietto[indice_frase]);
                   indice_frase++; 
               } else {
                   dialogo_finito = true;
-                  // Nota: Lo scongelamento avviene al prossimo frame nel CASO 1
               }
           }
       } else {
@@ -150,7 +148,13 @@ function update_vecchietto(s, player) {
   } 
   // --- CASO 3: IN ATTESA ---
   else {
-      let dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo);
+      // [POLIPHASER] Verifica Sovrapposizione
+      // Usiamo PP.physics.add_overlap_f solo nel create, ma qui siamo nell'update e vogliamo
+      // solo sapere SE si toccano, senza triggerare un evento una tantum.
+      // PoliPhaser NON ha una funzione `check_overlap` booleana.
+      // Quindi dobbiamo usare il nativo per questo check continuo.
+      
+      let dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo.ph_obj);
 
       if (dentro_zona) {
           cambia_animazione_sicura(tasto_S, "tasto");
@@ -159,9 +163,7 @@ function update_vecchietto(s, player) {
           if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
               if (tasto_rilasciato) {
                   dialogo_iniziato = true;
-                  // [NUOVO] CONGELA SUBITO
                   player.is_frozen = true; 
-                  // [NUOVO] Ferma subito il player visivamente per evitare scivolamenti
                   PP.physics.set_velocity_x(player, 0);
 
                   tasto_S.ph_obj.setVisible(false);

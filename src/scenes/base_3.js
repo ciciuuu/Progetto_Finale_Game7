@@ -2,25 +2,18 @@ let img_player;
 let player;
 let muri_livello; 
 
-// Variabili Sfondo
-let parallasse1;
-let parallasse2;
-let ts_background_1;
-let ts_background_2;
-
+let parallasse1; let parallasse2;
+let ts_background_1; let ts_background_2;
 let lista_trappole = [];
 
 function preload(s) {
-    // 1. PRELOAD ESTERNI
     preload_hud(s);
-    preload_proiettili(s); // Carica le immagini dei proiettili
+    preload_proiettili(s);
     preload_enemy(s);
     preload_cactus(s);
     preload_player(s);
-    
     if(typeof preload_blueprint === "function") preload_blueprint(s);
 
-    // 2. ASSETS
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
@@ -32,9 +25,8 @@ function create(s) {
     let hp_start = PP.game_state.get_variable("HP_checkpoint") || 10;
     PP.game_state.set_variable("HP_player", hp_start);
 
-    // Inizializzazione gruppo proiettili
     if (!s.gruppo_proiettili) {
-        s.gruppo_proiettili = s.physics.add.group();
+        s.gruppo_proiettili = s.physics.add.group(); // [NATIVO]
     }
 
     const PARALLAX_WIDTH = 15800;
@@ -42,14 +34,15 @@ function create(s) {
 
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6;
+    
     ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6;
-    ts_background_1.tile_geometry.scroll_factor_x = 0; ts_background_2.tile_geometry.scroll_factor_x = 0;
 
-    // --- COSTRUZIONE MAPPA ---
+    ts_background_1.tile_geometry.scroll_factor_x = 0;
+    ts_background_2.tile_geometry.scroll_factor_x = 0;
+
     if (window.godot_create && typeof LIV3 !== 'undefined') {
-        // [MODIFICA] Niente wrapper {ph_obj}. Usiamo l'oggetto nativo come in base.js
-        muri_livello = window.godot_create(s, LIV3);
+        muri_livello = window.godot_create(s, LIV3); // [NATIVO]
     } else {
         console.error("ERRORE: LIV3 non trovato.");
         muri_livello = null;
@@ -64,7 +57,7 @@ function create(s) {
     configure_player_animations(s, player);
     s.physics.world.TILE_BIAS = 32;
 
-    // [MODIFICA] Collisione Player-Muri NATIVA (perché muri_livello è nativo)
+    // [NATIVO] Collisione Player-Mappa
     if (muri_livello) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
@@ -73,12 +66,10 @@ function create(s) {
     create_hud(s);
     create_blueprint(s, player);
 
-    // --- NEMICI LIV3 ---
     let ragni_liv3 = [
-        { x: 500, y: 10, pattuglia: [400, 600] },
+        { x: 500, y: 100, pattuglia: [400, 600] },
         { x: 1200, y: 100, pattuglia: [1000, 1400] }
     ];
-    // Passiamo muri_livello (che ora è l'oggetto nativo)
     create_enemy(s, muri_livello, ragni_liv3, player);
 
     let cactus_liv3 = [
@@ -87,27 +78,30 @@ function create(s) {
     ];
     create_cactus(s, muri_livello, cactus_liv3);
 
-    // --- COLLEZIONABILI LIV3 ---
     let bp_liv3 = [ { x: 600, y: 150 }, { x: 700, y: 150 } ];
     if(typeof create_blueprint === "function") create_blueprint(s, bp_liv3, player);
 
     let ing_liv3 = [ { x: 2000, y: 200 }, { x: 2200, y: 200 } ];
     if(typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv3, player);
 
-    // --- TRAPPOLE ---
     lista_trappole = [];
+    // aggiungi_trappola_manuale(s, 1000, 1000, 500, 50);
+
     for (let i = 0; i < lista_trappole.length; i++) {
         let tr = lista_trappole[i];
         PP.physics.add_overlap_f(s, player, tr, function () {
-            if(typeof morte_player === "function") morte_player(s, player);
-            else if(typeof window.morte_player === "function") window.morte_player(s, player);
+            morte_player(s, player);
         });
     }
 }
 
 function update(s) {
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) s.cameras.main.setZoom(0.2);
-    else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) s.cameras.main.setZoom(2);
+    // [NATIVO] Zoom Camera
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
+        s.cameras.main.setZoom(0.2);
+    } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
+        s.cameras.main.setZoom(2);
+    }
 
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4;
@@ -128,11 +122,15 @@ function update(s) {
 }
 
 function destroy(s) { destroy_enemy(s); }
+
 function aggiungi_trappola_manuale(s, x, y, w, h) {
-    let zona = PP.shapes.rectangle_add(s, x + w/2, y + h/2, w, h, "0xFF0000", 0);
+    let centerX = x + (w / 2);
+    let centerY = y + (h / 2);
+    let zona = PP.shapes.rectangle_add(s, centerX, centerY, w, h, "0xFF0000", 0);
     PP.physics.add(s, zona, PP.physics.type.STATIC);
     lista_trappole.push(zona);
 }
+
 function morte_player(s, player) {
     if(typeof window.morte_player === "function") { window.morte_player(s, player); return; }
     if (player.is_dead) return; 
@@ -143,4 +141,5 @@ function morte_player(s, player) {
     }
     PP.scenes.start("game_over");
 }
+
 PP.scenes.add("base_3", preload, create, update, destroy);
