@@ -1,9 +1,7 @@
+// ok
+
 let img_blueprint;
 let img_ingranaggio;
-
-// Contatori Globali
-let tot_blueprint_raccolti = 0;
-let tot_ingranaggi_raccolti = 0;
 
 // Obiettivi per il messaggio finale
 const OBIETTIVO_BLUEPRINT = 4;
@@ -14,14 +12,30 @@ function preload_blueprint(s) {
     img_ingranaggio = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Ingranaggio.png");
 }
 
+function init_collezionabili_state() {
+    // Inizializza i contatori nel Game State se non esistono
+    if (PP.game_state.get_variable("tot_blueprint") === undefined) {
+        PP.game_state.set_variable("tot_blueprint", 0);
+    }
+    if (PP.game_state.get_variable("tot_ingranaggi") === undefined) {
+        PP.game_state.set_variable("tot_ingranaggi", 0);
+    }
+}
+
 // --- BLUEPRINT ---
 function collision_blueprint(s, player, item) {
-    tot_blueprint_raccolti++;
-    console.log("Blueprint Preso! Totale: " + tot_blueprint_raccolti + "/" + OBIETTIVO_BLUEPRINT);
+    // Recupera, incrementa e salva
+    let attuali = PP.game_state.get_variable("tot_blueprint") + 1;
+    PP.game_state.set_variable("tot_blueprint", attuali);
+    
+    console.log("Blueprint Preso! Totale: " + attuali + "/" + OBIETTIVO_BLUEPRINT);
+    
+    // Distruzione PoliPhaser
     PP.assets.destroy(item);
 }
 
 function create_blueprint(s, lista_spawn, player) {
+    init_collezionabili_state();
     if (!lista_spawn) return;
 
     for (let i = 0; i < lista_spawn.length; i++) {
@@ -38,12 +52,15 @@ function create_blueprint(s, lista_spawn, player) {
 
 // --- INGRANAGGI ---
 function collision_ingranaggio(s, player, item) {
-    tot_ingranaggi_raccolti++;
-    console.log("Ingranaggio Preso! Totale: " + tot_ingranaggi_raccolti + "/" + OBIETTIVO_INGRANAGGI);
+    let attuali = PP.game_state.get_variable("tot_ingranaggi") + 1;
+    PP.game_state.set_variable("tot_ingranaggi", attuali);
+
+    console.log("Ingranaggio Preso! Totale: " + attuali + "/" + OBIETTIVO_INGRANAGGI);
     PP.assets.destroy(item);
 }
 
 function create_ingranaggi(s, lista_spawn, player) {
+    init_collezionabili_state();
     if (!lista_spawn) return;
 
     for (let i = 0; i < lista_spawn.length; i++) {
@@ -57,12 +74,17 @@ function create_ingranaggi(s, lista_spawn, player) {
 
 // --- CONTROLLO FINALE ---
 function check_collezionabili_vittoria() {
-    if (tot_blueprint_raccolti >= OBIETTIVO_BLUEPRINT && tot_ingranaggi_raccolti >= OBIETTIVO_INGRANAGGI) {
+    let tot_b = PP.game_state.get_variable("tot_blueprint") || 0;
+    let tot_i = PP.game_state.get_variable("tot_ingranaggi") || 0;
+
+    if (tot_b >= OBIETTIVO_BLUEPRINT && tot_i >= OBIETTIVO_INGRANAGGI) {
         console.log("HAI PRESO TUTTI I COLLEZIONABILI! VITTORIA PERFETTA!");
+        // Qui potresti chiamare: PP.scenes.start("vittoria_perfetta");
     } else {
         console.log("HAI PERSO!! Ti mancano dei pezzi.");
-        console.log("Blueprint: " + tot_blueprint_raccolti);
-        console.log("Ingranaggi: " + tot_ingranaggi_raccolti);
+        console.log("Blueprint: " + tot_b);
+        console.log("Ingranaggi: " + tot_i);
+        // Qui potresti chiamare: PP.scenes.start("game_over_incompleto");
     }
 }
 

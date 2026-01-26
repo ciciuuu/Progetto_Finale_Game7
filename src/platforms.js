@@ -1,4 +1,4 @@
-let img_platform;
+/* let img_platform;
 let platform_2;
 
 function preload_platforms(s) {
@@ -53,3 +53,4 @@ function update_platforms(s) {
 
 
 }
+ */

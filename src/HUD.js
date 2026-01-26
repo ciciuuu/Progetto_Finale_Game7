@@ -1,4 +1,4 @@
-// HUD.js
+// ok
 
 let asset_ingranaggio_0;
 let asset_ingranaggio_1;
@@ -16,7 +16,7 @@ let blueprint;
 let asset_pistole;
 let pistola;
 
-// [NUOVO] Asset per la pistola statica (solo inquinante)
+// Asset per la pistola statica (solo inquinante)
 let asset_pistola_fissa;
 let pistola_fissa;
 
@@ -38,7 +38,7 @@ function preload_hud(s) {
     
     // Sprite animato
     asset_pistole = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/Pistola/Pistole_sheet.png", 50, 40);
-    // [NUOVO] Immagine fissa
+    // Immagine fissa
     asset_pistola_fissa = PP.assets.image.load(s, "assets/images/HUD/Pistola/Pistola_inquinante.png");
 
     asset_health_bar = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/health_bar.png");
@@ -47,13 +47,14 @@ function preload_hud(s) {
 
 function create_hud(s) {
     
-    // 2. CREAZIONE DEL LAYER
+    // 2. CREAZIONE DEL LAYER (POLIPHASER)
     livello_HUD = PP.layers.create(s);
+    // Z-index alto per stare sopra tutto
     PP.layers.set_z_index(livello_HUD, 1000);
 
 
-    // --- INGRANAGGIO ---
-    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 210, 0, 0, 0, 0);
+
+    /* ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 210, 0, 0, 0, 0);
     ingranaggio.ph_obj.setScrollFactor(0); 
     PP.layers.add_to_layer(livello_HUD, ingranaggio);
 
@@ -82,6 +83,62 @@ function create_hud(s) {
     // --- HEALTH BAR ---
     health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 1280/2, 220, 0.5, 0.5);
     health_bar.ph_obj.setScrollFactor(0);
+    PP.layers.add_to_layer(livello_HUD, health_bar) */
+
+
+    // --- INGRANAGGIO (Alto a Destra - Alzato di 20px) ---
+    // Posizione X: 1150 (Destra), Y: 190 (Era 210, -20px)
+    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 190, 0, 0, 0, 0);
+    
+    // [POLIPHASER] Scroll Factor tramite tile_geometry (invece di setScrollFactor)
+    ingranaggio.tile_geometry.scroll_factor_x = 0;
+    ingranaggio.tile_geometry.scroll_factor_y = 0;
+    
+    PP.layers.add_to_layer(livello_HUD, ingranaggio);
+
+
+    // --- BLUEPRINT (Alto a Destra - Sotto ingranaggio - Alzato di 20px) ---
+    // Posizione X: 1150, Y: 235 (Era 255, -20px)
+    blueprint = PP.assets.image.add(s, asset_blueprint, 885, 235, 0, 0, 0, 0);
+    
+    // [POLIPHASER] Scroll Factor
+    blueprint.tile_geometry.scroll_factor_x = 0;
+    blueprint.tile_geometry.scroll_factor_y = 0;
+    
+    PP.layers.add_to_layer(livello_HUD, blueprint);
+
+
+    // --- PISTOLA ANIMATA (Alto a Sinistra) ---
+    pistola = PP.assets.sprite.add(s, asset_pistole, 332, 190, 0, 0);
+    
+    // [POLIPHASER] Scroll Factor & Scala
+    pistola.tile_geometry.scroll_factor_x = 0;
+    pistola.tile_geometry.scroll_factor_y = 0;
+    pistola.geometry.scale_x = 1.3;
+    pistola.geometry.scale_y = 1.3;
+    
+    PP.layers.add_to_layer(livello_HUD, pistola);
+
+
+    // --- PISTOLA FISSA (Alto a Sinistra - Stessa posizione) ---
+    pistola_fissa = PP.assets.image.add(s, asset_pistola_fissa, 332, 190, 0, 0);
+    
+    // [POLIPHASER] Scroll Factor & Scala
+    pistola_fissa.tile_geometry.scroll_factor_x = 0;
+    pistola_fissa.tile_geometry.scroll_factor_y = 0;
+    pistola_fissa.geometry.scale_x = 1.3;
+    pistola_fissa.geometry.scale_y = 1.3;
+    
+    PP.layers.add_to_layer(livello_HUD, pistola_fissa);
+
+
+    // --- HEALTH BAR
+    health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 1280/2, 220, 0.5, 0.5);
+    
+    // [POLIPHASER] Scroll Factor
+    health_bar.tile_geometry.scroll_factor_x = 0;
+    health_bar.tile_geometry.scroll_factor_y = 0;
+    
     PP.layers.add_to_layer(livello_HUD, health_bar);
 
 
@@ -112,7 +169,7 @@ function update_hud(s, player) {
     if (is_arma_sbloccata) {
         // --- ARMA SBLOCCATA: Logica normale ---
         
-        // Gestione visibilità sprite
+        // Gestione visibilità
         pistola_fissa.visibility.hidden = true;
         pistola.visibility.hidden = false;
 
@@ -132,14 +189,14 @@ function update_hud(s, player) {
         }
 
     } else {
+        
         // --- ARMA BLOCCATA: Solo Inquinante ---
         
-        // Mostra immagine fissa, nascondi sprite
+        // [POLIPHASER] Visibilità
         pistola_fissa.visibility.hidden = false;
         pistola.visibility.hidden = true;
 
         // Forziamo la variabile globale dell'HUD su inquinante
-        // Così player.js la legge e imposta lo sparo rosso
         hud_modalita_inquinante = true;
     }
 

@@ -1,3 +1,5 @@
+// ok
+
 // --- VARIABILI GLOBALI VECCHIETTO ---
 let img_vecchietto;
 let vecchietto;
