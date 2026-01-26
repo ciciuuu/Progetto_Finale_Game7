@@ -23,7 +23,7 @@ function spawna_ragno(s, x, y) {
     let nuovo_ragno = PP.assets.sprite.add(s, img_enemy, x, y, 0.5, 1);
 
     // --- AGGIUNTA HP ---
-    nuovo_ragno.hp = 3; 
+    nuovo_ragno.hp = 3;
     // Facciamo un riferimento comodo per la logica nativa
     nuovo_ragno.ph_obj.wrapper = nuovo_ragno;
 
@@ -101,7 +101,7 @@ function muovi_singolo_ragno(ragno_nativo) {
     else if (ragno_nativo.body.blocked.left) {
         ragno_nativo.direzione_corrente = 1;
         ragno_nativo.flipX = true;
-    } 
+    }
     else if (ragno_nativo.x >= limite_dx) {
         ragno_nativo.direzione_corrente = -1;
         ragno_nativo.flipX = false;
@@ -154,4 +154,4 @@ function morte_ragno(s, ragno_wrapper) {
     });
 }
 
-function destroy_enemy(s) {}
+function destroy_enemy(s) { }
