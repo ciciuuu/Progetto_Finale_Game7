@@ -13,14 +13,29 @@ let zona_inizio_sinistra;
 let zona_dopo_vecchietto;
 let zona_fine_lvl1;
 
+// Variabili Trappola Muri
+let img_muro_sinistra;
+let img_muro_destra;
+let muro_sinistra_obj;
+let muro_destra_obj;
+let trappola_attivata = false;
+
+// Trigger Trappola (227 * 32)
+const X_ATTIVAZIONE_TRAPPOLA = 227 * 32; 
+
+// Variabile per l'immagine specifica di QUESTO livello
+let img_zona_pietra;
+
 function preload(s) {
     zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_pietra.png");
     zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_inizio_sinistra.png");
     zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/ZS_dopo_vecchietto.png");
     zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine_lvl1.png");
 
+    // Caricamento Muri
+    img_muro_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine1_sinistra.png");
+    img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine1_destra.png");
 
-    // Caricamento script esterni
     if (typeof preload_zone_segrete === "function") preload_zone_segrete(s);
     if (typeof preload_blueprint === "function") preload_blueprint(s);
 
@@ -28,8 +43,9 @@ function preload(s) {
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
+    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_pietra.png");
+
     if (window.godot_preload) window.godot_preload(s);
-    
     
     preload_hud(s);
     preload_proiettili(s);
@@ -45,7 +61,9 @@ function create(s) {
     PP.game_state.set_variable("arma_sbloccata", false);
     PP.game_state.set_variable("tot_blueprint", 0);
     PP.game_state.set_variable("tot_ingranaggi", 0);
-
+    
+    // Reset trappola
+    trappola_attivata = false;
 
     if (!s.gruppo_proiettili) {
         s.gruppo_proiettili = s.physics.add.group();
@@ -86,6 +104,27 @@ function create(s) {
     PP.camera.start_follow(s, player, 0, 75);
     create_hud(s);
     create_vecchietto(s);
+
+    // ===============================================
+    // --- TRAPPOLA MURI CADENTI ---
+    // ===============================================
+    
+    // Muro Sinistro (Start: 224, -27)
+    muro_sinistra_obj = PP.assets.image.add(s, img_muro_sinistra, 222 * 32, -27 * 32, 0, 0); 
+    PP.physics.add(s, muro_sinistra_obj, PP.physics.type.DYNAMIC);
+    PP.physics.set_allow_gravity(muro_sinistra_obj, false); 
+    PP.physics.set_immovable(muro_sinistra_obj, true); 
+    
+    // Muro Destro (Start: 230, -27)
+    muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 227 * 32, -27 * 32, 0, 0);
+    PP.physics.add(s, muro_destra_obj, PP.physics.type.DYNAMIC);
+    PP.physics.set_allow_gravity(muro_destra_obj, false);
+    PP.physics.set_immovable(muro_destra_obj, true);
+
+    // [POLIPHASER] Collisione Player - Muri
+    PP.physics.add_collider(s, player, muro_sinistra_obj);
+    PP.physics.add_collider(s, player, muro_destra_obj);
+
 
     // ===============================================
     // --- CONFIGURAZIONE ZONE SEGRETE (LIV 1) ---
@@ -184,7 +223,39 @@ function update(s) {
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
-    if (player.ph_obj.x > 227 * 32 & player.ph_obj.y > 0) {
+    // --- LOGICA TRAPPOLA MURI ---
+    // Controlla se il player supera la linea X (227 * 32)
+    if (!trappola_attivata && player.ph_obj.x >= X_ATTIVAZIONE_TRAPPOLA) {
+        trappola_attivata = true;
+    }
+
+    if (trappola_attivata) {
+        // velocità = numero tile * 32 pixel / tempo impiegato in secondi
+        let velocityY = 5*32/0.1;
+        
+        let targetY = -23 * 32; 
+
+        // Movimento Muro Sinistro
+        if (muro_sinistra_obj.ph_obj.y < targetY) {
+            PP.physics.set_velocity_y(muro_sinistra_obj, velocityY);
+        } else {
+            // Stop e Fix posizione
+            PP.physics.set_velocity_y(muro_sinistra_obj, 0);
+            muro_sinistra_obj.ph_obj.y = targetY; 
+        }
+
+        // Movimento Muro Destro
+        if (muro_destra_obj.ph_obj.y < targetY) {
+            PP.physics.set_velocity_y(muro_destra_obj, velocityY);
+        } else {
+            // Stop e Fix posizione
+            PP.physics.set_velocity_y(muro_destra_obj, 0);
+            muro_destra_obj.ph_obj.y = targetY;
+        }
+    }
+
+    // Cambio Livello
+    if (player.ph_obj.x > 227 * 32 && player.ph_obj.y > 0) {
         let vita_al_passaggio = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
         PP.game_state.set_variable("arma_sbloccata", true);
@@ -195,7 +266,6 @@ function update(s) {
 
     if (player) manage_player_update(s, player, muri_livello);
 
-    // [NUOVO] Update Zone
     if (typeof update_zone_segrete === "function") update_zone_segrete(s);
 
     update_vecchietto(s, player);
