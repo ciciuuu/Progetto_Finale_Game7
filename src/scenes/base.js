@@ -26,6 +26,9 @@ function preload(s) {
 
 function create(s) {
     PP.game_state.set_variable("HP_player", 10);
+    
+    // [NUOVO] L'arma rinnovabile parte bloccata
+    PP.game_state.set_variable("arma_sbloccata", false);
 
     if (!s.gruppo_proiettili) {
         s.gruppo_proiettili = s.physics.add.group();
@@ -110,7 +113,7 @@ function create(s) {
 }
 
 function update(s) {
-    // [NATIVO] Zoom Camera (PoliPhaser non ha questa funzione)
+    // [NATIVO] Zoom Camera
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2);
     } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
@@ -125,6 +128,8 @@ function update(s) {
     if (player.ph_obj.x > 6800) {
         let vita_al_passaggio = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
+        // Sblocchiamo arma per il prossimo livello se per caso non lo era
+        PP.game_state.set_variable("arma_sbloccata", true); 
         PP.scenes.start("base_3");
         PP.game_state.set_variable("spawn_x", 100); 
         PP.game_state.set_variable("spawn_y", 100); 
@@ -141,7 +146,6 @@ function update(s) {
 
 function destroy(s) { destroy_enemy(s); }
 
-// Helper PoliPhaser per trappole
 function aggiungi_trappola_manuale(s, x, y, w, h) {
     let centerX = x + (w / 2);
     let centerY = y + (h / 2);

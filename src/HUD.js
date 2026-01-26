@@ -16,8 +16,11 @@ let blueprint;
 let asset_pistole;
 let pistola;
 
-// 1. DICHIARAZIONE VARIABILE LAYER (Globale)
-// Il nuovo livello restituito deve essere salvato in una variabile [cite: 36, 48]
+// [NUOVO] Asset per la pistola statica (solo inquinante)
+let asset_pistola_fissa;
+let pistola_fissa;
+
+// 1. DICHIARAZIONE VARIABILE LAYER
 let livello_HUD;
 
 // Variabili interne dell'HUD
@@ -32,7 +35,11 @@ function preload_hud(s) {
     asset_ingranaggio_3 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/3_ingranaggio.png");
 
     asset_blueprint = PP.assets.image.load(s, "assets/images/HUD/Blueprint/BP_boh.png");
+    
+    // Sprite animato
     asset_pistole = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/Pistola/Pistole_sheet.png", 50, 40);
+    // [NUOVO] Immagine fissa
+    asset_pistola_fissa = PP.assets.image.load(s, "assets/images/HUD/Pistola/Pistola_inquinante.png");
 
     asset_health_bar = PP.assets.image.load(s, "assets/images/HUD/HEALTHBAR/health_bar.png");
     asset_healthbar_sheet = PP.assets.sprite.load_spritesheet(s, "assets/images/HUD/HEALTHBAR/healthbar_sheet.png", 195, 32);
@@ -40,48 +47,41 @@ function preload_hud(s) {
 
 function create_hud(s) {
     
-    // -------------------------------------------------------------
-    // 2. CREAZIONE DEL LAYER (Tassativo secondo PDF)
-    // -------------------------------------------------------------
-    // Creiamo un nuovo livello vuoto [cite: 33]
+    // 2. CREAZIONE DEL LAYER
     livello_HUD = PP.layers.create(s);
-
-    // Assegniamo un z-index specifico al layer [cite: 59]
-    // 1000 assicura che sia davanti a tutto (background, player, nemici)
     PP.layers.set_z_index(livello_HUD, 1000);
 
 
     // --- INGRANAGGIO ---
     ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 210, 0, 0, 0, 0);
     ingranaggio.ph_obj.setScrollFactor(0); 
-    
-    // Aggiungiamo l'oggetto al livello [cite: 40]
     PP.layers.add_to_layer(livello_HUD, ingranaggio);
 
 
     // --- BLUEPRINT ---
     blueprint = PP.assets.image.add(s, asset_blueprint, 885, 255, 0, 0, 0, 0);
     blueprint.ph_obj.setScrollFactor(0);
-    
-    // Aggiungiamo l'oggetto al livello 
     PP.layers.add_to_layer(livello_HUD, blueprint);
 
 
-    // --- PISTOLA ---
+    // --- PISTOLA ANIMATA (Rinnovabile/Inquinante) ---
     pistola = PP.assets.sprite.add(s, asset_pistole, 332, 210, 0, 0);
     pistola.ph_obj.setScrollFactor(0);
     pistola.geometry.scale_x = 1.3;
     pistola.geometry.scale_y = 1.3;
-    
-    // Aggiungiamo l'oggetto al livello [cite: 42]
     PP.layers.add_to_layer(livello_HUD, pistola);
+
+    // --- PISTOLA FISSA (Solo Inquinante - Inizialmente visibile) ---
+    pistola_fissa = PP.assets.image.add(s, asset_pistola_fissa, 332, 210, 0, 0, 0, 0);
+    pistola_fissa.ph_obj.setScrollFactor(0);
+    pistola_fissa.geometry.scale_x = 1.3;
+    pistola_fissa.geometry.scale_y = 1.3;
+    PP.layers.add_to_layer(livello_HUD, pistola_fissa);
 
 
     // --- HEALTH BAR ---
     health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 332, 550, 0, 0);
     health_bar.ph_obj.setScrollFactor(0);
-    
-    // Aggiungiamo l'oggetto al livello [cite: 55]
     PP.layers.add_to_layer(livello_HUD, health_bar);
 
 
@@ -105,19 +105,42 @@ function create_hud(s) {
 }
 
 function update_hud(s, player) {
-    // --- LOGICA INDIPENDENTE ---
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
-        if (hud_tasto_R_rilasciato) {
-            hud_modalita_inquinante = !hud_modalita_inquinante;
-            if (hud_modalita_inquinante) {
-                PP.assets.sprite.animation_play(pistola, "anim_inquinante");
-            } else {
-                PP.assets.sprite.animation_play(pistola, "anim_normale");
+    
+    // Controllo stato sblocco arma
+    let is_arma_sbloccata = PP.game_state.get_variable("arma_sbloccata");
+
+    if (is_arma_sbloccata) {
+        // --- ARMA SBLOCCATA: Logica normale ---
+        
+        // Gestione visibilità sprite
+        pistola_fissa.visibility.hidden = true;
+        pistola.visibility.hidden = false;
+
+        // Gestione tasto L
+        if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
+            if (hud_tasto_R_rilasciato) {
+                hud_modalita_inquinante = !hud_modalita_inquinante;
+                if (hud_modalita_inquinante) {
+                    PP.assets.sprite.animation_play(pistola, "anim_inquinante");
+                } else {
+                    PP.assets.sprite.animation_play(pistola, "anim_normale");
+                }
+                hud_tasto_R_rilasciato = false;
             }
-            hud_tasto_R_rilasciato = false;
+        } else {
+            hud_tasto_R_rilasciato = true;
         }
+
     } else {
-        hud_tasto_R_rilasciato = true;
+        // --- ARMA BLOCCATA: Solo Inquinante ---
+        
+        // Mostra immagine fissa, nascondi sprite
+        pistola_fissa.visibility.hidden = false;
+        pistola.visibility.hidden = true;
+
+        // Forziamo la variabile globale dell'HUD su inquinante
+        // Così player.js la legge e imposta lo sparo rosso
+        hud_modalita_inquinante = true;
     }
 
     // --- HEALTH BAR ---
