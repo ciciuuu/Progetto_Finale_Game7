@@ -113,105 +113,111 @@ function cambia_animazione_tasto(nuova_animazione) {
 }
 
 function update_vecchietto(s, player) {
-  if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
-
-  // Depth sorting
-  if (player.ph_obj && player.ph_obj.depth <= 5) {
-      player.ph_obj.setDepth(10);
-  }
-
-  // --- CASO 1: DIALOGO FINITO ---
-  if (dialogo_finito) {
-       if (tasto_S.visibility) tasto_S.visibility.hidden = true;
-       if (testo_schermo.visibility) testo_schermo.visibility.hidden = true;
-       if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = true;
-       
-       cambia_animazione_vecchietto("idle");
-       player.is_frozen = false;
-       
-       PP.game_state.set_variable("arma_sbloccata", true);
-       return; 
-  }
-
-  // --- CASO 2: DIALOGO IN CORSO ---
-  if (dialogo_iniziato) {
-      player.is_frozen = true;
-      cambia_animazione_vecchietto("parla");
-      
-      // Nascondi tasto S durante il dialogo
-      if (tasto_S.visibility) tasto_S.visibility.hidden = true;
-
-      let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
-                          PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) || 
-                          PP.interactive.kb.is_key_down(s, PP.key_codes.ENTER);
-
-      if (tasto_premuto) {
-          if (tasto_rilasciato) {
-              tasto_rilasciato = false; 
-
-              if (indice_frase < frasi_vecchietto.length) {
+    if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
+  
+    // Depth sorting
+    if (player.ph_obj && player.ph_obj.depth <= 5) {
+        player.ph_obj.setDepth(10);
+    }
+  
+    // --- CASO 1: DIALOGO FINITO ---
+    if (dialogo_finito) {
+         if (tasto_S.visibility) tasto_S.visibility.hidden = true;
+         if (testo_schermo.visibility) testo_schermo.visibility.hidden = true;
+         if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = true;
+         
+         cambia_animazione_vecchietto("idle");
+         player.is_frozen = false;
+         
+         return; 
+    }
+  
+    // --- CASO 2: DIALOGO IN CORSO ---
+    if (dialogo_iniziato) {
+        player.is_frozen = true;
+        cambia_animazione_vecchietto("parla");
+        
+        if (tasto_S.visibility) tasto_S.visibility.hidden = true;
+  
+        let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
+                            PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) || 
+                            PP.interactive.kb.is_key_down(s, PP.key_codes.ENTER);
+  
+        if (tasto_premuto) {
+            if (tasto_rilasciato) {
+                tasto_rilasciato = false; 
+  
+                if (indice_frase < frasi_vecchietto.length) {
+                    if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
+                    if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
+                    
+                    PP.shapes.text_change(testo_schermo, frasi_vecchietto[indice_frase]);
+                    indice_frase++; 
+                } else {
+                    // --- FINE DIALOGO ---
+                    dialogo_finito = true;
+                    
+                    // 1. Sblocca l'arma nel gioco
+                    PP.game_state.set_variable("arma_sbloccata", true);
+                    
+                    // 2. [FIX] Imposta DEFAULT RINNOVABILE (false = verde)
+                    // Questo aggiorna immediatamente l'HUD e il Player al prossimo frame
+                    if (typeof hud_modalita_inquinante !== 'undefined') {
+                        hud_modalita_inquinante = false; 
+                    }
+                }
+            }
+        } else {
+            tasto_rilasciato = true;
+        }
+    } 
+    // --- CASO 3: IN ATTESA (Player vicino) ---
+    else {
+        let dentro_zona = false;
+        if (player.ph_obj && sensore_dialogo.ph_obj) {
+            // Nota: PoliPhaser non ha overlap booleano diretto su shape statiche senza callback,
+            // quindi usiamo l'overlap nativo del physics world solo per il check di prossimità UI
+            dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo.ph_obj);
+        }
+  
+        if (dentro_zona) {
+            if (tasto_S.visibility) tasto_S.visibility.hidden = false;
+            cambia_animazione_tasto("tasto");
+            cambia_animazione_vecchietto("idle");
+  
+            if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
+              if (tasto_rilasciato) {
+                  dialogo_iniziato = true;
+                  player.is_frozen = true; 
+                  PP.physics.set_velocity_x(player, 0);
+  
+                  if (player.ph_obj.x < vecchietto.ph_obj.x) {
+                      player.geometry.flip_x = false; 
+                      player.facing_right = true; 
+                      PP.physics.set_collision_rectangle(player, 20, 44, 14, 8);
+                  } else {
+                      player.geometry.flip_x = true;
+                      player.facing_right = false; 
+                      PP.physics.set_collision_rectangle(player, 20, 44, 20, 8);
+                  }
+  
+                  if (tasto_S.visibility) tasto_S.visibility.hidden = true;
                   if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
                   if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
                   
-                  PP.shapes.text_change(testo_schermo, frasi_vecchietto[indice_frase]);
-                  indice_frase++; 
-              } else {
-                  dialogo_finito = true;
+                  PP.shapes.text_change(testo_schermo, frasi_vecchietto[0]);
+                  
+                  indice_frase = 1;
+                  tasto_rilasciato = false;
               }
+          } else {
+              tasto_rilasciato = true; 
           }
-      } else {
-          tasto_rilasciato = true;
-      }
-  } 
-  // --- CASO 3: IN ATTESA (Player vicino) ---
-  else {
-      let dentro_zona = false;
-      if (player.ph_obj && sensore_dialogo.ph_obj) {
-          dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo.ph_obj);
-      }
-
-      if (dentro_zona) {
-          // Player vicino: Mostra tasto S che si muove
-          if (tasto_S.visibility) tasto_S.visibility.hidden = false;
-          cambia_animazione_tasto("tasto");
-          cambia_animazione_vecchietto("idle");
-
-          if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
-            if (tasto_rilasciato) {
-                dialogo_iniziato = true;
-                player.is_frozen = true; 
-                PP.physics.set_velocity_x(player, 0);
-
-                // Orientamento player verso vecchietto
-                if (player.ph_obj.x < vecchietto.ph_obj.x) {
-                    player.geometry.flip_x = false; 
-                    player.facing_right = true; 
-                    PP.physics.set_collision_rectangle(player, 20, 44, 14, 8);
-                } else {
-                    player.geometry.flip_x = true;
-                    player.facing_right = false; 
-                    PP.physics.set_collision_rectangle(player, 20, 44, 20, 8);
-                }
-
-                // Setup UI Dialogo
-                if (tasto_S.visibility) tasto_S.visibility.hidden = true;
-                if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
-                if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
-                
-                PP.shapes.text_change(testo_schermo, frasi_vecchietto[0]);
-                
-                indice_frase = 1;
-                tasto_rilasciato = false;
-            }
+  
         } else {
-            tasto_rilasciato = true; // Reset per permettere di ripremere
+            if (tasto_S.visibility) tasto_S.visibility.hidden = false;
+            cambia_animazione_tasto("puntini");
+            cambia_animazione_vecchietto("idle");
         }
-
-      } else {
-          // Player lontano: Mostra i puntini
-          if (tasto_S.visibility) tasto_S.visibility.hidden = false;
-          cambia_animazione_tasto("puntini");
-          cambia_animazione_vecchietto("idle");
-      }
+    }
   }
-}

@@ -191,19 +191,21 @@ function update_hud(s, player) {
         pistola_fissa.visibility.hidden = true;
         pistola.visibility.hidden = false;
 
-        // Gestione tasto L
+        // 1. GESTIONE INPUT (Cambia solo la variabile)
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.L)) {
             if (hud_tasto_R_rilasciato) {
                 hud_modalita_inquinante = !hud_modalita_inquinante;
-                if (hud_modalita_inquinante) {
-                    PP.assets.sprite.animation_play(pistola, "anim_inquinante");
-                } else {
-                    PP.assets.sprite.animation_play(pistola, "anim_normale");
-                }
                 hud_tasto_R_rilasciato = false;
             }
         } else {
             hud_tasto_R_rilasciato = true;
+        }
+
+        // 2. AGGIORNAMENTO GRAFICO (Avviene sempre, così reagisce al Vecchietto)
+        if (hud_modalita_inquinante) {
+            PP.assets.sprite.animation_play(pistola, "anim_inquinante");
+        } else {
+            PP.assets.sprite.animation_play(pistola, "anim_normale");
         }
 
     } else {
