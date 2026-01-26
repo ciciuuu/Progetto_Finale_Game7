@@ -1,5 +1,3 @@
-//quasi ok
-
 let img_player;
 let player;
 let muri_livello; 
@@ -8,8 +6,13 @@ let parallasse1; let parallasse2;
 let ts_background_1; let ts_background_2;
 let lista_trappole = [];
 
+// Variabile per evitare loop del finale
+let fine_livello_triggerata = false;
+
+// [CALCOLO] 107 caselle * 32 pixel = 3424
+const X_FINE_LIVELLO = 3424; 
+
 function preload(s) {
-    // Caricamento moduli esterni
     preload_hud(s);
     preload_proiettili(s);
     preload_enemy(s);
@@ -17,22 +20,20 @@ function preload(s) {
     preload_player(s);
     if(typeof preload_blueprint === "function") preload_blueprint(s);
 
-    // Caricamento Assets (PoliPhaser)
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
-    // Preload Nativo Godot (Non toccare)
     if (window.godot_preload) window.godot_preload(s);
 }
 
 function create(s) {
-    // Recupero HP dal livello precedente
     let hp_start = PP.game_state.get_variable("HP_checkpoint") || 10;
     PP.game_state.set_variable("HP_player", hp_start);
+    
+    // Reset trigger
+    fine_livello_triggerata = false;
 
-    // [NATIVO NECESSARIO] Gruppo Proiettili
-    // PoliPhaser non ha un metodo documentato per creare Gruppi Fisici vuoti per il pooling
     if (!s.gruppo_proiettili) {
         s.gruppo_proiettili = s.physics.add.group(); 
     }
@@ -40,18 +41,15 @@ function create(s) {
     const PARALLAX_WIDTH = 15800;
     const PARALLAX_HEIGHT = 3000;
 
-    // Sfondi (PoliPhaser)
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6;
     
     ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6;
 
-    // [POLIPHASER] Scroll Factor
     ts_background_1.tile_geometry.scroll_factor_x = 0;
     ts_background_2.tile_geometry.scroll_factor_x = 0;
 
-    // [NATIVO NECESSARIO] Generazione Mappa da Godot
     if (window.godot_create && typeof LIV3 !== 'undefined') {
         muri_livello = window.godot_create(s, LIV3); 
     } else {
@@ -62,52 +60,39 @@ function create(s) {
     let startX = PP.game_state.get_variable("spawn_x") || 100;
     let startY = PP.game_state.get_variable("spawn_y") || 100;
 
-    // Player (PoliPhaser)
     player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
     PP.physics.add(s, player, PP.physics.type.DYNAMIC);
     
     configure_player_animations(s, player);
-    
-    // [NATIVO NECESSARIO] Configurazione Mondo
     s.physics.world.TILE_BIAS = 32;
 
-    // [NATIVO NECESSARIO] Collisione Player-Mappa
     if (muri_livello) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
     
-    // Camera (PoliPhaser)
     PP.camera.start_follow(s, player, 0, 75);
-    
-    // UI e Elementi
     create_hud(s);
-    // Nota: create_blueprint qui viene chiamato senza coordinate, immagino gestisca tutto internamente o sia un refuso nel codice originale, 
-    // ma mantengo la logica originale di base_3.js che chiamava create_blueprint(s, player) più sotto con coordinate.
-    
-    // Nemici
+    create_blueprint(s, player);
+
     let ragni_liv3 = [
         { x: 500, y: 100, pattuglia: [400, 600] },
         { x: 1200, y: 100, pattuglia: [1000, 1400] }
     ];
     create_enemy(s, muri_livello, ragni_liv3, player);
 
-    // Cactus
     let cactus_liv3 = [
         { x: 1500, y: 300 },
         { x: 2500, y: 300 }
     ];
     create_cactus(s, muri_livello, cactus_liv3);
 
-    // Collezionabili
     let bp_liv3 = [ { x: 600, y: 150 }, { x: 700, y: 150 } ];
     if(typeof create_blueprint === "function") create_blueprint(s, bp_liv3, player);
 
     let ing_liv3 = [ { x: 2000, y: 200 }, { x: 2200, y: 200 } ];
     if(typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv3, player);
 
-    // Trappole
     lista_trappole = [];
-    // Esempio: aggiungi_trappola_manuale(s, 1000, 1000, 500, 50);
 
     for (let i = 0; i < lista_trappole.length; i++) {
         let tr = lista_trappole[i];
@@ -118,24 +103,29 @@ function create(s) {
 }
 
 function update(s) {
-    // [NATIVO NECESSARIO] Zoom Camera
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2);
     } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(2);
     }
 
-    // Parallasse (PoliPhaser)
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4;
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
-    // Check Fine Livello / Caduta nel vuoto
-    // [POLIPHASER] Usa geometry.x
-    if (player.geometry.x > 10000) {
-        if(typeof check_collezionabili_vittoria === "function") check_collezionabili_vittoria();
-        player.geometry.x = -9999; 
+    // [TRIGGER FINE LIVELLO]
+    // Se il player supera la X 3424 (107 * 32)
+    if (!fine_livello_triggerata && player.ph_obj.x >= X_FINE_LIVELLO) {
+        fine_livello_triggerata = true;
+        if(typeof check_collezionabili_vittoria === "function") {
+            check_collezionabili_vittoria(s, player);
+        }
+    }
+
+    // Caduta nel vuoto (di sicurezza)
+    if (player.ph_obj.x > 10000) {
+        player.ph_obj.x = -9999; 
     }
 
     if (player) manage_player_update(s, player, muri_livello);
@@ -158,11 +148,8 @@ function aggiungi_trappola_manuale(s, x, y, w, h) {
 
 function morte_player(s, player) {
     if(typeof window.morte_player === "function") { window.morte_player(s, player); return; }
-    
     if (player.is_dead) return; 
     player.is_dead = true;
-    
-    // [NATIVO NECESSARIO] Tint e Body
     if (player.ph_obj) {
         player.ph_obj.setTint(0xFF0000); 
         player.ph_obj.body.enable = false; 

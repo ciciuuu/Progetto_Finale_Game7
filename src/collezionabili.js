@@ -1,5 +1,3 @@
-// ok
-
 let img_blueprint;
 let img_ingranaggio;
 
@@ -13,7 +11,6 @@ function preload_blueprint(s) {
 }
 
 function init_collezionabili_state() {
-    // Inizializza i contatori nel Game State se non esistono
     if (PP.game_state.get_variable("tot_blueprint") === undefined) {
         PP.game_state.set_variable("tot_blueprint", 0);
     }
@@ -24,13 +21,10 @@ function init_collezionabili_state() {
 
 // --- BLUEPRINT ---
 function collision_blueprint(s, player, item) {
-    // Recupera, incrementa e salva
     let attuali = PP.game_state.get_variable("tot_blueprint") + 1;
     PP.game_state.set_variable("tot_blueprint", attuali);
     
     console.log("Blueprint Preso! Totale: " + attuali + "/" + OBIETTIVO_BLUEPRINT);
-    
-    // Distruzione PoliPhaser
     PP.assets.destroy(item);
 }
 
@@ -41,11 +35,7 @@ function create_blueprint(s, lista_spawn, player) {
     for (let i = 0; i < lista_spawn.length; i++) {
         let pos = lista_spawn[i];
         let item = PP.assets.image.add(s, img_blueprint, pos.x, pos.y, 0.5, 0.5);
-        
-        // Fisica Statica con PoliPhaser
         PP.physics.add(s, item, PP.physics.type.STATIC);
-        
-        // Collisione con PoliPhaser
         PP.physics.add_overlap_f(s, player, item, collision_blueprint);
     }
 }
@@ -66,25 +56,24 @@ function create_ingranaggi(s, lista_spawn, player) {
     for (let i = 0; i < lista_spawn.length; i++) {
         let pos = lista_spawn[i];
         let item = PP.assets.image.add(s, img_ingranaggio, pos.x, pos.y, 0.5, 0.5);
-        
         PP.physics.add(s, item, PP.physics.type.STATIC);
         PP.physics.add_overlap_f(s, player, item, collision_ingranaggio);
     }
 }
 
-// --- CONTROLLO FINALE ---
+// --- CONTROLLO FINALE (Triggerato da base_3.js) ---
 function check_collezionabili_vittoria() {
     let tot_b = PP.game_state.get_variable("tot_blueprint") || 0;
     let tot_i = PP.game_state.get_variable("tot_ingranaggi") || 0;
 
+    // Logica di controllo semplice: cambia scena in base al risultato
     if (tot_b >= OBIETTIVO_BLUEPRINT && tot_i >= OBIETTIVO_INGRANAGGI) {
-        console.log("HAI PRESO TUTTI I COLLEZIONABILI! VITTORIA PERFETTA!");
-        // Qui potresti chiamare: PP.scenes.start("vittoria_perfetta");
+        console.log("VITTORIA PERFETTA -> Good Ending");
+        PP.scenes.start("good_ending");
     } else {
-        console.log("HAI PERSO!! Ti mancano dei pezzi.");
-        console.log("Blueprint: " + tot_b);
-        console.log("Ingranaggi: " + tot_i);
-        // Qui potresti chiamare: PP.scenes.start("game_over_incompleto");
+        console.log("MANCANO PEZZI -> Bad Ending");
+        console.log("Blueprint: " + tot_b + ", Ingranaggi: " + tot_i);
+        PP.scenes.start("bad_ending");
     }
 }
 
