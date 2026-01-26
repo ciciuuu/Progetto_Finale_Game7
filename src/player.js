@@ -218,7 +218,7 @@ function manage_player_update(s, player, muri_livello) {
 
     // --- MOVIMENTO GOD MODE ---
     if (player.god_mode) {
-        let speed_fly = 700;
+        let speed_fly = 1200;
         
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
             PP.physics.set_velocity_x(player, speed_fly);

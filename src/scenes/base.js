@@ -143,7 +143,7 @@ function update(s) {
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
-    if (player.ph_obj.x > 6800) {
+    if (player.ph_obj.x > 227*32 & player.ph_obj.y > 0 ) {
         let vita_al_passaggio = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
         PP.game_state.set_variable("arma_sbloccata", true); 
