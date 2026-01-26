@@ -1,55 +1,71 @@
 let img_blueprint;
-let img_cuore;
 let img_ingranaggio;
 
-// Variabile globale per contare quanti ne hai presi
-let contatore_raccolti = 0; 
+// Contatori Globali
+let tot_blueprint_raccolti = 0;
+let tot_ingranaggi_raccolti = 0;
+
+// Obiettivi per il messaggio finale
+const OBIETTIVO_BLUEPRINT = 4;
+const OBIETTIVO_INGRANAGGI = 4;
 
 function preload_blueprint(s) {
-  // Load dell'immagine del blueprint
-  img_blueprint = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Blueprint_coll.png");
-
-  img_cuore = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Cuore.png");
-
-  img_ingranaggio = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Ingranaggio.png");
+    img_blueprint = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Blueprint_coll.png");
+    img_ingranaggio = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Ingranaggio.png");
 }
 
-function collision_blueprint(s, player, blueprint_collezionabile) {
-  // Aumento il contatore di 1
-  contatore_raccolti = contatore_raccolti + 1;
-
-  // Scrivo in console quale numero ho preso
-  console.log("collezionabile " + contatore_raccolti + " preso");
-
-  // In caso di collisione distruggo il blueprint
-  PP.assets.destroy(blueprint_collezionabile);
+// --- BLUEPRINT ---
+function collision_blueprint(s, player, item) {
+    tot_blueprint_raccolti++;
+    console.log("Blueprint Preso! Totale: " + tot_blueprint_raccolti + "/" + OBIETTIVO_BLUEPRINT);
+    PP.assets.destroy(item);
 }
 
-function create_blueprint(s, player) {
+function create_blueprint(s, lista_spawn, player) {
+    if (!lista_spawn) return;
 
-  // Creo l'oggetto usando l'immagine caricata
-  let blueprint_collezionabile = PP.assets.image.add(s, img_blueprint, 100, -100, 0.5, 0.5);
+    for (let i = 0; i < lista_spawn.length; i++) {
+        let pos = lista_spawn[i];
+        let item = PP.assets.image.add(s, img_blueprint, pos.x, pos.y, 0.5, 0.5);
+        
+        // Fisica Statica con PoliPhaser
+        PP.physics.add(s, item, PP.physics.type.STATIC);
+        
+        // Collisione con PoliPhaser
+        PP.physics.add_overlap_f(s, player, item, collision_blueprint);
+    }
+}
 
-  let blueprint_collezionabile1 = PP.assets.image.add(s, img_blueprint, 3684, 29, 0.5, 0.5);
+// --- INGRANAGGI ---
+function collision_ingranaggio(s, player, item) {
+    tot_ingranaggi_raccolti++;
+    console.log("Ingranaggio Preso! Totale: " + tot_ingranaggi_raccolti + "/" + OBIETTIVO_INGRANAGGI);
+    PP.assets.destroy(item);
+}
 
-  let blueprint_collezionabile2 = PP.assets.image.add(s, img_blueprint, 200, -100, 0.5, 0.5);
+function create_ingranaggi(s, lista_spawn, player) {
+    if (!lista_spawn) return;
 
-  let blueprint_collezionabile3 = PP.assets.image.add(s, img_blueprint, 1820, -165, 0.5, 0.5);
+    for (let i = 0; i < lista_spawn.length; i++) {
+        let pos = lista_spawn[i];
+        let item = PP.assets.image.add(s, img_ingranaggio, pos.x, pos.y, 0.5, 0.5);
+        
+        PP.physics.add(s, item, PP.physics.type.STATIC);
+        PP.physics.add_overlap_f(s, player, item, collision_ingranaggio);
+    }
+}
 
-
-  // Aggiungo la fisica (STATICA, così non cade e non viene spinto)
-  PP.physics.add(s, blueprint_collezionabile, PP.physics.type.STATIC);
-  PP.physics.add(s, blueprint_collezionabile1, PP.physics.type.STATIC);
-  PP.physics.add(s, blueprint_collezionabile2, PP.physics.type.STATIC);
-  PP.physics.add(s, blueprint_collezionabile3, PP.physics.type.STATIC);
-
-  // Imposto la collisione (Overlap) tra player e blueprint
-  PP.physics.add_overlap_f(s, player, blueprint_collezionabile, collision_blueprint);
-  PP.physics.add_overlap_f(s, player, blueprint_collezionabile1, collision_blueprint);
-  PP.physics.add_overlap_f(s, player, blueprint_collezionabile2, collision_blueprint);
-  PP.physics.add_overlap_f(s, player, blueprint_collezionabile3, collision_blueprint);
+// --- CONTROLLO FINALE ---
+function check_collezionabili_vittoria() {
+    if (tot_blueprint_raccolti >= OBIETTIVO_BLUEPRINT && tot_ingranaggi_raccolti >= OBIETTIVO_INGRANAGGI) {
+        console.log("HAI PRESO TUTTI I COLLEZIONABILI! VITTORIA PERFETTA!");
+    } else {
+        console.log("HAI PERSO!! Ti mancano dei pezzi.");
+        console.log("Blueprint: " + tot_blueprint_raccolti);
+        console.log("Ingranaggi: " + tot_ingranaggi_raccolti);
+    }
 }
 
 function update_blueprint(s) {
-
+    // Vuoto
 }

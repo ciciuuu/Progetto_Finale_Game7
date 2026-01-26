@@ -107,7 +107,19 @@ function create(s) {
     ];
     create_cactus(s, muri_livello, cactus_liv1);
 
-    create_blueprint(s, player);
+    // Lista Blueprint Livello 1
+    let bp_liv1 = [
+        { x: 100, y: -100 },
+        { x: 3684, y: 29 }
+    ];
+    create_blueprint(s, bp_liv1, player);
+
+    // Lista Ingranaggi Livello 1
+    let ing_liv1 = [
+        { x: 200, y: -100 },
+        { x: 1820, y: -165 }
+    ];
+    create_ingranaggi(s, ing_liv1, player);
 
     // TRAPPOLE
     gruppo_trappole = s.physics.add.staticGroup();
