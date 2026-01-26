@@ -176,23 +176,30 @@ function update_vecchietto(s, player) {
           cambia_animazione_sicura(vecchietto, "idle");
 
           if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
-              if (tasto_rilasciato) {
-                  dialogo_iniziato = true;
-                  player.is_frozen = true; 
-                  PP.physics.set_velocity_x(player, 0);
+            if (tasto_rilasciato) {
+                dialogo_iniziato = true;
+                player.is_frozen = true; 
+                PP.physics.set_velocity_x(player, 0);
 
-                  tasto_S.visibility.hidden = true;
-                  sfondo_testo.visibility.hidden = false;
-                  testo_schermo.visibility.hidden = false;
-                  
-                  PP.shapes.text_change(testo_schermo, frasi_vecchietto[0]);
-                  
-                  indice_frase = 1;
-                  tasto_rilasciato = false;
-              }
-          } else {
-              tasto_rilasciato = true;
-          }
+                // [NUOVO] Gira il player verso il vecchietto
+                // Se il player è a sinistra del vecchietto, guarda a destra (flip_x = false)
+                // Altrimenti guarda a sinistra (flip_x = true)
+                if (player.ph_obj.x < vecchietto.ph_obj.x) {
+                    player.geometry.flip_x = false; 
+                } else {
+                    player.geometry.flip_x = true;
+                }
+
+                tasto_S.visibility.hidden = true;
+                sfondo_testo.visibility.hidden = false;
+                testo_schermo.visibility.hidden = false;
+                
+                PP.shapes.text_change(testo_schermo, frasi_vecchietto[0]);
+                
+                indice_frase = 1;
+                tasto_rilasciato = false;
+            }
+        }
 
       } else {
           cambia_animazione_sicura(vecchietto, "idle");

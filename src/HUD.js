@@ -80,7 +80,7 @@ function create_hud(s) {
 
 
     // --- HEALTH BAR ---
-    health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 332, 550, 0, 0);
+    health_bar = PP.assets.sprite.add(s, asset_healthbar_sheet, 1280/2, 220, 0.5, 0.5);
     health_bar.ph_obj.setScrollFactor(0);
     PP.layers.add_to_layer(livello_HUD, health_bar);
 

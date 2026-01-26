@@ -14,10 +14,22 @@ let player_vulnerable = true;
 let sipario_nero_obj = null;
 let is_fading_death = false;
 
+// [NUOVO] Variabili Effetto Danno (Immagine)
+let asset_bordo_danno; 
+let bordo_danno;       
+
+// ---------------------------------------------------------
+// --- CONFIGURAZIONE EFFETTO DANNO ---
+// ---------------------------------------------------------
+let damage_intensity = 1;        // Partiamo da 1 (visibilità massima)
+let damage_fade_speed = 0.002;   // Molto lento, così hai tempo di vederlo
+// ---------------------------------------------------------
+
 let layer_effetti;
 
 function preload_player(s) {
-    // Caricamenti se servono
+    // [POLIPHASER] Caricamento immagine danno
+    asset_bordo_danno = PP.assets.image.load(s, "assets/images/HUD/bordo_viola_danno.png");
 }
 
 function configure_player_animations(s, player) {
@@ -33,22 +45,18 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
     
-    // Animazioni Sparo
     PP.assets.sprite.animation_add_list(player, "sparo_inquinante", [41, 42, 43, 36, 37, 38], 8, -1);
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile", [51, 52, 53, 46, 47, 48], 11, -1);
     PP.assets.sprite.animation_add_list(player, "sparo_inquinante_fermo", [61, 62, 63, 56, 57, 58], 8, -1);
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_fermo", [71, 72, 73, 66, 67, 68], 11, -1);
     
-    // Animazioni Sparo in Salto
     PP.assets.sprite.animation_add_list(player, "sparo_inquinante_salto_su", [16, 17, 18], 8, 0);
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_salto_su", [26, 27, 28], 11, 0);
     PP.assets.sprite.animation_add_list(player, "sparo_inquinante_salto_giu", [21, 22, 23], 8, 0);
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_salto_giu", [31, 32, 33], 11, 0);
 
-    // [POLIPHASER] Impostazione collisioni e offset INIZIALE
+    // [POLIPHASER] Collisioni
     PP.physics.set_collision_rectangle(player, 20, 44, 14, 8);
-    
-    // [FIX] Inizializziamo lo stato della direzione per evitare chiamate ripetute
     player.facing_right = true;
 
     player.sparo_attivo = false;
@@ -61,10 +69,9 @@ function configure_player_animations(s, player) {
     player.anim_sparo_corrente = "sparo_rinnovabile";
     player.god_mode = false;
     player.is_dead = false; 
-    
     player_vulnerable = true;
     
-    // [NATIVO NECESSARIO] Gestione Tinta e Alpha
+    // [NATIVO NECESSARIO] Reset Tint/Alpha
     if(player.ph_obj) {
         player.ph_obj.clearTint(); 
         player.ph_obj.alpha = 1; 
@@ -72,6 +79,31 @@ function configure_player_animations(s, player) {
 
     sipario_nero_obj = null;
     is_fading_death = false;
+
+    // [NUOVO] Aggiunta Immagine Danno
+    // Centrata a 640, 360 (metà di 1280x720)
+    bordo_danno = PP.assets.image.add(s, asset_bordo_danno, 640, 360, 0.5, 0.5);
+    
+    // Aggiunta al layer effetti
+    PP.layers.add_to_layer(layer_effetti, bordo_danno);
+    
+    // Partiamo con alpha 0 (invisibile)
+    bordo_danno.visibility.alpha = 0;
+
+    // [NATIVO NECESSARIO] ScrollFactor 0 per incollarlo alla camera
+    if (bordo_danno.ph_obj) {
+        bordo_danno.ph_obj.setScrollFactor(0);
+        
+        // [FIX VISIBILITÀ] Forziamo la scala a 1 per essere sicuri che copra lo schermo
+        // Se il tuo gioco ha uno zoom della camera, l'immagine verrebbe ingrandita troppo.
+        // Qui proviamo a resettare la scala.
+        bordo_danno.scale_x = 1;
+        bordo_danno.scale_y = 1;
+
+        // DEBUG: Se non vedi l'immagine, togli il commento alla riga sotto.
+        // Se vedi un rettangolo ROSSO quando vieni colpito, l'immagine funziona ma la PNG è trasparente.
+        // bordo_danno.ph_obj.setTint(0xFF0000); 
+    }
 }
 
 function damage_player(s, player) {
@@ -85,8 +117,19 @@ function damage_player(s, player) {
 
     console.log("Colpito! HP rimasti: " + hp_rimanenti);
 
+    // [NATIVO NECESSARIO] Feedback visivo Player (Rosso)
     if (player.ph_obj) {
         player.ph_obj.setTint(0xff523b);
+    }
+
+    // [NUOVO] Feedback Schermo: Appare l'immagine con intensità massima
+    if (bordo_danno) {
+        bordo_danno.visibility.alpha = damage_intensity;
+        
+        // [FIX EXTRA] Resettiamo la posizione al centro della camera (caso mai si fosse spostata)
+        // Siccome usiamo ScrollFactor 0, x e y sono relativi allo schermo (0-1280), non al mondo
+        bordo_danno.x = 640;
+        bordo_danno.y = 360;
     }
 
     if (hp_rimanenti <= 0) {
@@ -158,10 +201,23 @@ function morte_player(s, player) {
 
 function manage_player_update(s, player, muri_livello) {
     
+    // [NUOVO] Gestione Dissolvenza Immagine Danno
+    if (bordo_danno) {
+        // Se è visibile, diminuiamo l'alpha lentamente
+        if (bordo_danno.visibility.alpha > 0) {
+            bordo_danno.visibility.alpha -= damage_fade_speed;
+            
+            // Sicurezza per non andare sotto zero
+            if (bordo_danno.visibility.alpha < 0) {
+                bordo_danno.visibility.alpha = 0;
+            }
+        }
+    }
+
     // Gestione Fade Morte
     if (is_fading_death && sipario_nero_obj) {
-        if (sipario_nero_obj.ph_obj.alpha < 1) {
-            sipario_nero_obj.ph_obj.alpha += 0.02; 
+        if (sipario_nero_obj.visibility.alpha < 1) {
+            sipario_nero_obj.visibility.alpha += 0.02; 
         } else {
             is_fading_death = false;
             PP.game_state.set_variable("ultimo_livello", s.scene.key);
@@ -211,22 +267,20 @@ function manage_player_update(s, player, muri_livello) {
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
         target_velocity_x = player_speed;
         
-        // [FIX] Controlliamo se la direzione è cambiata PRIMA di chiamare PoliPhaser
         if (player.facing_right === false) {
             player.geometry.flip_x = false;
             PP.physics.set_collision_rectangle(player, 20, 44, 14, 8);
-            player.facing_right = true; // Aggiorniamo lo stato
+            player.facing_right = true; 
         }
         is_moving = true;
     }
     else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
         target_velocity_x = -player_speed;
         
-        // [FIX] Controlliamo se la direzione è cambiata PRIMA di chiamare PoliPhaser
         if (player.facing_right === true) {
             player.geometry.flip_x = true;
             PP.physics.set_collision_rectangle(player, 20, 44, 20, 8);
-            player.facing_right = false; // Aggiorniamo lo stato
+            player.facing_right = false;
         }
         is_moving = true;
     }
@@ -340,17 +394,6 @@ function manage_player_update(s, player, muri_livello) {
         }
     } else {
         j_pressed = false;
-    }
-
-    if (player.god_mode) {
-        let speed_fly = 700;
-        if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) PP.physics.set_velocity_x(player, speed_fly);
-        else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) PP.physics.set_velocity_x(player, -speed_fly);
-        else PP.physics.set_velocity_x(player, 0);
-
-        if (PP.interactive.kb.is_key_down(s, PP.key_codes.W) || PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) PP.physics.set_velocity_y(player, -speed_fly);
-        else if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) PP.physics.set_velocity_y(player, speed_fly);
-        else PP.physics.set_velocity_y(player, 0);
     }
 
     // DEBUG
