@@ -8,12 +8,16 @@ let ts_background_1; let ts_background_2;
 let lista_trappole = [];
 
 // caricamento assets zone segrete
-let img_zona_pietra;
-let img_inizio_sinistra;
+let zona_pietra;
+let zona_inizio_sinistra;
+let zona_dopo_vecchietto;
+let zona_fine_lvl1;
 
 function preload(s) {
-    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_pietra.png");
-    img_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_inizio_sinistra.png");
+    zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_pietra.png");
+    zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_inizio_sinistra.png");
+    zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/ZS_dopo_vecchietto.png");
+    zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine_lvl1.png");
 
 
     // Caricamento script esterni
@@ -88,8 +92,7 @@ function create(s) {
     // ===============================================
     let zone_liv1 = [
         { 
-            // [NUOVO] Passo la variabile dell'immagine caricata nel preload
-            asset: img_zona_pietra, 
+            asset: zona_pietra, 
             img_x: 1664, 
             img_y: -288,
             trigger_x: 1664-32, 
@@ -98,15 +101,33 @@ function create(s) {
             trigger_h: 32*4   
         },
         { 
-            // [NUOVO] Passo la variabile dell'immagine caricata nel preload
-            asset: img_inizio_sinistra, 
+            asset: zona_inizio_sinistra, 
             img_x: 448-64, 
             img_y: 0,
             trigger_x: 449, 
             trigger_y: 0, 
             trigger_w: 32*15,  
             trigger_h: 32*11   
-        }
+        },
+        { 
+            asset: zona_dopo_vecchietto, 
+            img_x: 111*32, 
+            img_y: -2*32,
+            trigger_x: 112*32, 
+            trigger_y: -2*32, 
+            trigger_w: 32*11,  
+            trigger_h: 32*4   
+        },
+        { 
+            asset: zona_fine_lvl1, 
+            img_x: 227*32, 
+            img_y: -16*32,
+            trigger_x: 227*32, 
+            trigger_y: -16*32, 
+            trigger_w: 32*3,  
+            trigger_h: 32*32   
+        },
+
     ];
 
     if(typeof create_zone_segrete === "function") {
