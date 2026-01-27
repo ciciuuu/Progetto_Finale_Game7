@@ -17,8 +17,6 @@ function create_game_over(s) {
 
     // 2. Titolo Bianco e Centrato
     let titolo = PP.shapes.text_styled_add(s, cx, h / 3, "L'INQUINAMENTO\nHA VINTO!", 50, "Helvetica", "bold", "0xFFFFFF", null, 0.5, 0.5);
-    
-    // IMPORTANTE: Questo comando centra le righe di testo una rispetto all'altra
     titolo.ph_obj.setAlign('center'); 
 
     // 3. Helper per creare bottoni
@@ -26,18 +24,16 @@ function create_game_over(s) {
         let b = PP.assets.image.add(s, img_go_btn, x, h / 1.3, 0.5, 0.5);
         b.geometry.scale_x = 3; 
         b.geometry.scale_y = 1.5;
-        // Testo Bottone
         PP.shapes.text_styled_add(s, x, h / 1.3, label, 24, "Arial", "bold", "0xFFFFFF", null, 0.5, 0.5);
         return b;
     };
 
-    go_btn_rigioca = make_btn(cx - 380, "RIGIOCA");
-    go_btn_checkpoint = make_btn(cx, "CHECKPOINT");
-    go_btn_menu = make_btn(cx + 380, "MENU");
+    go_btn_rigioca = make_btn(cx - 380, "NUOVA PARTITA");
+    go_btn_checkpoint = make_btn(cx, "ULTIMO CHECKPOINT");
+    go_btn_menu = make_btn(cx + 380, "MENÙ");
 }
 
 function update_game_over(s) {
-    // Helper click manuale
     let check_click = (btn_pp, action) => {
         if (!s.input.activePointer) return;
         let mx = s.input.activePointer.x;
@@ -45,7 +41,6 @@ function update_game_over(s) {
         let down = s.input.activePointer.isDown;
         
         let b = btn_pp.ph_obj;
-        // Collisione Mouse
         if (mx > b.x - (b.width * b.scaleX)/2 && mx < b.x + (b.width * b.scaleX)/2 && 
             my > b.y - (b.height * b.scaleY)/2 && my < b.y + (b.height * b.scaleY)/2) {
             
@@ -58,21 +53,41 @@ function update_game_over(s) {
         }
     };
 
+    // 1. NUOVA PARTITA: RESETTA TUTTO (Checkpoint compreso)
     check_click(go_btn_rigioca, () => {
+        
+        // Disattiva il checkpoint in memoria!
+        PP.game_state.set_variable("checkpoint_attivo", false);
+        
+        // Reset variabili di gioco
         PP.game_state.set_variable("HP_player", 10);
-        PP.game_state.set_variable("HP_checkpoint", 10); // Resettiamo anche il salvataggio
+        PP.game_state.set_variable("HP_checkpoint", 10);
         PP.game_state.set_variable("spawn_x", 150);
         PP.game_state.set_variable("spawn_y", 620);
+        
+        PP.game_state.set_variable("arma_sbloccata", false);
+        PP.game_state.set_variable("tot_blueprint", 0);
+        PP.game_state.set_variable("tot_ingranaggi", 0);
+        
+        // Pulisce le liste di oggetti presi/nemici uccisi
+        PP.game_state.set_variable("nemici_uccisi", []);
+        PP.game_state.set_variable("collezionabili_presi", []);
+
+        // Forza HUD Inquinante
+        if (typeof hud_modalita_inquinante !== 'undefined') {
+            hud_modalita_inquinante = true;
+        }
+
         PP.scenes.start("base");
     });
 
-    // 2. BOTTONE CHECKPOINT: Riparte dall'ultimo livello salvato
+    // 2. ULTIMO CHECKPOINT: Carica i dati salvati
     check_click(go_btn_checkpoint, () => {
+        // Se non c'è un livello salvato, va alla base
         let lv_salvato = PP.game_state.get_variable("ultimo_livello") || "base";
         
-        let vita_salvata = PP.game_state.get_variable("HP_checkpoint") || 10;
-        PP.game_state.set_variable("HP_player", vita_salvata);
-
+        // La logica di caricamento posizione è gestita dentro il create() del livello stesso
+        // qui ci limitiamo a lanciare la scena.
         PP.scenes.start(lv_salvato);
     });
 

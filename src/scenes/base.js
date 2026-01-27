@@ -21,6 +21,14 @@ let trappola_attivata = false;
 // Trigger Trappola (227 * 32)
 const X_ATTIVAZIONE_TRAPPOLA = 227 * 32; 
 
+// [CHECKPOINT] Variabili
+let checkpoint_obj;
+let checkpoint_preso = false;
+
+// --- COORDINATE CHECKPOINT AGGIORNATE (+1 tile a destra) ---
+const X_CHECKPOINT = 78 * 32; 
+const Y_CHECKPOINT = -5 * 32;
+
 // Variabile per l'immagine specifica di QUESTO livello
 let img_zona_pietra;
 
@@ -53,13 +61,41 @@ function preload(s) {
 }
 
 function create(s) {
-    // --- SETUP GLOBALE ---
-    PP.game_state.set_variable("HP_player", 10);
-    PP.game_state.set_variable("arma_sbloccata", false);
-    PP.game_state.set_variable("tot_blueprint", 0);
-    PP.game_state.set_variable("tot_ingranaggi", 0);
+    // [CHECKPOINT SYSTEM] Gestione Caricamento o Reset
+    let final_spawn_x, final_spawn_y;
     
-    // Reset trappola
+    let checkpoint_attivo = PP.game_state.get_variable("checkpoint_attivo");
+
+    if (checkpoint_attivo) {
+        console.log("CARICAMENTO DA CHECKPOINT (Sicuro)...");
+        // [FIX] Usiamo le variabili CP dedicate
+        final_spawn_x = PP.game_state.get_variable("cp_x");
+        final_spawn_y = PP.game_state.get_variable("cp_y");
+        
+        let hp_salvati = PP.game_state.get_variable("HP_checkpoint");
+        PP.game_state.set_variable("HP_player", hp_salvati);
+        
+        checkpoint_preso = true; 
+        
+    } else {
+        console.log("NUOVA PARTITA / RESET COMPLETO");
+        // --- SETUP GLOBALE INIZIALE ---
+        PP.game_state.set_variable("HP_player", 10);
+        PP.game_state.set_variable("arma_sbloccata", false);
+        PP.game_state.set_variable("tot_blueprint", 0);
+        PP.game_state.set_variable("tot_ingranaggi", 0);
+        
+        // Reset liste persistenza
+        PP.game_state.set_variable("nemici_uccisi", []);
+        PP.game_state.set_variable("collezionabili_presi", []);
+        
+        // --- COORDINATE SPAWN INIZIALE AGGIORNATE ---
+        final_spawn_x = -20 * 32;
+        final_spawn_y = -2 * 32;
+        
+        checkpoint_preso = false;
+    }
+    
     trappola_attivata = false;
 
     if (!s.gruppo_proiettili) {
@@ -85,10 +121,7 @@ function create(s) {
         muri_livello = null;
     }
 
-    let startX = PP.game_state.get_variable("spawn_x") || 150;
-    let startY = PP.game_state.get_variable("spawn_y") || 620;
-
-    player = PP.assets.sprite.add(s, img_player, startX, startY, 0.5, 1);
+    player = PP.assets.sprite.add(s, img_player, final_spawn_x, final_spawn_y, 0.5, 1);
     PP.physics.add(s, player, PP.physics.type.DYNAMIC);
 
     configure_player_animations(s, player);
@@ -96,6 +129,16 @@ function create(s) {
 
     if (muri_livello) {
         s.physics.add.collider(player.ph_obj, muri_livello);
+    }
+
+    // [CHECKPOINT] Creazione Trigger Fisico
+    if (!checkpoint_preso) {
+        checkpoint_obj = PP.shapes.rectangle_add(s, X_CHECKPOINT, Y_CHECKPOINT, 100, 500, "0x00FF00", 0); 
+        PP.physics.add(s, checkpoint_obj, PP.physics.type.STATIC);
+        
+        PP.physics.add_overlap_f(s, player, checkpoint_obj, function() {
+            attiva_checkpoint(s);
+        });
     }
 
     PP.camera.start_follow(s, player, 0, 60);
@@ -106,14 +149,11 @@ function create(s) {
     // --- TRAPPOLA MURI CADENTI ---
     // ===============================================
     
-    // Muro Destro (Start: 227, -27)
-    // Nota: Ho rimosso il blocco del Muro Sinistro come richiesto
     muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 226 * 32, -27 * 32, 0, 0);
     PP.physics.add(s, muro_destra_obj, PP.physics.type.DYNAMIC);
     PP.physics.set_allow_gravity(muro_destra_obj, false);
     PP.physics.set_immovable(muro_destra_obj, true);
 
-    // [POLIPHASER] Collisione Player - Muro Destro
     PP.physics.add_collider(s, player, muro_destra_obj);
 
 
@@ -121,68 +161,33 @@ function create(s) {
     // --- CONFIGURAZIONE ZONE SEGRETE (LIV 1) ---
     // ===============================================
     let zone_liv1 = [
-        { 
-            asset: zona_pietra, 
-            img_x: 1664, 
-            img_y: -288,
-            trigger_x: 1664-32, 
-            trigger_y: -288+32, 
-            trigger_w: 32*8,  
-            trigger_h: 32*4   
-        },
-        { 
-            asset: zona_inizio_sinistra, 
-            img_x: 448-64, 
-            img_y: 0,
-            trigger_x: 449, 
-            trigger_y: 0, 
-            trigger_w: 32*15,  
-            trigger_h: 32*11   
-        },
-        { 
-            asset: zona_dopo_vecchietto, 
-            img_x: 111*32, 
-            img_y: -2*32,
-            trigger_x: 112*32, 
-            trigger_y: -2*32, 
-            trigger_w: 32*11,  
-            trigger_h: 32*4   
-        },
-        { 
-            asset: zona_fine_lvl1, 
-            img_x: 227*32, 
-            img_y: -16*32,
-            trigger_x: 227*32, 
-            trigger_y: -15*32, 
-            trigger_w: 32*3,  
-            trigger_h: 32*32   
-        },
-
+        { asset: zona_pietra, img_x: 1664, img_y: -288, trigger_x: 1664-32, trigger_y: -288+32, trigger_w: 32*8, trigger_h: 32*4 },
+        { asset: zona_inizio_sinistra, img_x: 448-64, img_y: 0, trigger_x: 449, trigger_y: 0, trigger_w: 32*15, trigger_h: 32*11 },
+        { asset: zona_dopo_vecchietto, img_x: 111*32, img_y: -2*32, trigger_x: 112*32, trigger_y: -2*32, trigger_w: 32*11, trigger_h: 32*4 },
+        { asset: zona_fine_lvl1, img_x: 227*32, img_y: -16*32, trigger_x: 227*32, trigger_y: -15*32, trigger_w: 32*3, trigger_h: 32*32 },
     ];
 
-    if(typeof create_zone_segrete === "function") {
-        create_zone_segrete(s, player, zone_liv1);
-    }
-    // ===============================================
-
+    if(typeof create_zone_segrete === "function") create_zone_segrete(s, player, zone_liv1);
+    
+    // [PERSISTENZA] ID univoci
     let ragni_liv1 = [
-        { x: -8, y: 0, pattuglia: [-234, -15] },
-        { x: 182, y: -64, pattuglia: [70, 180] },
-        { x: -30, y: 0, pattuglia: [-200, -50] },
-        { x: 3142, y: 0, pattuglia: [3000, 3447] },
+        { x: -8, y: 0, pattuglia: [-234, -15], id: "ragno_1" },
+        { x: 182, y: -64, pattuglia: [70, 180], id: "ragno_2" },
+        { x: -30, y: 0, pattuglia: [-200, -50], id: "ragno_3" },
+        { x: 3142, y: 0, pattuglia: [3000, 3447], id: "ragno_4" },
     ];
     create_enemy(s, muri_livello, ragni_liv1, player);
 
     let cactus_liv1 = [
-        { x: 100, y: 400 },
-        { x: 1200, y: 350 }
+        { x: 100, y: 400, id: "cactus_1" },
+        { x: 1200, y: 350, id: "cactus_2" }
     ];
     create_cactus(s, muri_livello, cactus_liv1);
 
-    let bp_liv1 = [{ x: 100, y: -100 }, { x: 3684, y: 29 }];
+    let bp_liv1 = [{ x: 100, y: -100, id: "bp_1" }, { x: 3684, y: 29, id: "bp_2" }];
     if (typeof create_blueprint === "function") create_blueprint(s, bp_liv1, player);
 
-    let ing_liv1 = [{ x: 200, y: -100 }, { x: 1820, y: -165 }];
+    let ing_liv1 = [{ x: 200, y: -100, id: "ing_1" }, { x: 1820, y: -165, id: "ing_2" }];
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player);
 
     lista_trappole = [];
@@ -202,6 +207,30 @@ function create(s) {
     }
 }
 
+// CHECKPOINT
+function attiva_checkpoint(s) {
+    if (checkpoint_preso) return;
+    checkpoint_preso = true;
+    console.log("CHECKPOINT ATTIVATO!");
+
+    PP.game_state.set_variable("cp_x", player.geometry.x);
+    PP.game_state.set_variable("cp_y", player.geometry.y);
+    
+    // Aggiorniamo anche spawn_x per compatibilità, ma usiamo cp_x per respawn
+    PP.game_state.set_variable("spawn_x", player.geometry.x);
+    PP.game_state.set_variable("spawn_y", player.geometry.y);
+    
+    let hp_now = PP.game_state.get_variable("HP_player");
+    PP.game_state.set_variable("HP_checkpoint", hp_now);
+
+    PP.game_state.set_variable("checkpoint_attivo", true);
+
+    if (checkpoint_obj) {
+        checkpoint_obj.ph_obj.y = 99999; 
+    }
+}
+window.attiva_checkpoint = attiva_checkpoint;
+
 function update(s) {
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2);
@@ -214,23 +243,16 @@ function update(s) {
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2;
 
-    // --- LOGICA TRAPPOLA MURI ---
-    // Controlla se il player supera la linea X (227 * 32)
     if (!trappola_attivata && player.ph_obj.x >= X_ATTIVAZIONE_TRAPPOLA) {
         trappola_attivata = true;
     }
 
     if (trappola_attivata) {
-        // velocità = numero tile * 32 pixel / tempo impiegato in secondi
         let velocityY = 5*32/0.1;
-        
         let targetY = -23 * 32; 
-
-        // Movimento Muro Destro (Solo questo rimasto)
         if (muro_destra_obj.ph_obj.y < targetY) {
             PP.physics.set_velocity_y(muro_destra_obj, velocityY);
         } else {
-            // Stop e Fix posizione
             PP.physics.set_velocity_y(muro_destra_obj, 0);
             muro_destra_obj.ph_obj.y = targetY;
         }
@@ -240,16 +262,15 @@ function update(s) {
     if (player.ph_obj.x > 227 * 32 && player.ph_obj.y > 0) {
         let vita_al_passaggio = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
-        PP.game_state.set_variable("arma_sbloccata", true);
+
         PP.scenes.start("base_3");
-        PP.game_state.set_variable("spawn_x", 100);
-        PP.game_state.set_variable("spawn_y", 100);
+        
+        PP.game_state.set_variable("spawn_x", -27 * 32);
+        PP.game_state.set_variable("spawn_y", -11 * 32);
     }
 
     if (player) manage_player_update(s, player, muri_livello);
-
     if (typeof update_zone_segrete === "function") update_zone_segrete(s);
-
     update_vecchietto(s, player);
     update_enemy(s);
     update_cactus(s, player, muri_livello);

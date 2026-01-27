@@ -24,6 +24,9 @@ let indice_frase = 0;
 let animazione_corrente_vecchietto = ""; 
 let animazione_corrente_tasto = "";
 
+// Variabile per disabilitare totalmente il vecchietto se arma già presa
+let vecchietto_disabilitato = false;
+
 // --- FRASI ---
 let frasi_vecchietto = [
     "VECCHIETTO: Ciao viaggiatore! Benvenuto nella caverna.",
@@ -38,6 +41,15 @@ function preload_vecchietto(s) {
 }
 
 function create_vecchietto(s) {
+    
+    // [CHECKPOINT] Se l'arma è già sbloccata, il vecchietto è solo decorativo
+    let arma_gia_presa = PP.game_state.get_variable("arma_sbloccata");
+    vecchietto_disabilitato = arma_gia_presa;
+
+    // Reset stati
+    dialogo_iniziato = false;
+    dialogo_finito = arma_gia_presa; // Se già presa, consideriamo il dialogo "finito"
+    
     // --- CREAZIONE LAYERS ---
     layer_game = PP.layers.create(s);
     PP.layers.set_z_index(layer_game, 5);
@@ -48,7 +60,7 @@ function create_vecchietto(s) {
     layer_fg_ui = PP.layers.create(s);
     PP.layers.set_z_index(layer_fg_ui, 101);
 
-    // 1. VECCHIETTO (Abbassato di 64px: -192 + 64 = -128)
+    // 1. VECCHIETTO
     vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -128, 0.5, 1);
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
     PP.layers.add_to_layer(layer_game, vecchietto);
@@ -56,27 +68,31 @@ function create_vecchietto(s) {
     PP.assets.sprite.animation_add_list(vecchietto, "idle", [0, 1, 2, 3], 6, -1);
     PP.assets.sprite.animation_add_list(vecchietto, "parla", [4, 5, 6, 7], 6, -1);
     
-    // Avvio animazione e tracciamento stato
     PP.assets.sprite.animation_play(vecchietto, "idle");
     animazione_corrente_vecchietto = "idle";
 
-    // 2. SENSORE DI CONTATTO (Abbassato di 64px: -192 + 64 = -128)
-    sensore_dialogo = PP.shapes.rectangle_add(s, 2849, -128, 250, 200, "0xFF0000", 0);
-    PP.physics.add(s, sensore_dialogo, PP.physics.type.STATIC);
-    // Nascondiamo il sensore
-    if(sensore_dialogo.visibility) sensore_dialogo.visibility.alpha = 0;
+    // 2. SENSORE DI CONTATTO (Solo se non disabilitato)
+    if (!vecchietto_disabilitato) {
+        sensore_dialogo = PP.shapes.rectangle_add(s, 2849, -128, 250, 200, "0xFF0000", 0);
+        PP.physics.add(s, sensore_dialogo, PP.physics.type.STATIC);
+        if(sensore_dialogo.visibility) sensore_dialogo.visibility.alpha = 0;
+    } else {
+        sensore_dialogo = null;
+    }
 
-    // 3. TASTO S (Abbassato di 64px: -240 + 64 = -176)
-    tasto_S = PP.assets.sprite.add(s, img_tasto_S, 2847, -176, 0.5, 1);
-    PP.layers.add_to_layer(layer_game, tasto_S);
+    // 3. TASTO S (Solo se non disabilitato)
+    if (!vecchietto_disabilitato) {
+        tasto_S = PP.assets.sprite.add(s, img_tasto_S, 2847, -176, 0.5, 1);
+        PP.layers.add_to_layer(layer_game, tasto_S);
 
-    // Animazioni Tasto S
-    PP.assets.sprite.animation_add_list(tasto_S, "puntini", [0, 1], 2, -1);
-    PP.assets.sprite.animation_add_list(tasto_S, "tasto", [2, 3], 2, -1);
-    
-    // Avvio iniziale
-    PP.assets.sprite.animation_play(tasto_S, "puntini");
-    animazione_corrente_tasto = "puntini";
+        PP.assets.sprite.animation_add_list(tasto_S, "puntini", [0, 1], 2, -1);
+        PP.assets.sprite.animation_add_list(tasto_S, "tasto", [2, 3], 2, -1);
+        
+        PP.assets.sprite.animation_play(tasto_S, "puntini");
+        animazione_corrente_tasto = "puntini";
+    } else {
+        tasto_S = null;
+    }
 
     // 4. INTERFACCIA UTENTE (UI)
     sfondo_testo = PP.shapes.rectangle_add(s, 640, 360, 800, 150, "0x000000", 0.3);
@@ -98,37 +114,32 @@ function create_vecchietto(s) {
     if (testo_schermo.visibility) testo_schermo.visibility.hidden = true;
 }
 
-// Helper per evitare reset animazione
 function cambia_animazione_vecchietto(nuova_animazione) {
     if (animazione_corrente_vecchietto === nuova_animazione) return;
     PP.assets.sprite.animation_play(vecchietto, nuova_animazione);
     animazione_corrente_vecchietto = nuova_animazione;
 }
 
-// [FIX] Helper per gestire l'animazione del tasto senza glitch
 function cambia_animazione_tasto(nuova_animazione) {
+    if (!tasto_S) return;
     if (animazione_corrente_tasto === nuova_animazione) return;
     PP.assets.sprite.animation_play(tasto_S, nuova_animazione);
     animazione_corrente_tasto = nuova_animazione;
 }
 
 function update_vecchietto(s, player) {
+    if (vecchietto_disabilitato) return;
     if (!player || !sensore_dialogo || !tasto_S || !vecchietto) return;
   
-    // Depth sorting
-    if (player.ph_obj && player.ph_obj.depth <= 5) {
-        player.ph_obj.setDepth(10);
-    }
+    // ... logica depth ...
   
     // --- CASO 1: DIALOGO FINITO ---
     if (dialogo_finito) {
          if (tasto_S.visibility) tasto_S.visibility.hidden = true;
          if (testo_schermo.visibility) testo_schermo.visibility.hidden = true;
          if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = true;
-         
          cambia_animazione_vecchietto("idle");
          player.is_frozen = false;
-         
          return; 
     }
   
@@ -136,7 +147,6 @@ function update_vecchietto(s, player) {
     if (dialogo_iniziato) {
         player.is_frozen = true;
         cambia_animazione_vecchietto("parla");
-        
         if (tasto_S.visibility) tasto_S.visibility.hidden = true;
   
         let tasto_premuto = PP.interactive.kb.is_key_down(s, PP.key_codes.S) || 
@@ -150,20 +160,18 @@ function update_vecchietto(s, player) {
                 if (indice_frase < frasi_vecchietto.length) {
                     if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
                     if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
-                    
                     PP.shapes.text_change(testo_schermo, frasi_vecchietto[indice_frase]);
                     indice_frase++; 
                 } else {
-                    // --- FINE DIALOGO ---
                     dialogo_finito = true;
-                    
-                    // 1. Sblocca l'arma nel gioco
                     PP.game_state.set_variable("arma_sbloccata", true);
-                    
-                    // 2. [FIX] Imposta DEFAULT RINNOVABILE (false = verde)
-                    // Questo aggiorna immediatamente l'HUD e il Player al prossimo frame
                     if (typeof hud_modalita_inquinante !== 'undefined') {
                         hud_modalita_inquinante = false; 
+                    }
+                    
+                    // [FIX DEFINITIVO] Controllo esistenza funzione
+                    if (typeof window.attiva_checkpoint === "function") {
+                        window.attiva_checkpoint(s);
                     }
                 }
             }
@@ -171,26 +179,22 @@ function update_vecchietto(s, player) {
             tasto_rilasciato = true;
         }
     } 
-    // --- CASO 3: IN ATTESA (Player vicino) ---
+    // ... resto uguale ...
     else {
+        // ... logica else uguale ...
         let dentro_zona = false;
         if (player.ph_obj && sensore_dialogo.ph_obj) {
-            // Nota: PoliPhaser non ha overlap booleano diretto su shape statiche senza callback,
-            // quindi usiamo l'overlap nativo del physics world solo per il check di prossimità UI
             dentro_zona = s.physics.overlap(player.ph_obj, sensore_dialogo.ph_obj);
         }
-  
         if (dentro_zona) {
             if (tasto_S.visibility) tasto_S.visibility.hidden = false;
             cambia_animazione_tasto("tasto");
             cambia_animazione_vecchietto("idle");
-  
             if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
               if (tasto_rilasciato) {
                   dialogo_iniziato = true;
                   player.is_frozen = true; 
                   PP.physics.set_velocity_x(player, 0);
-  
                   if (player.ph_obj.x < vecchietto.ph_obj.x) {
                       player.geometry.flip_x = false; 
                       player.facing_right = true; 
@@ -200,20 +204,16 @@ function update_vecchietto(s, player) {
                       player.facing_right = false; 
                       PP.physics.set_collision_rectangle(player, 20, 44, 20, 8);
                   }
-  
                   if (tasto_S.visibility) tasto_S.visibility.hidden = true;
                   if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = false;
                   if (testo_schermo.visibility) testo_schermo.visibility.hidden = false;
-                  
                   PP.shapes.text_change(testo_schermo, frasi_vecchietto[0]);
-                  
                   indice_frase = 1;
                   tasto_rilasciato = false;
               }
           } else {
               tasto_rilasciato = true; 
           }
-  
         } else {
             if (tasto_S.visibility) tasto_S.visibility.hidden = false;
             cambia_animazione_tasto("puntini");

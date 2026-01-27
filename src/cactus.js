@@ -13,9 +13,23 @@ function create_cactus(s, muri, spawn_list) {
     }
     if (!spawn_list) return;
 
+    // [PERSISTENZA] Recupera lista morti
+    let morti = PP.game_state.get_variable("nemici_uccisi") || [];
+
     for (let i = 0; i < spawn_list.length; i++) {
         let dati = spawn_list[i];
+
+        // [PERSISTENZA] Se l'ID è nella lista dei morti, NON spawnare
+        if (dati.id && morti.includes(dati.id)) {
+            console.log("Cactus " + dati.id + " già morto. Skip.");
+            continue;
+        }
+
         let nemico = spawna_singolo_cactus(s, dati.x, dati.y);
+        
+        // Assegna ID all'oggetto wrapper per usarlo alla morte
+        if (dati.id) nemico.id_univoco = dati.id;
+
         gruppo_cactus.add(nemico.ph_obj);
     }
     if (muri) {
@@ -79,7 +93,6 @@ function update_cactus(s, player, muri_livello) {
 
         // 1. COLLISIONE FISICA (Danno al contatto)
         if (s.physics.overlap(player.ph_obj, cactus_nativo)) {
-            // CHIAMATA A PLAYER.JS
             if (typeof damage_player === "function") damage_player(s, player);
         }
 
@@ -135,7 +148,6 @@ function spara_proiettile_cactus(s, x, y, target_x, target_y, player, muri_livel
     // 1. COLLISIONE PROIETTILE-PLAYER
     s.physics.add.overlap(bullet.ph_obj, player.ph_obj, function (b, p) {
         PP.assets.destroy(bullet);
-        // CHIAMATA A PLAYER.JS
         if (typeof damage_player === "function") damage_player(s, player);
     });
 
@@ -145,8 +157,6 @@ function spara_proiettile_cactus(s, x, y, target_x, target_y, player, muri_livel
             PP.assets.destroy(bullet);
         });
     }
-
-    
 }
 
 function damage_cactus(s, cactus_nativo, valore_danno) {
@@ -156,34 +166,37 @@ function damage_cactus(s, cactus_nativo, valore_danno) {
     let danno_effettivo = valore_danno !== undefined ? valore_danno : 1;
     wrapper.hp -= danno_effettivo;
 
-    // Feedback visivo lampeggio
     cactus_nativo.setTint(0xff0000);
     s.time.delayedCall(100, () => {
         if (cactus_nativo.active) cactus_nativo.clearTint();
     });
 
-    console.log("Cactus colpito! HP rimasti: " + wrapper.hp);
-
     if (wrapper.hp <= 0) {
         morte_cactus(s, wrapper);
     }
+}
 
 function morte_cactus(s, cactus_wrapper) {
     if (cactus_wrapper.is_dead) return;
     cactus_wrapper.is_dead = true;
     let sprite_nativo = cactus_wrapper.ph_obj;
 
-    // Disabilita radar e fisica
+    // [PERSISTENZA] Salva ID nella lista morti
+    if (cactus_wrapper.id_univoco) {
+        let morti = PP.game_state.get_variable("nemici_uccisi") || [];
+        if (!morti.includes(cactus_wrapper.id_univoco)) {
+            morti.push(cactus_wrapper.id_univoco);
+            PP.game_state.set_variable("nemici_uccisi", morti);
+            console.log("Cactus " + cactus_wrapper.id_univoco + " registrato morto.");
+        }
+    }
+
     if (sprite_nativo.cerchio_radar) sprite_nativo.cerchio_radar.destroy();
     sprite_nativo.body.enable = false;
-    //sprite_nativo.setVelocity(0, 0);
 
-    // Animazione morte
     PP.assets.sprite.animation_play(cactus_wrapper, "morte");
 
     s.time.delayedCall(1000, () => {
         if (sprite_nativo.active) sprite_nativo.destroy();
     });
-}
-
 }

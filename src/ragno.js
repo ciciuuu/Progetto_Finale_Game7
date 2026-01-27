@@ -2,14 +2,10 @@ let img_enemy;
 let img_enemy2;
 let gruppo_ragni;
 
-
 function preload_enemy(s) {
     img_enemy = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/Morte e camminata.png", 36, 36);
     img_enemy2 = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/attacco 59x59.png", 59, 59);
 }
-
-// Nota: Le funzioni set_vulnerable e take_damage sono state RIMOSSE da qui.
-// Ora usiamo damage_player che sta in player.js
 
 function imposta_pattuglia(ragno_wrapper, min_x, max_x) {
     let sprite = ragno_wrapper.ph_obj;
@@ -21,10 +17,7 @@ function imposta_pattuglia(ragno_wrapper, min_x, max_x) {
 
 function spawna_ragno(s, x, y) {
     let nuovo_ragno = PP.assets.sprite.add(s, img_enemy, x, y, 0.5, 1);
-
-    // --- AGGIUNTA HP ---
     nuovo_ragno.hp = 3;
-    // Facciamo un riferimento comodo per la logica nativa
     nuovo_ragno.ph_obj.wrapper = nuovo_ragno;
 
     PP.assets.sprite.animation_add(nuovo_ragno, "camminata", 8, 11, 12, -1);
@@ -37,7 +30,6 @@ function spawna_ragno(s, x, y) {
         nuovo_ragno.ph_obj.body.setFriction(0);
     }
     PP.assets.sprite.animation_play(nuovo_ragno, "camminata");
-
     PP.physics.add(s, nuovo_ragno, PP.physics.type.DYNAMIC);
 
     return nuovo_ragno;
@@ -48,10 +40,24 @@ function create_enemy(s, muri, spawn_list, player) {
         gruppo_ragni = s.physics.add.group();
     }
 
+    // [PERSISTENZA] Recupera lista morti
+    let morti = PP.game_state.get_variable("nemici_uccisi") || [];
+
     if (spawn_list) {
         for (let i = 0; i < spawn_list.length; i++) {
             let dati = spawn_list[i];
+            
+            // [PERSISTENZA] Se ha un ID ed è nella lista morti, SALTA LO SPAWN
+            if (dati.id && morti.includes(dati.id)) {
+                console.log("Ragno " + dati.id + " già morto. Skip.");
+                continue; 
+            }
+
             let nemico = spawna_ragno(s, dati.x, dati.y);
+            
+            // Assegna ID all'oggetto
+            if (dati.id) nemico.id_univoco = dati.id;
+
             if (dati.pattuglia) {
                 imposta_pattuglia(nemico, dati.pattuglia[0], dati.pattuglia[1]);
             }
@@ -63,12 +69,9 @@ function create_enemy(s, muri, spawn_list, player) {
         s.physics.add.collider(gruppo_ragni, muri);
     }
 
-    // GESTIONE COLLISIONE COL PLAYER
     if (player && player.ph_obj) {
         s.physics.add.overlap(player.ph_obj, gruppo_ragni, function (player_obj, enemy_obj) {
-            // Se il ragno è attivo
             if (enemy_obj.active && enemy_obj.body.enable) {
-                // CHIAMIAMO LA FUNZIONE CHE STA IN PLAYER.JS
                 if (typeof damage_player === "function") {
                     damage_player(s, player);
                 }
@@ -86,7 +89,6 @@ function update_enemy(s) {
             muovi_singolo_ragno(singolo_ragno);
         }
     }
-    // Debug tasto K rimosso o spostato se vuoi testare il danno manualmente
 }
 
 function muovi_singolo_ragno(ragno_nativo) {
@@ -117,16 +119,9 @@ function damage_ragno(s, ragno_nativo, valore_danno) {
     let wrapper = ragno_nativo.wrapper;
     if (!wrapper || wrapper.is_dead) return;
 
-    // Se non passiamo nulla, di default fa 1 danno (per sicurezza)
     let danno = valore_danno || 1;
-
-    // Questa riga serve per evitare l'errore se per caso 
-    // valore_danno non viene passato: imposta 1 di default.
-    let danno_effettivo = valore_danno !== undefined ? valore_danno : 1;
-
     wrapper.hp -= danno;
 
-    // Feedback visivo
     ragno_nativo.setTint(0xff0000);
     s.time.delayedCall(100, () => {
         if (ragno_nativo.active) ragno_nativo.clearTint();
@@ -139,16 +134,21 @@ function damage_ragno(s, ragno_nativo, valore_danno) {
 
 function morte_ragno(s, ragno_wrapper) {
     ragno_wrapper.is_dead = true;
+    
+    // [PERSISTENZA] Salva ID nella lista morti
+    if (ragno_wrapper.id_univoco) {
+        let morti = PP.game_state.get_variable("nemici_uccisi") || [];
+        if (!morti.includes(ragno_wrapper.id_univoco)) {
+            morti.push(ragno_wrapper.id_univoco);
+            PP.game_state.set_variable("nemici_uccisi", morti);
+            console.log("Nemico " + ragno_wrapper.id_univoco + " registrato morto.");
+        }
+    }
+
     let sprite = ragno_wrapper.ph_obj;
-
-    // Disabilitiamo collisioni e movimento
     sprite.body.enable = false;
-    //sprite.setVelocity(0, 0);
-
-    // Eseguiamo animazione morte
     PP.assets.sprite.animation_play(ragno_wrapper, "morte");
 
-    // Distruggiamo lo sprite dopo l'animazione (durata circa 600ms)
     s.time.delayedCall(600, () => {
         sprite.destroy();
     });
