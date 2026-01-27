@@ -56,7 +56,7 @@ function create_blueprint(s, lista_spawn, player) {
         // [PERSISTENZA] Skip se già preso
         if (pos.id && presi.includes(pos.id)) continue;
 
-        let item = PP.assets.image.add(s, img_blueprint, pos.x, pos.y, 0.5, 0.5);
+        let item = PP.assets.image.add(s, img_blueprint, pos.x, pos.y, 0, 0);
         if (pos.id) item.id_univoco = pos.id;
 
         PP.physics.add(s, item, PP.physics.type.STATIC);
@@ -88,7 +88,7 @@ function create_ingranaggi(s, lista_spawn, player) {
         // [PERSISTENZA] Skip se già preso
         if (pos.id && presi.includes(pos.id)) continue;
 
-        let item = PP.assets.image.add(s, img_ingranaggio, pos.x, pos.y, 0.5, 0.5);
+        let item = PP.assets.image.add(s, img_ingranaggio, pos.x, pos.y, 0, 0);
         if (pos.id) item.id_univoco = pos.id;
 
         PP.physics.add(s, item, PP.physics.type.STATIC);

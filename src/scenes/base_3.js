@@ -8,7 +8,7 @@ let lista_trappole = [];
 
 let fine_livello_triggerata = false;
 
-const X_FINE_LIVELLO = 107 * 32;
+const X_FINE_LIVELLO = 152 * 32;
 
 // [CHECKPOINT] Variabili Livello 3
 let checkpoint_obj;
@@ -179,8 +179,9 @@ function create(s) {
     // COLL BLUEPRINT
 
     let bp_liv3 = [
-        { x: 600, y: 150, id: "bp_L3_1" }, 
-        { x: 700, y: 150, id: "bp_L3_2" }
+        { x: 14*32+6, y: -34*32+5, id: "bp_L3_1" }, 
+        { x: 98*32+6, y: -22*32+5, id: "bp_L3_2" }, 
+        { x: 43*32+6, y: 54*32+5, id: "bp_L3_3" }, 
     ];
     if (typeof create_blueprint === "function") create_blueprint(s, bp_liv3, player);
 
@@ -188,8 +189,9 @@ function create(s) {
     // COLL INGRANAGGI
     
     let ing_liv3 = [
-        { x: 2000, y: 200, id: "ing_L3_1" },
-        { x: 2200, y: 200, id: "ing_L3_2" }
+        { x: 39*32+6, y: -10*32+5, id: "ing_L3_1" },
+        { x: 83*32+6, y: 6*32+5, id: "ing_L3_2" },
+        { x: 145*32+6, y : 82*32+5, id: "ing_L3_3" },
     ];
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv3, player);
 
