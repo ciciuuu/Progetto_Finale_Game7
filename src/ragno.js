@@ -20,7 +20,7 @@ function spawna_ragno(s, x, y) {
     let nuovo_ragno = PP.assets.sprite.add(s, img_enemy, x, y, 0.5, 1);
 
     // --- AGGIUNTA HP ---
-    nuovo_ragno.hp = 3;
+    nuovo_ragno.hp = 5;
     // Facciamo un riferimento comodo per la logica nativa
     nuovo_ragno.ph_obj.wrapper = nuovo_ragno;
 
