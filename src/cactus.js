@@ -3,7 +3,7 @@ let gruppo_cactus;
 let asset_proiettile_cactus;
 
 function preload_cactus(s) {
-    img_cactus = PP.assets.sprite.load_spritesheet(s, "assets/images/CACTUS/Animazioni Cactus.png", 33, 40);
+    img_cactus = PP.assets.sprite.load_spritesheet(s, "assets/images/CACTUS/Animazioni Cactus.png", 30, 37);
     asset_proiettile_cactus = PP.assets.image.load(s, "assets/images/CACTUS/Proiettile.png");
 }
 
@@ -38,7 +38,7 @@ function create_cactus(s, muri, spawn_list) {
 }
 
 function spawna_singolo_cactus(s, x, y) {
-    let cactus = PP.assets.sprite.add(s, img_cactus, x, y, 0.5, 1);
+    let cactus = PP.assets.sprite.add(s, img_cactus, x, y, 0, 1);
 
     cactus.hp = 5;
     cactus.ph_obj.wrapper = cactus;

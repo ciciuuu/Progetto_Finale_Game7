@@ -162,16 +162,16 @@ function create(s) {
     // CACTUS
 
     let cactus_liv3 = [
-        { x: 1*32, y: 1*32, id: "cactus_L3_1"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_2"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_3"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_4"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_5"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_6"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_7"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_8"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_9"},
-        { x: 1*32, y: 1*32, id: "cactus_L3_10"},
+        { x: -4*32, y: -8*32, id: "cactus_L3_1"},
+        { x: 17*32, y: -23*32, id: "cactus_L3_2"},
+        { x: 51*32, y: -4*32, id: "cactus_L3_3"},
+        { x: 88*32, y: -14*32, id: "cactus_L3_4"},
+        { x: 60*32, y: 27*32, id: "cactus_L3_5"},
+        { x: 76*32, y: 40*32, id: "cactus_L3_6"},
+        { x: 56*32, y: 55*32, id: "cactus_L3_7"},
+        { x: 46*32, y: 55*32, id: "cactus_L3_8"},
+        { x: 75*32, y: 76*32, id: "cactus_L3_9"},
+        { x: 82*32, y: 81*32, id: "cactus_L3_10"},
     ];
     create_cactus(s, muri_livello, cactus_liv3);
 
