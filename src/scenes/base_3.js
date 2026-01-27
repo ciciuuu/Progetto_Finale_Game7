@@ -113,12 +113,15 @@ function create(s) {
     s.physics.world.TILE_BIAS = 32;
 
     if (muri_livello) {
+        // [NATIVO NECESSARIO] Collisione Player - Muri Godot
+        // muri_livello è un Gruppo Phaser Nativo, quindi PP.physics.add_collider fallirebbe
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
 
     // [CHECKPOINT] Creazione Trigger
     if (!checkpoint_preso) {
-        checkpoint_obj = PP.shapes.rectangle_add(s, X_CHECKPOINT_L3_TRIGGER, Y_CHECKPOINT_L3_TRIGGER, 100, 500, "0x00FF00", 0);
+        // [MODIFICA] Rettangolo 32x64 (2 tile verticali)
+        checkpoint_obj = PP.shapes.rectangle_add(s, X_CHECKPOINT_L3_TRIGGER, Y_CHECKPOINT_L3_TRIGGER, 32, 64, "0x00FF00", 0);
         PP.physics.add(s, checkpoint_obj, PP.physics.type.STATIC);
 
         PP.physics.add_overlap_f(s, player, checkpoint_obj, function () {
@@ -139,7 +142,7 @@ function create(s) {
     if (typeof create_zone_segrete === "function") create_zone_segrete(s, player, zone_liv3);
     
     
-    /*  RAGNI { x: posizione x tile su godot * 32 (pixel * tiles) + 18 (offset sprite ragno),
+    /* RAGNI { x: posizione x tile su godot * 32 (pixel * tiles) + 18 (offset sprite ragno),
                 y: posizione y tile su godot * 32 (pixel * tiles) (non serve il + 18 perché la y poggia per terra),
                 pattuglia: [posizione destra(stessa x di prima) * 32 + 18, 
                             posizione sinistra * 32 + 18],
@@ -159,21 +162,21 @@ function create(s) {
     create_enemy(s, muri_livello, ragni_liv3, player);
 
 
-    // CACTUS
+// CACTUS (se non metto il raggio è in automatico 200)
 
-    let cactus_liv3 = [
-        { x: -4*32, y: -8*32, id: "cactus_L3_1"},
-        { x: 17*32, y: -23*32, id: "cactus_L3_2"},
-        { x: 51*32, y: -4*32, id: "cactus_L3_3"},
-        { x: 88*32, y: -14*32, id: "cactus_L3_4"},
-        { x: 60*32, y: 27*32, id: "cactus_L3_5"},
-        { x: 76*32, y: 40*32, id: "cactus_L3_6"},
-        { x: 56*32, y: 55*32, id: "cactus_L3_7"},
-        { x: 46*32, y: 55*32, id: "cactus_L3_8"},
-        { x: 75*32, y: 76*32, id: "cactus_L3_9"},
-        { x: 82*32, y: 81*32, id: "cactus_L3_10"},
-    ];
-    create_cactus(s, muri_livello, cactus_liv3);
+let cactus_liv3 = [
+    { x: -4*32, y: -8*32, id: "cactus_L3_1", raggio: 400},
+    { x: 17*32, y: -23*32, id: "cactus_L3_2", raggio: 250}, 
+    { x: 51*32, y: -4*32, id: "cactus_L3_3", raggio: 350},
+    { x: 88*32, y: -14*32, id: "cactus_L3_4", raggio: 300},
+    { x: 60*32, y: 27*32, id: "cactus_L3_5", raggio: 250},
+    { x: 76*32, y: 40*32, id: "cactus_L3_6", raggio: 400},
+    { x: 56*32, y: 55*32, id: "cactus_L3_7", raggio: 150},
+    { x: 46*32, y: 55*32, id: "cactus_L3_8", raggio: 350},
+    { x: 75*32, y: 76*32, id: "cactus_L3_9", raggio: 200},
+    { x: 82*32, y: 81*32, id: "cactus_L3_10", raggio: 200},
+];
+create_cactus(s, muri_livello, cactus_liv3);
 
 
     // COLL BLUEPRINT
@@ -219,6 +222,11 @@ function attiva_checkpoint_l3(s) {
 
     let hp_now = PP.game_state.get_variable("HP_player");
     PP.game_state.set_variable("HP_checkpoint", hp_now);
+
+    // [NUOVO] Salva lo stato dei collezionabili presi fino a qui
+    if (typeof window.salva_collezionabili_al_checkpoint === "function") {
+        window.salva_collezionabili_al_checkpoint();
+    }
 
     PP.game_state.set_variable("checkpoint_attivo", true);
     PP.game_state.set_variable("ultimo_livello", "base_3");
@@ -277,6 +285,7 @@ function morte_player(s, player) {
     if (player.is_dead) return;
     player.is_dead = true;
     if (player.ph_obj) {
+        // [NATIVO] PoliPhaser non ha un wrapper per setTint e body.enable
         player.ph_obj.setTint(0xFF0000);
         player.ph_obj.body.enable = false;
     }

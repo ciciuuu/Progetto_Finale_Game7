@@ -213,15 +213,20 @@ function attiva_checkpoint(s) {
     checkpoint_preso = true;
     console.log("CHECKPOINT ATTIVATO!");
 
-    PP.game_state.set_variable("cp_x", player.geometry.x);
-    PP.game_state.set_variable("cp_y", player.geometry.y);
+    PP.game_state.set_variable("cp_x", player.ph_obj.x);
+    PP.game_state.set_variable("cp_y", player.ph_obj.y);
     
     // Aggiorniamo anche spawn_x per compatibilità, ma usiamo cp_x per respawn
-    PP.game_state.set_variable("spawn_x", player.geometry.x);
-    PP.game_state.set_variable("spawn_y", player.geometry.y);
+    PP.game_state.set_variable("spawn_x", player.ph_obj.x);
+    PP.game_state.set_variable("spawn_y", player.ph_obj.y);
     
     let hp_now = PP.game_state.get_variable("HP_player");
     PP.game_state.set_variable("HP_checkpoint", hp_now);
+
+    // [NUOVO] Salva lo stato dei collezionabili presi fino a qui
+    if (typeof window.salva_collezionabili_al_checkpoint === "function") {
+        window.salva_collezionabili_al_checkpoint();
+    }
 
     PP.game_state.set_variable("checkpoint_attivo", true);
 

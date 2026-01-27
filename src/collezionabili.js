@@ -1,8 +1,9 @@
 let img_blueprint;
 let img_ingranaggio;
 
-const OBIETTIVO_BLUEPRINT = 4;
-const OBIETTIVO_INGRANAGGI = 4;
+// OBIETTIVO TOTALE: 3 per livello x 2 livelli = 6 Totali per tipo
+const OBIETTIVO_BLUEPRINT = 6;
+const OBIETTIVO_INGRANAGGI = 6;
 
 function preload_blueprint(s) {
     img_blueprint = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Blueprint_coll.png");
@@ -16,20 +17,61 @@ function init_collezionabili_state() {
     if (PP.game_state.get_variable("tot_ingranaggi") === undefined) {
         PP.game_state.set_variable("tot_ingranaggi", 0);
     }
-    // Lista ID presi
-    if (PP.game_state.get_variable("collezionabili_presi") === undefined) {
-        PP.game_state.set_variable("collezionabili_presi", []);
+    // Lista ID presi "permanenti" (salvati al checkpoint)
+    if (PP.game_state.get_variable("collezionabili_presi_checkpoint") === undefined) {
+        PP.game_state.set_variable("collezionabili_presi_checkpoint", []);
+    }
+    // Lista ID presi "temporanei" (in questo run, prima di salvare)
+    if (PP.game_state.get_variable("collezionabili_presi_temp") === undefined) {
+        PP.game_state.set_variable("collezionabili_presi_temp", []);
     }
 }
 
-// Helper per salvare ID
+// Funzione chiamata quando tocchi un checkpoint per consolidare i progressi
+function salva_collezionabili_al_checkpoint() {
+    let temp = PP.game_state.get_variable("collezionabili_presi_temp") || [];
+    let perm = PP.game_state.get_variable("collezionabili_presi_checkpoint") || [];
+    
+    // Uniamo le liste
+    let nuova_perm = perm.concat(temp);
+    PP.game_state.set_variable("collezionabili_presi_checkpoint", nuova_perm);
+    PP.game_state.set_variable("collezionabili_presi_temp", []); // Svuota temp
+    
+    // Salviamo i conteggi numerici
+    let b = PP.game_state.get_variable("tot_blueprint");
+    let i = PP.game_state.get_variable("tot_ingranaggi");
+    PP.game_state.set_variable("tot_blueprint_checkpoint", b);
+    PP.game_state.set_variable("tot_ingranaggi_checkpoint", i);
+}
+
+// Funzione chiamata al respawn (morte) per resettare ai valori del checkpoint
+function resetta_collezionabili_al_respawn() {
+    // Svuota i temporanei (così quelli presi dopo il checkpoint ricompaiono)
+    PP.game_state.set_variable("collezionabili_presi_temp", []);
+    
+    // Ripristina i contatori numerici
+    let b_save = PP.game_state.get_variable("tot_blueprint_checkpoint") || 0;
+    let i_save = PP.game_state.get_variable("tot_ingranaggi_checkpoint") || 0;
+    
+    PP.game_state.set_variable("tot_blueprint", b_save);
+    PP.game_state.set_variable("tot_ingranaggi", i_save);
+}
+
+// Helper per salvare ID (Temporaneo fino al checkpoint)
 function salva_collezionabile_preso(id) {
     if (!id) return;
-    let presi = PP.game_state.get_variable("collezionabili_presi") || [];
-    if (!presi.includes(id)) {
-        presi.push(id);
-        PP.game_state.set_variable("collezionabili_presi", presi);
+    let temp = PP.game_state.get_variable("collezionabili_presi_temp") || [];
+    if (!temp.includes(id)) {
+        temp.push(id);
+        PP.game_state.set_variable("collezionabili_presi_temp", temp);
     }
+}
+
+// Helper verifica se preso (controlla sia temp che checkpoint)
+function is_collezionabile_preso(id) {
+    let temp = PP.game_state.get_variable("collezionabili_presi_temp") || [];
+    let perm = PP.game_state.get_variable("collezionabili_presi_checkpoint") || [];
+    return temp.includes(id) || perm.includes(id);
 }
 
 // --- BLUEPRINT ---
@@ -37,7 +79,6 @@ function collision_blueprint(s, player, item) {
     let attuali = PP.game_state.get_variable("tot_blueprint") + 1;
     PP.game_state.set_variable("tot_blueprint", attuali);
     
-    // [PERSISTENZA] Salva ID
     if (item.id_univoco) salva_collezionabile_preso(item.id_univoco);
 
     console.log("Blueprint Preso! Totale: " + attuali + "/" + OBIETTIVO_BLUEPRINT);
@@ -48,13 +89,11 @@ function create_blueprint(s, lista_spawn, player) {
     init_collezionabili_state();
     if (!lista_spawn) return;
 
-    let presi = PP.game_state.get_variable("collezionabili_presi") || [];
-
     for (let i = 0; i < lista_spawn.length; i++) {
         let pos = lista_spawn[i];
         
-        // [PERSISTENZA] Skip se già preso
-        if (pos.id && presi.includes(pos.id)) continue;
+        // Se già preso (temp o perm), non spawnare
+        if (pos.id && is_collezionabile_preso(pos.id)) continue;
 
         let item = PP.assets.image.add(s, img_blueprint, pos.x, pos.y, 0, 0);
         if (pos.id) item.id_univoco = pos.id;
@@ -69,7 +108,6 @@ function collision_ingranaggio(s, player, item) {
     let attuali = PP.game_state.get_variable("tot_ingranaggi") + 1;
     PP.game_state.set_variable("tot_ingranaggi", attuali);
 
-    // [PERSISTENZA] Salva ID
     if (item.id_univoco) salva_collezionabile_preso(item.id_univoco);
 
     console.log("Ingranaggio Preso! Totale: " + attuali + "/" + OBIETTIVO_INGRANAGGI);
@@ -80,13 +118,10 @@ function create_ingranaggi(s, lista_spawn, player) {
     init_collezionabili_state();
     if (!lista_spawn) return;
 
-    let presi = PP.game_state.get_variable("collezionabili_presi") || [];
-
     for (let i = 0; i < lista_spawn.length; i++) {
         let pos = lista_spawn[i];
 
-        // [PERSISTENZA] Skip se già preso
-        if (pos.id && presi.includes(pos.id)) continue;
+        if (pos.id && is_collezionabile_preso(pos.id)) continue;
 
         let item = PP.assets.image.add(s, img_ingranaggio, pos.x, pos.y, 0, 0);
         if (pos.id) item.id_univoco = pos.id;
@@ -96,6 +131,7 @@ function create_ingranaggi(s, lista_spawn, player) {
     }
 }
 
+// --- AGGIORNATO PER POLIPHASER (PP.scenes.start) ---
 function check_collezionabili_vittoria() {
     let tot_b = PP.game_state.get_variable("tot_blueprint") || 0;
     let tot_i = PP.game_state.get_variable("tot_ingranaggi") || 0;
@@ -109,6 +145,10 @@ function check_collezionabili_vittoria() {
         PP.scenes.start("bad_ending");
     }
 }
+
+// Espongo le funzioni per chiamarle da base.js / base_3.js
+window.salva_collezionabili_al_checkpoint = salva_collezionabili_al_checkpoint;
+window.resetta_collezionabili_al_respawn = resetta_collezionabili_al_respawn;
 
 function update_blueprint(s) {
 }
