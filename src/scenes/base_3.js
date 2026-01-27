@@ -136,7 +136,8 @@ function create(s) {
     // ZONE SEGRETE
 
     let zone_liv3 = [
-        { asset: zona3_blocco_terra, img_x: 32 * 86, img_y: 32 * -30, trigger_x: 32 * 93, trigger_y: 32 * -26, trigger_w: 32 * 9, trigger_h: 32 * 7 },
+        {   asset: zona3_blocco_terra, 
+            img_x: 32 * 86, img_y: 32 * -30, trigger_x: 32 * 93, trigger_y: 32 * -26, trigger_w: 32 * 9, trigger_h: 32 * 7 },
         { asset: zona3_terra_sotterranea, img_x: 32 * 40, img_y: 32 * 46, trigger_x: 32 * 40, trigger_y: 32 * 47, trigger_w: 32 * 21, trigger_h: 32 * 19 },
     ];
     if (typeof create_zone_segrete === "function") create_zone_segrete(s, player, zone_liv3);
@@ -157,7 +158,6 @@ function create(s) {
         { x: 75*32+18, y: 22*32 , pattuglia: [75*32+18, 66*32+18], id: "ragno_L3_7"},
         { x: 94*32+18, y: 44*32 , pattuglia: [94*32+18, 87*32+18], id: "ragno_L3_8"},
         { x: 65*32+18, y: 81*32 , pattuglia: [65*32+18, 51*32+18], id: "ragno_L3_9"},
-        
     ];
     create_enemy(s, muri_livello, ragni_liv3, player);
 
@@ -200,6 +200,8 @@ create_cactus(s, muri_livello, cactus_liv3);
 
 
     // TRAPPOLE LAVA INQUINATA
+    lista_trappole = [];
+    aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
 
     lista_trappole = [];
     for (let i = 0; i < lista_trappole.length; i++) {

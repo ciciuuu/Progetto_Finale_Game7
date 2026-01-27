@@ -18,8 +18,8 @@ let img_muro_destra;
 let muro_destra_obj;
 let trappola_attivata = false;
 
-// Trigger Trappola (227 * 32)
-const X_ATTIVAZIONE_TRAPPOLA = 227 * 32; 
+// Trigger Trappola (221 * 32)
+const X_ATTIVAZIONE_TRAPPOLA = 221 * 32; 
 
 // [CHECKPOINT] Variabili
 let checkpoint_obj;
@@ -78,7 +78,6 @@ function create(s) {
         checkpoint_preso = true; 
         
     } else {
-        console.log("NUOVA PARTITA / RESET COMPLETO");
         // --- SETUP GLOBALE INIZIALE ---
         PP.game_state.set_variable("HP_player", 10);
         PP.game_state.set_variable("arma_sbloccata", false);
@@ -149,7 +148,7 @@ function create(s) {
     // --- TRAPPOLA MURI CADENTI ---
     // ===============================================
     
-    muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 226 * 32, -27 * 32, 0, 0);
+    muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 218 * 32, -27 * 32, 0, 0);
     PP.physics.add(s, muro_destra_obj, PP.physics.type.DYNAMIC);
     PP.physics.set_allow_gravity(muro_destra_obj, false);
     PP.physics.set_immovable(muro_destra_obj, true);
@@ -157,37 +156,81 @@ function create(s) {
     PP.physics.add_collider(s, player, muro_destra_obj);
 
 
-    // ===============================================
     // --- CONFIGURAZIONE ZONE SEGRETE (LIV 1) ---
-    // ===============================================
+
     let zone_liv1 = [
-        { asset: zona_pietra, img_x: 1664, img_y: -288, trigger_x: 1664-32, trigger_y: -288+32, trigger_w: 32*8, trigger_h: 32*4 },
-        { asset: zona_inizio_sinistra, img_x: 448-64, img_y: 0, trigger_x: 449, trigger_y: 0, trigger_w: 32*15, trigger_h: 32*11 },
-        { asset: zona_dopo_vecchietto, img_x: 111*32, img_y: -2*32, trigger_x: 112*32, trigger_y: -2*32, trigger_w: 32*11, trigger_h: 32*4 },
-        { asset: zona_fine_lvl1, img_x: 227*32, img_y: -16*32, trigger_x: 227*32, trigger_y: -15*32, trigger_w: 32*3, trigger_h: 32*32 },
+        {
+            asset: zona_pietra,
+            img_x: 79*32,
+            img_y: -12*32,
+            trigger_x: 79*32 - 32,
+            trigger_y: -12*32 + 32,
+            trigger_w: 32 * 8,
+            trigger_h: 32 * 4
+        },
+        {
+            asset: zona_inizio_sinistra,
+            img_x: 448 - 64,
+            img_y: 0,
+            trigger_x: 449,
+            trigger_y: 0,
+            trigger_w: 32 * 15,
+            trigger_h: 32 * 11
+        },
+        {
+            asset: zona_dopo_vecchietto,
+            img_x: 111 * 32,
+            img_y: -2 * 32,
+            trigger_x: 112 * 32,
+            trigger_y: -2 * 32,
+            trigger_w: 32 * 11,
+            trigger_h: 32 * 4
+        },
+        {
+            asset: zona_fine_lvl1,
+            img_x: 219 * 32,
+            img_y: -16 * 32,
+            trigger_x: 219 * 32,
+            trigger_y: -15 * 32,
+            trigger_w: 32 * 5,
+            trigger_h: 32 * 32
+        }
     ];
 
     if(typeof create_zone_segrete === "function") create_zone_segrete(s, player, zone_liv1);
     
     // [PERSISTENZA] ID univoci
     let ragni_liv1 = [
-        { x: -8, y: 0, pattuglia: [-234, -15], id: "ragno_1" },
-        { x: 182, y: -64, pattuglia: [70, 180], id: "ragno_2" },
-        { x: -30, y: 0, pattuglia: [-200, -50], id: "ragno_3" },
-        { x: 3142, y: 0, pattuglia: [3000, 3447], id: "ragno_4" },
-    ];
+        { x: 15*32+18, y: 27*32 , pattuglia: [15*32+18, 13*32+18], id: "ragno_1"},
+        { x: 39*32+18, y: 19*32 , pattuglia: [39*32+18, 32*32+18], id: "ragno_2"},
+        { x: 107*32+18, y: -1*32 , pattuglia: [107*32+18, 94*32+18], id: "ragno_3"},
+        { x: 122*32+18, y: -4*32 , pattuglia: [122*32+18, 111*32+18], id: "ragno_4"},
+        { x: 208*32+18, y: -16*32 , pattuglia: [208*32+18, 205*32+18], id: "ragno_5"},
+        { x: 214*32+18, y: -17*32 , pattuglia: [214*32+18, 209*32+18], id: "ragno_6"},
+    ];   
     create_enemy(s, muri_livello, ragni_liv1, player);
 
     let cactus_liv1 = [
-        { x: 100, y: 400, id: "cactus_1" },
-        { x: 1200, y: 350, id: "cactus_2" }
+        { x: 19*32, y: -1*32, id: "cactus_L3_1", raggio: 350},
+        { x: 99*32, y: -7*32, id: "cactus_L3_2", raggio: 400},
+        { x: 144*32, y: -2*32, id: "cactus_L3_3", raggio: 400},
+        { x: 167*32, y: -8*32, id: "cactus_L3_4", raggio: 400},
+        { x: 191*32, y: 1*32, id: "cactus_L3_5", raggio: 400},
+        { x: 189*32, y: -14*32, id: "cactus_L3_5", raggio: 400},
     ];
     create_cactus(s, muri_livello, cactus_liv1);
 
-    let bp_liv1 = [{ x: 100, y: -100, id: "bp_1" }, { x: 3684, y: 29, id: "bp_2" }];
+    let bp_liv1 = [
+        { x: 83*32, y: -8*32, id: "bp_1" },
+        { x: 114*32, y: 0*32, id: "bp_2" },
+        { x: 189*32, y: 1*32, id: "bp_3" },
+    ];
     if (typeof create_blueprint === "function") create_blueprint(s, bp_liv1, player);
-
-    let ing_liv1 = [{ x: 200, y: -100, id: "ing_1" }, { x: 1820, y: -165, id: "ing_2" }];
+    let ing_liv1 = [
+        { x: 41*32, y: 19*32, id: "ing_1" },
+        { x: 156*32, y: -15*32, id: "ing_2" },
+        { x: 210*32, y: -17*32, id: "ing_3" },
+    ];
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player);
 
     lista_trappole = [];
@@ -264,7 +307,7 @@ function update(s) {
     }
 
     // Cambio Livello
-    if (player.ph_obj.x > 227 * 32 && player.ph_obj.y > 0) {
+    if (player.geometry.x >= 219 * 32 && player.geometry.y > 0) {
         let vita_al_passaggio = PP.game_state.get_variable("HP_player");
         PP.game_state.set_variable("HP_checkpoint", vita_al_passaggio);
 

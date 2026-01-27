@@ -134,7 +134,7 @@ function update_cactus(s, player, muri_livello) {
 
 // Questa funzione lancia un oggetto INVISIBILE velocissimo per controllare la linea di tiro
 function lancia_sonda_controllo(s, x, y, target_x, target_y, player, muri_livello, cactus_nativo) {
-    let speed_sonda = 2000; // Molto veloce per essere quasi istantanea
+    let speed_sonda = 1500; // Molto veloce per essere quasi istantanea
     let Y_OFFSET_SPARO = 36;
 
     // [POLIPHASER] Creiamo la sonda usando lo sprite del proiettile ma invisibile
