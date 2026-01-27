@@ -46,7 +46,7 @@ function update(s) {
         PP.game_state.set_variable("tot_ingranaggi", 0);
         PP.game_state.set_variable("arma_sbloccata", false);
         
-        PP.scenes.start("base_3");
+        PP.scenes.start("base");
     }
   
     if(PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {

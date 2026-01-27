@@ -36,7 +36,7 @@ function spawna_singolo_cactus(s, x, y, raggio_custom) {
     // [POLIPHASER] Creazione Sprite
     let cactus = PP.assets.sprite.add(s, img_cactus, x, y, 0, 1);
 
-    cactus.hp = 5;
+    cactus.hp = 3;
     cactus.ph_obj.wrapper = cactus;
 
     // [POLIPHASER] Fisica
