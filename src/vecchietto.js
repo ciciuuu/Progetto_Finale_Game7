@@ -61,7 +61,7 @@ function create_vecchietto(s) {
     PP.layers.set_z_index(layer_fg_ui, 101);
 
     // 1. VECCHIETTO
-    vecchietto = PP.assets.sprite.add(s, img_vecchietto, 2849, -128, 0.5, 1);
+    vecchietto = PP.assets.sprite.add(s, img_vecchietto, 54*32, 0*32, 0.5, 1);
     PP.physics.add(s, vecchietto, PP.physics.type.STATIC);
     PP.layers.add_to_layer(layer_game, vecchietto);
 
@@ -73,7 +73,7 @@ function create_vecchietto(s) {
 
     // 2. SENSORE DI CONTATTO (Solo se non disabilitato)
     if (!vecchietto_disabilitato) {
-        sensore_dialogo = PP.shapes.rectangle_add(s, 2849, -128, 250, 200, "0xFF0000", 0);
+        sensore_dialogo = PP.shapes.rectangle_add(s, 54*32, 0*32, 250, 200, "0xFF0000", 0);
         PP.physics.add(s, sensore_dialogo, PP.physics.type.STATIC);
         if(sensore_dialogo.visibility) sensore_dialogo.visibility.alpha = 0;
     } else {
@@ -82,7 +82,7 @@ function create_vecchietto(s) {
 
     // 3. TASTO S (Solo se non disabilitato)
     if (!vecchietto_disabilitato) {
-        tasto_S = PP.assets.sprite.add(s, img_tasto_S, 2847, -176, 0.5, 1);
+        tasto_S = PP.assets.sprite.add(s, img_tasto_S, 54*32-1, -40, 0.5, 1);
         PP.layers.add_to_layer(layer_game, tasto_S);
 
         PP.assets.sprite.animation_add_list(tasto_S, "puntini", [0, 1], 2, -1);

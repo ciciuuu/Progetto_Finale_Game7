@@ -79,6 +79,11 @@ function create(s) {
         PP.game_state.set_variable("ultimo_livello", "base_3");
         checkpoint_preso = false;
     }
+    
+    // Inizializza l'arma equipaggiata (0 = standard) se non esiste
+    if (PP.game_state.get_variable("arma_equipaggiata") === undefined) {
+        PP.game_state.set_variable("arma_equipaggiata", 0);
+    }
 
     fine_livello_triggerata = false;
 
@@ -246,6 +251,27 @@ function update(s) {
         s.cameras.main.setZoom(2);
     }
 
+    // CAMBIO ARMA (Tasto Q)
+    if (PP.interactive.kb.is_key_down(s, PP.key_codes.Q)) {
+        if (!s.tasto_q_premuto) {
+            s.tasto_q_premuto = true;
+            let sbloccata = PP.game_state.get_variable("arma_sbloccata");
+            
+            if (sbloccata) {
+                // Leggi arma corrente (0 = default, 1 = nuova)
+                let current = PP.game_state.get_variable("arma_equipaggiata") || 0;
+                let nuova_arma = (current === 0) ? 1 : 0;
+                
+                PP.game_state.set_variable("arma_equipaggiata", nuova_arma);
+                console.log("Cambio arma: " + (nuova_arma === 0 ? "Standard" : "Potenziata"));
+            } else {
+                console.log("Arma non ancora sbloccata! Parla col vecchietto.");
+            }
+        }
+    } else {
+        s.tasto_q_premuto = false;
+    }
+
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2;
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4;
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1;
@@ -287,7 +313,6 @@ function morte_player(s, player) {
     if (player.is_dead) return;
     player.is_dead = true;
     if (player.ph_obj) {
-        // [NATIVO] PoliPhaser non ha un wrapper per setTint e body.enable
         player.ph_obj.setTint(0xFF0000);
         player.ph_obj.body.enable = false;
     }

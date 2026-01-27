@@ -80,7 +80,7 @@ function create(s) {
     } else {
         // --- SETUP GLOBALE INIZIALE ---
         PP.game_state.set_variable("HP_player", 10);
-        PP.game_state.set_variable("arma_sbloccata", false);
+        PP.game_state.set_variable("arma_sbloccata", false); 
         PP.game_state.set_variable("tot_blueprint", 0);
         PP.game_state.set_variable("tot_ingranaggi", 0);
         
@@ -240,7 +240,8 @@ function create(s) {
     aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 70, 160);
     aggiungi_trappola_manuale(s, 4102 - 5, 0 + 16, 32 * 12, 32 * 5);
     aggiungi_trappola_manuale(s, 4806 - 5, 0 + 16, 32 * 32, 32 * 8);
-    aggiungi_trappola_manuale(s, 6374 - 5, -352 + 16, 32 * 6, 32 * 15);
+    aggiungi_trappola_manuale(s, 186*32, -11*32, 32 * 8, 32 * 3);
+    aggiungi_trappola_manuale(s, 199*32 , -13*32, 32 * 6, 32 * 17);
 
     for (let i = 0; i < lista_trappole.length; i++) {
         let tr = lista_trappole[i];
