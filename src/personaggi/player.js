@@ -57,7 +57,7 @@ function configure_player_animations(s, player) {
     player.last_fired = 0;
     player.modalita_inquinante = false; 
     player.tasto_R_rilasciato = true;   
-    player.fire_rate = 750;     
+    player.fire_rate = 400;     
     player.anim_sparo_corrente = "sparo_rinnovabile";
     player.god_mode = false;
     player.is_dead = false; 
@@ -257,10 +257,10 @@ function manage_player_update(s, player, muri_livello) {
         if (player.modalita_inquinante !== hud_modalita_inquinante) {
             player.modalita_inquinante = hud_modalita_inquinante;
             if (player.modalita_inquinante) {
-                player.fire_rate = 545; 
+                player.fire_rate = 750; 
                 player.anim_sparo_corrente = "sparo_inquinante";
             } else {
-                player.fire_rate = 750; 
+                player.fire_rate = 400; 
                 player.anim_sparo_corrente = "sparo_rinnovabile";
             }
         }
