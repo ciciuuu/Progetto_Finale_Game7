@@ -107,12 +107,14 @@ function create_blueprint(s, lista_spawn, player) {
 
 // --- INGRANAGGI ---
 function collision_ingranaggio(s, player, item) {
-    let attuali = PP.game_state.get_variable("tot_ingranaggi") + 1;
+    let attuali = (PP.game_state.get_variable("tot_ingranaggi") || 0) + 1;
     PP.game_state.set_variable("tot_ingranaggi", attuali);
 
-    if (item.id_univoco) salva_collezionabile_preso(item.id_univoco);
+    if (item.id_univoco) {
+        salva_collezionabile_preso(item.id_univoco);
+        console.log("Preso ingranaggio con ID: " + item.id_univoco);
+    }
 
-    console.log("Ingranaggio Preso! Totale: " + attuali + "/" + OBIETTIVO_INGRANAGGI);
     PP.assets.destroy(item);
 }
 

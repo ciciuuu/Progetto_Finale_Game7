@@ -4,6 +4,11 @@ let asset_ingranaggio_0;
 let asset_ingranaggio_1;
 let asset_ingranaggio_2;
 let asset_ingranaggio_3;
+
+let ingranaggio_sfondo;
+let ingranaggio_1;
+let ingranaggio_2;
+let ingranaggio_3;
 let ingranaggio;
 
 let asset_health_bar;
@@ -85,11 +90,30 @@ function create_hud(s) {
     vignette_dannoviola.ph_obj.alpha = 0;
 
 
-    // --- INGRANAGGIO (Alto a Destra - Alzato di 20px) ---
-    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 855, 185 , 0, 0, 0, 0);
-    ingranaggio.tile_geometry.scroll_factor_x = 0;
-    ingranaggio.tile_geometry.scroll_factor_y = 0;
-    PP.layers.add_to_layer(livello_HUD, ingranaggio, vignette_dannorosso);
+    // 1. Lo sfondo (asset_ingranaggio_0) sempre visibile
+    ingranaggio_sfondo = PP.assets.image.add(s, asset_ingranaggio_0, 855, 185, 0, 0);
+    ingranaggio_sfondo.tile_geometry.scroll_factor_x = 0;
+    ingranaggio_sfondo.tile_geometry.scroll_factor_y = 0;
+    PP.layers.add_to_layer(livello_HUD, ingranaggio_sfondo);
+
+    // 2. I tre ingranaggi sovrapposti, inizialmente trasparenti
+    ingranaggio_1 = PP.assets.image.add(s, asset_ingranaggio_1, 855, 185, 0, 0);
+    ingranaggio_1.tile_geometry.scroll_factor_x = 0;
+    ingranaggio_1.tile_geometry.scroll_factor_y = 0;
+    ingranaggio_1.ph_obj.alpha = 0; // Invisibile
+    PP.layers.add_to_layer(livello_HUD, ingranaggio_1);
+
+    ingranaggio_2 = PP.assets.image.add(s, asset_ingranaggio_2, 855, 185, 0, 0);
+    ingranaggio_2.tile_geometry.scroll_factor_x = 0;
+    ingranaggio_2.tile_geometry.scroll_factor_y = 0;
+    ingranaggio_2.ph_obj.alpha = 0; // Invisibile
+    PP.layers.add_to_layer(livello_HUD, ingranaggio_2);
+
+    ingranaggio_3 = PP.assets.image.add(s, asset_ingranaggio_3, 855, 185, 0, 0);
+    ingranaggio_3.tile_geometry.scroll_factor_x = 0;
+    ingranaggio_3.tile_geometry.scroll_factor_y = 0;
+    ingranaggio_3.ph_obj.alpha = 0; // Invisibile
+    PP.layers.add_to_layer(livello_HUD, ingranaggio_3);
 
 
     /* // --- BLUEPRINT (Alto a Destra - Sotto ingranaggio - Alzato di 20px) ---
@@ -149,6 +173,28 @@ function create_hud(s) {
 }
 
 function update_hud(s, player) {
+
+    // --- 1. GESTIONE GRAFICA INGRANAGGI (SISTEMA A ID) ---
+    // Controlliamo se la funzione di verifica esiste (definita nel file collezionabili)
+    if (typeof is_collezionabile_preso === "function") {
+        
+        let id_prefisso = "";
+        
+        // Identifichiamo in che livello siamo (cambia i nomi con quelli delle tue scene)
+        if (s.scene.key === "base") {
+            // Nel livello 1 cerchiamo gli ID: ing_1, ing_2, ing_3
+            ingranaggio_1.ph_obj.alpha = is_collezionabile_preso("ing_1") ? 1 : 0;
+            ingranaggio_2.ph_obj.alpha = is_collezionabile_preso("ing_2") ? 1 : 0;
+            ingranaggio_3.ph_obj.alpha = is_collezionabile_preso("ing_3") ? 1 : 0;
+        } 
+        else if (s.scene.key === "base_3") {
+            // Nel livello 2 l'HUD torna "vuoto" e cerca gli ID: ing_4, ing_5, ing_6
+            ingranaggio_1.ph_obj.alpha = is_collezionabile_preso("ing_L3_1") ? 1 : 0;
+            ingranaggio_2.ph_obj.alpha = is_collezionabile_preso("ing_L3_2") ? 1 : 0;
+            ingranaggio_3.ph_obj.alpha = is_collezionabile_preso("ing_L3_3") ? 1 : 0;
+        }
+    
+    }
     
     // Controllo stato sblocco arma
     let is_arma_sbloccata = PP.game_state.get_variable("arma_sbloccata");
