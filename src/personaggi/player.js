@@ -15,6 +15,7 @@ let sipario_nero_obj = null;
 let is_fading_death = false;
 
 let layer_effetti;
+let layer_player; // [NUOVO] Variabile per il layer del giocatore
 
 
 function preload_player(s) {
@@ -24,9 +25,22 @@ function preload_player(s) {
 
 function configure_player_animations(s, player) {
     
-    // --- CREAZIONE LAYER EFFETTI ---
+    // --- [MODIFICA IMPORTANTE] GESTIONE LIVELLI (Z-INDEX) ---
+    
+    // 1. Creiamo un layer specifico per il Player
+    // Z-Index 10 è maggiore del Tutorial (che è 1), quindi il player starà davanti
+    layer_player = PP.layers.create(s);
+    PP.layers.set_z_index(layer_player, 10);
+    PP.layers.add_to_layer(layer_player, player);
+
+    // 2. Layer per effetti globali (es. Sipario nero morte)
+    // Questo deve essere altissimo per coprire TUTTO (HUD, Player, Tutorial)
     layer_effetti = PP.layers.create(s);
     PP.layers.set_z_index(layer_effetti, 9999);
+
+
+    // --- FINE MODIFICA ---
+
 
     // Animazioni
     PP.assets.sprite.animation_add_list(player, "run", [0, 1, 2, 3, 4, 5, 6, 7, 8], 13, -1);
@@ -71,8 +85,6 @@ function configure_player_animations(s, player) {
 
     sipario_nero_obj = null;
     is_fading_death = false;
-
-
 }
 
 function damage_player(s, player) {
@@ -162,6 +174,7 @@ function morte_player(s, player) {
         0
     );
     
+    // Aggiungiamo il sipario al layer effetti (che è altissimo, 9999)
     if (layer_effetti) {
         PP.layers.add_to_layer(layer_effetti, sipario_nero_obj);
     }
@@ -187,7 +200,8 @@ function manage_player_update(s, player, muri_livello) {
 
     if (player.is_frozen) {
         PP.physics.set_velocity_x(player, 0);
-        // [MODIFICA] Permettiamo l'animazione "parla" anche se il player è bloccato
+        
+        // Permettiamo l'animazione "parla" anche se il player è bloccato
         if (player.ph_obj.anims.currentAnim && 
             player.ph_obj.anims.currentAnim.key !== "idle" && 
             player.ph_obj.anims.currentAnim.key !== "parla") {

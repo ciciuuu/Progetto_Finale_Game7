@@ -21,10 +21,10 @@ const ALTEZZA_SCHERMO = 720; // Imposta l'altezza corretta del tuo gioco
 const NUMERO_TAVOLE = 6;
 const LIMITE_SCROLL = -(NUMERO_TAVOLE - 1) * LARGHEZZA_SCHERMO;
 
-// --- VARIABILI TESTO ---
-let txt_tavola_2;
-let txt_tavola_4;
-let txt_tavola_6;
+// --- VARIABILI TESTO (Aggiornate per 1, 3, 5) ---
+let txt_tavola_1;
+let txt_tavola_3;
+let txt_tavola_5;
 
 // --- CONFIGURAZIONE TESTO ---
 const TEXT_SIZE = 30;           // Grandezza font
@@ -74,21 +74,18 @@ function create(s) {
     }
 
     // --- ESEMPIO CONTENUTI CON PARAGRAFI ---
-    // Usa \n per andare a capo normale.
-    // Usa \n\n per lasciare una riga vuota tra i paragrafi.
-    // Usa il MAIUSCOLO per simulare il grassetto (enfasi).
+    // Aggiornato per Tavole 1, 3, 5
     
-    let stringa_t2 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio.\n\nTutti lo chiamavano la Grande Fornace, perché il suo calore garantiva la sopravvivenza dell’intero villaggio.\n\nEra la loro luce, la loro sicurezza.";
-    let stringa_t4 = "Un giorno, però, la macchina esplose.\n\nNello scoppio, 6 componenti fondamentali furono scagliati lontano, dispersi nelle terre circostanti.";
-    let stringa_t6 = "Il villaggio piombò nel caos.\n\nSi decise che sarebbe stata Eren, la tecnica del villaggio, a partire per recuperare i pezzi perduti.";
+    let stringa_t1 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio.\n\nTutti lo chiamavano la Grande Fornace, perché il suo calore garantiva la regolazione termica dell'interno villaggio durante le gelide notti del deserto.\n\nEra la loro luce, la loro sicurezza.";
+    let stringa_t3 = "Un giorno, però, la Grande Fornace esplose.\n\nNello scoppio, dei componenti fondamentali furono scagliati lontano, dispersi nelle terre circostanti.";
+    let stringa_t5 = "Il villaggio piombò nel caos.\n\nSi decise che sarebbe stata Eren, la tecnica del villaggio, a partire per recuperare i pezzi perduti.";
 
     // Creazione oggetti testo
-    // NOTA: Gli ultimi due parametri (0.5, 0.5) impostano l'origine al CENTRO del blocco di testo.
-    // Questo permette di centrarlo perfettamente usando le coordinate.
+    // Tavola 1, Tavola 3, Tavola 5
     
-    txt_tavola_2 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t2, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
-    txt_tavola_4 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t4, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
-    txt_tavola_6 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t6, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
+    txt_tavola_1 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t1, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
+    txt_tavola_3 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t3, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
+    txt_tavola_5 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t5, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
 
 
     function setup_bottone(oggetto, scala_base, scala_zoom) {
@@ -210,21 +207,19 @@ function update(s) {
     }
 
     // --- AGGIORNAMENTO POSIZIONE TESTI (CENTRATI AUTOMATICAMENTE) ---
+    // NOTA: Tavola 1 è indice 0, Tavola 3 è indice 2, Tavola 5 è indice 4
     
-    // Calcoliamo la X centrale di ogni tavola:
-    // PosizioneCorrente + (IndiceTavola * Larghezza) + (MetàLarghezza)
-    
-    // Tavola 2 (Indice 1)
-    txt_tavola_2.geometry.x = tavola_attiva.geometry.x + (1 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
-    txt_tavola_2.geometry.y = ALTEZZA_SCHERMO / 2;
+    // Tavola 1 (Indice 0)
+    txt_tavola_1.geometry.x = tavola_attiva.geometry.x + (0 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
+    txt_tavola_1.geometry.y = ALTEZZA_SCHERMO / 2;
 
-    // Tavola 4 (Indice 3)
-    txt_tavola_4.geometry.x = tavola_attiva.geometry.x + (3 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
-    txt_tavola_4.geometry.y = ALTEZZA_SCHERMO / 2;
+    // Tavola 3 (Indice 2)
+    txt_tavola_3.geometry.x = tavola_attiva.geometry.x + (2 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
+    txt_tavola_3.geometry.y = ALTEZZA_SCHERMO / 2;
 
-    // Tavola 6 (Indice 5)
-    txt_tavola_6.geometry.x = tavola_attiva.geometry.x + (5 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
-    txt_tavola_6.geometry.y = ALTEZZA_SCHERMO / 2;
+    // Tavola 5 (Indice 4)
+    txt_tavola_5.geometry.x = tavola_attiva.geometry.x + (4 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
+    txt_tavola_5.geometry.y = ALTEZZA_SCHERMO / 2;
 
 
     // AGGIORNAMENTO ANIMAZIONE INDICATORE TAVOLE    
