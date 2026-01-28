@@ -79,6 +79,7 @@ function create_enemy(s, muri, spawn_list, player) {
             if (enemy_obj.active && enemy_obj.body.enable) {
                 // CHIAMIAMO LA FUNZIONE CHE STA IN PLAYER.JS
                 if (typeof damage_player === "function") {
+                    PP.game_state.set_variable("causa_morte", "ragno");
                     damage_player(s, player);
                 }
             }

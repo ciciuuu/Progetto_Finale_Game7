@@ -102,7 +102,9 @@ function update_cactus(s, player, muri_livello) {
 
         // [NATIVO] Collisione Fisica (Danno al contatto)
         if (s.physics.overlap(player.ph_obj, cactus_nativo)) {
-            if (typeof damage_player === "function") damage_player(s, player);
+            if (typeof damage_player === "function") 
+                PP.game_state.set_variable("causa_morte", "cactus_contatto");
+                damage_player(s, player);
         }
 
         // [NATIVO] Logica Radar
@@ -220,7 +222,9 @@ function spara_proiettile_cactus(s, x, y, target_x, target_y, player, muri_livel
     // [POLIPHASER] Collisione Proiettile-Player
     PP.physics.add_overlap_f(s, bullet, player, function (b, p) {
         PP.assets.destroy(bullet);
-        if (typeof damage_player === "function") damage_player(s, player);
+        if (typeof damage_player === "function") 
+            PP.game_state.set_variable("causa_morte", "cactus_proiettile");
+            damage_player(s, player);
     });
 
     // [NATIVO] Collisione Muri

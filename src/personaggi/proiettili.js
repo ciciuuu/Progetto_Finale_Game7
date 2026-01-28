@@ -62,8 +62,11 @@ function gestisci_sparo(s, entita, muri_livello) {
 
       // Se finisce la vita sparando, attiviamo la morte
       if (nuovo_hp <= 0 && typeof morte_player === "function") {
+        PP.game_state.set_variable("causa_morte", "suicidio");
         morte_player(s, entita);
       }
+
+
 
     }
 

@@ -277,6 +277,7 @@ function create(s) {
     for (let i = 0; i < lista_trappole.length; i++) {
         let tr = lista_trappole[i];
         PP.physics.add_overlap_f(s, player, tr, function () {
+            PP.game_state.set_variable("causa_morte", "sabbie");
             morte_player(s, player, null);
         });
     }
