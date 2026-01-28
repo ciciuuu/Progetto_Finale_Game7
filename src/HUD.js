@@ -20,6 +20,16 @@ let vignette_dannorosso;
 let asset_bordo_dannoviola;
 let vignette_dannoviola;
 
+let asset_blueprint_0;
+let asset_blueprint_1;
+let asset_blueprint_2;
+let asset_blueprint_3;
+
+let blueprint_sfondo;
+let blueprint_1;
+let blueprint_2;
+let blueprint_3;
+
 let asset_blueprint;
 let blueprint;
 
@@ -43,6 +53,12 @@ function preload_hud(s) {
     asset_ingranaggio_1 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/1_ingranaggio.png");
     asset_ingranaggio_2 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/2_ingranaggio.png");
     asset_ingranaggio_3 = PP.assets.image.load(s, "assets/images/HUD/Ingranaggi/3_ingranaggio.png");
+
+    // Blueprint (Aggiungi questi - assicurati dei percorsi!)
+    asset_blueprint_0 = PP.assets.image.load(s, "assets/images/HUD/Blueprint/0_blueprint.png");
+    asset_blueprint_1 = PP.assets.image.load(s, "assets/images/HUD/Blueprint/1_blueprint.png");
+    asset_blueprint_2 = PP.assets.image.load(s, "assets/images/HUD/Blueprint/2_blueprint.png");
+    asset_blueprint_3 = PP.assets.image.load(s, "assets/images/HUD/Blueprint/3_blueprint.png");
 
     asset_blueprint = PP.assets.image.load(s, "assets/images/HUD/Blueprint/BP_boh.png");
     
@@ -91,36 +107,58 @@ function create_hud(s) {
 
 
     // 1. Lo sfondo (asset_ingranaggio_0) sempre visibile
-    ingranaggio_sfondo = PP.assets.image.add(s, asset_ingranaggio_0, 855, 185, 0, 0);
+    ingranaggio_sfondo = PP.assets.image.add(s, asset_ingranaggio_0, 855, 192, 0, 0);
     ingranaggio_sfondo.tile_geometry.scroll_factor_x = 0;
     ingranaggio_sfondo.tile_geometry.scroll_factor_y = 0;
     PP.layers.add_to_layer(livello_HUD, ingranaggio_sfondo);
 
     // 2. I tre ingranaggi sovrapposti, inizialmente trasparenti
-    ingranaggio_1 = PP.assets.image.add(s, asset_ingranaggio_1, 855, 185, 0, 0);
+    ingranaggio_1 = PP.assets.image.add(s, asset_ingranaggio_1, 855, 192, 0, 0);
     ingranaggio_1.tile_geometry.scroll_factor_x = 0;
     ingranaggio_1.tile_geometry.scroll_factor_y = 0;
     ingranaggio_1.ph_obj.alpha = 0; // Invisibile
     PP.layers.add_to_layer(livello_HUD, ingranaggio_1);
 
-    ingranaggio_2 = PP.assets.image.add(s, asset_ingranaggio_2, 855, 185, 0, 0);
+    ingranaggio_2 = PP.assets.image.add(s, asset_ingranaggio_2, 855, 192, 0, 0);
     ingranaggio_2.tile_geometry.scroll_factor_x = 0;
     ingranaggio_2.tile_geometry.scroll_factor_y = 0;
     ingranaggio_2.ph_obj.alpha = 0; // Invisibile
     PP.layers.add_to_layer(livello_HUD, ingranaggio_2);
 
-    ingranaggio_3 = PP.assets.image.add(s, asset_ingranaggio_3, 855, 185, 0, 0);
+    ingranaggio_3 = PP.assets.image.add(s, asset_ingranaggio_3, 855, 192, 0, 0);
     ingranaggio_3.tile_geometry.scroll_factor_x = 0;
     ingranaggio_3.tile_geometry.scroll_factor_y = 0;
     ingranaggio_3.ph_obj.alpha = 0; // Invisibile
     PP.layers.add_to_layer(livello_HUD, ingranaggio_3);
 
 
-    /* // --- BLUEPRINT (Alto a Destra - Sotto ingranaggio - Alzato di 20px) ---
-    blueprint = PP.assets.image.add(s, asset_blueprint, 885, 235, 0, 0, 0, 0);
-    blueprint.tile_geometry.scroll_factor_x = 0;
-    blueprint.tile_geometry.scroll_factor_y = 0;
-    PP.layers.add_to_layer(livello_HUD, blueprint); */
+    // --- BLUEPRINT (Sistema a ID) ---
+    // Sfondo vuoto
+    blueprint_sfondo = PP.assets.image.add(s, asset_blueprint_0, 885, 228, 0, 0);
+    blueprint_sfondo.tile_geometry.scroll_factor_x = 0;
+    blueprint_sfondo.tile_geometry.scroll_factor_y = 0;
+    PP.layers.add_to_layer(livello_HUD, blueprint_sfondo);
+
+    // Pezzo 1
+    blueprint_1 = PP.assets.image.add(s, asset_blueprint_1, 885, 228, 0, 0);
+    blueprint_1.tile_geometry.scroll_factor_x = 0;
+    blueprint_1.tile_geometry.scroll_factor_y = 0;
+    blueprint_1.ph_obj.alpha = 0;
+    PP.layers.add_to_layer(livello_HUD, blueprint_1);
+
+    // Pezzo 2
+    blueprint_2 = PP.assets.image.add(s, asset_blueprint_2, 885, 228, 0, 0);
+    blueprint_2.tile_geometry.scroll_factor_x = 0;
+    blueprint_2.tile_geometry.scroll_factor_y = 0;
+    blueprint_2.ph_obj.alpha = 0;
+    PP.layers.add_to_layer(livello_HUD, blueprint_2);
+
+    // Pezzo 3
+    blueprint_3 = PP.assets.image.add(s, asset_blueprint_3, 885, 228, 0, 0);
+    blueprint_3.tile_geometry.scroll_factor_x = 0;
+    blueprint_3.tile_geometry.scroll_factor_y = 0;
+    blueprint_3.ph_obj.alpha = 0;
+    PP.layers.add_to_layer(livello_HUD, blueprint_3);
 
 
     // --- PISTOLA ANIMATA (Alto a Sinistra) ---
@@ -186,12 +224,22 @@ function update_hud(s, player) {
             ingranaggio_1.ph_obj.alpha = is_collezionabile_preso("ing_1") ? 1 : 0;
             ingranaggio_2.ph_obj.alpha = is_collezionabile_preso("ing_2") ? 1 : 0;
             ingranaggio_3.ph_obj.alpha = is_collezionabile_preso("ing_3") ? 1 : 0;
+
+            // Blueprint L1 (Assicurati che gli ID nel Livello 1 siano questi)
+            blueprint_1.ph_obj.alpha = is_collezionabile_preso("bp_1") ? 1 : 0;
+            blueprint_2.ph_obj.alpha = is_collezionabile_preso("bp_2") ? 1 : 0;
+            blueprint_3.ph_obj.alpha = is_collezionabile_preso("bp_3") ? 1 : 0;
         } 
         else if (s.scene.key === "base_3") {
             // Nel livello 2 l'HUD torna "vuoto" e cerca gli ID: ing_4, ing_5, ing_6
             ingranaggio_1.ph_obj.alpha = is_collezionabile_preso("ing_L3_1") ? 1 : 0;
             ingranaggio_2.ph_obj.alpha = is_collezionabile_preso("ing_L3_2") ? 1 : 0;
             ingranaggio_3.ph_obj.alpha = is_collezionabile_preso("ing_L3_3") ? 1 : 0;
+
+            // Blueprint L2 (ID presi dal tuo codice livello 2)
+            blueprint_1.ph_obj.alpha = is_collezionabile_preso("bp_L3_1") ? 1 : 0;
+            blueprint_2.ph_obj.alpha = is_collezionabile_preso("bp_L3_2") ? 1 : 0;
+            blueprint_3.ph_obj.alpha = is_collezionabile_preso("bp_L3_3") ? 1 : 0;
         }
     
     }
