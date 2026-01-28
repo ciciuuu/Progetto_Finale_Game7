@@ -1,5 +1,6 @@
 let img_player;
 let player;
+let layer_player;
 let muri_livello;
 
 let parallasse1; let parallasse2;
@@ -25,6 +26,11 @@ const X_ATTIVAZIONE_TRAPPOLA = 221 * 32;
 let checkpoint_obj;
 let checkpoint_preso = false;
 
+let layer_tutorial;
+let img_wasd;
+let wasd;
+
+
 // --- COORDINATE CHECKPOINT ---
 const X_CHECKPOINT = 51 * 32; 
 const Y_CHECKPOINT = 0 * 32;
@@ -37,6 +43,9 @@ function preload(s) {
     zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_inizio_sinistra.png");
     zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/ZS_dopo_vecchietto.png");
     zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine_lvl1.png");
+
+
+    img_wasd = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/wasd.png");
 
     // Caricamento Muro (Solo Destra)
     img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine1_destra.png");
@@ -64,6 +73,23 @@ function preload(s) {
 }
 
 function create(s) {
+
+    
+    layer_tutorial = PP.layers.create(s);
+    PP.layers.set_z_index(layer_tutorial, 1);
+    
+    wasd = PP.assets.image.add(s, img_wasd, -23*32, 0*32 , 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, wasd);
+
+
+   /*  layer_player = PP.layers.create(s);
+    PP.layers.set_z_index(layer_player, 5);
+    
+    PP.layers.add_to_layer(layer_player, player);
+
+
+    //layer_trappole = PP.layers.create(s); */
+    
     // [CHECKPOINT SYSTEM] Gestione Caricamento o Reset
     let final_spawn_x, final_spawn_y;
     

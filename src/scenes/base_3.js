@@ -51,7 +51,7 @@ function preload(s) {
 }
 
 function create(s) {
-
+    
     // [CHECKPOINT SYSTEM] Gestione Spawn Sicuro
     let final_spawn_x, final_spawn_y;
 

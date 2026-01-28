@@ -16,9 +16,11 @@ let is_fading_death = false;
 
 let layer_effetti;
 
+
 function preload_player(s) {
     // Caricamenti player se servono
 }
+
 
 function configure_player_animations(s, player) {
     
