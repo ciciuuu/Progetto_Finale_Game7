@@ -3,7 +3,7 @@ let bad_ending_obj;
 
 function preload(s) {
     // Carica l'immagine per il finale cattivo
-    img_bad_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Good ending.jpeg");
+    img_bad_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Bad ending.jpeg");
 }
 
 function create(s) {
@@ -22,6 +22,10 @@ function create(s) {
 function update(s) {
     // Torna al menu principale premendo Spazio
     if(PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
+        // Puliamo le variabili anche qui per sicurezza
+        PP.game_state.set_variable("checkpoint_attivo", false);
+        PP.game_state.set_variable("ultimo_livello", null);
+
         PP.scenes.start("main_menu");
     }
 }

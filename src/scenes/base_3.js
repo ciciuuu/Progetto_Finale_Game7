@@ -202,7 +202,7 @@ function create(s) {
         { x: 88*32, y: -14*32, id: "cactus_L3_4", raggio: 300},
         { x: 60*32, y: 27*32, id: "cactus_L3_5", raggio: 250},
         { x: 76*32, y: 40*32, id: "cactus_L3_6", raggio: 400},
-        { x: 56*32, y: 55*32, id: "cactus_L3_7", raggio: 150},
+        { x: 56*32, y: 55*32, id: "cactus_L3_7", raggio: 400},
         { x: 46*32, y: 55*32, id: "cactus_L3_8", raggio: 350},
         { x: 75*32, y: 76*32, id: "cactus_L3_9", raggio: 200},
         { x: 82*32, y: 81*32, id: "cactus_L3_10", raggio: 200},

@@ -10,9 +10,6 @@ function create(s) {
     // Sfondo a tutto schermo (0,0 con origin 0,0)
     good_ending_obj = PP.assets.image.add(s, img_good_ending_asset, 0, 0, 0, 0);
     
-    // Adatta l'immagine allo schermo se necessario (opzionale)
-    // good_ending_obj.geometry.scale_x = ... 
-
     // Testo informativo (opzionale)
     PP.shapes.text_styled_add(s, 
         PP.game.config.canvas_width / 2, 
@@ -25,6 +22,10 @@ function create(s) {
 function update(s) {
     // Torna al menu principale premendo Spazio
     if(PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
+        // Puliamo le variabili anche qui per sicurezza
+        PP.game_state.set_variable("checkpoint_attivo", false);
+        PP.game_state.set_variable("ultimo_livello", null);
+        
         PP.scenes.start("main_menu");
     }
 }

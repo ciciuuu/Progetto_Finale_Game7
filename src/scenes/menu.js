@@ -40,12 +40,36 @@ function create(s) {
 function update(s) {
     // Gestione Input PoliPhaser
     if(PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
-        // Resetta lo stato di gioco e l'HUD quando inizi una nuova partita
+        
+        // --- RESET COMPLETO DELLA PARTITA ---
+        
+        // 1. Reset Checkpoint (FONDAMENTALE)
+        PP.game_state.set_variable("checkpoint_attivo", false);
+        PP.game_state.set_variable("ultimo_livello", null);
+        PP.game_state.set_variable("cp_x", null);
+        PP.game_state.set_variable("cp_y", null);
+
+        // 2. Reset Player
         PP.game_state.set_variable("HP_player", 10);
+        PP.game_state.set_variable("HP_checkpoint", 10);
+        PP.game_state.set_variable("arma_sbloccata", false);
+        PP.game_state.set_variable("arma_equipaggiata", 0);
+        
+        // 3. Reset Collezionabili
         PP.game_state.set_variable("tot_blueprint", 0);
         PP.game_state.set_variable("tot_ingranaggi", 0);
-        PP.game_state.set_variable("arma_sbloccata", false);
+        PP.game_state.set_variable("tot_blueprint_checkpoint", 0);
+        PP.game_state.set_variable("tot_ingranaggi_checkpoint", 0);
+        PP.game_state.set_variable("collezionabili_presi_checkpoint", []);
+        PP.game_state.set_variable("collezionabili_presi_temp", []);
         
+        // 4. Reset Nemici e altro
+        PP.game_state.set_variable("nemici_uccisi", []);
+        
+        // Reset Spawn iniziale livello 1 (per sicurezza)
+        PP.game_state.set_variable("spawn_x", -20 * 32);
+        PP.game_state.set_variable("spawn_y", -2 * 32);
+
         PP.scenes.start("base");
     }
   

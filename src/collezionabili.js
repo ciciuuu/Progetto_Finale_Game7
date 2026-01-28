@@ -187,7 +187,6 @@ function check_collezionabili_vittoria() {
     }
 }
 
-// Espongo le funzioni per chiamarle da base.js / base_3.js
 window.salva_collezionabili_al_checkpoint = salva_collezionabili_al_checkpoint;
 window.resetta_collezionabili_al_respawn = resetta_collezionabili_al_respawn;
 
