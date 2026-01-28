@@ -3,7 +3,7 @@ let bad_ending_obj;
 
 function preload(s) {
     // Carica l'immagine per il finale cattivo
-    img_bad_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Bad ending.jpg");
+    img_bad_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Bad ending.jpg");
 }
 
 function create(s) {

@@ -35,6 +35,8 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
     
+    PP.assets.sprite.animation_add_list(player, "parla", [25, 29, 30, 34, 35, 39], 8, -1);
+
     PP.assets.sprite.animation_add_list(player, "sparo_inquinante", [41, 42, 43, 36, 37, 38], 8, -1);
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile", [51, 52, 53, 46, 47, 48], 11, -1);
     PP.assets.sprite.animation_add_list(player, "sparo_inquinante_fermo", [61, 62, 63, 56, 57, 58], 8, -1);
@@ -185,8 +187,10 @@ function manage_player_update(s, player, muri_livello) {
 
     if (player.is_frozen) {
         PP.physics.set_velocity_x(player, 0);
-        // [NATIVO NECESSARIO]
-        if (player.ph_obj.anims.currentAnim && player.ph_obj.anims.currentAnim.key !== "idle") {
+        // [MODIFICA] Permettiamo l'animazione "parla" anche se il player è bloccato
+        if (player.ph_obj.anims.currentAnim && 
+            player.ph_obj.anims.currentAnim.key !== "idle" && 
+            player.ph_obj.anims.currentAnim.key !== "parla") {
             PP.assets.sprite.animation_play(player, "idle");
         }
         return; 

@@ -3,7 +3,7 @@ let good_ending_obj;
 
 function preload(s) {
     // Carica l'immagine per il finale buono
-    img_good_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Good ending.jpg");
+    img_good_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Good ending.jpg");
 }
 
 function create(s) {

@@ -11,19 +11,19 @@ function create(s) {
     sfondo_menu_obj = PP.assets.image.add(s, asset_sfondo_menu, 0, 0, 0, 0);
 
     // Titolo
-    PP.shapes.text_styled_add(s, 
+   /*  PP.shapes.text_styled_add(s, 
                 PP.game.config.canvas_width / 2,
                 PP.game.config.canvas_height / 2,
-                "Main Menu",
+                "Main ",
                 100,
                 "Helvetica",
                 "normal",
                 "0xFFFFFF", // Formato colore corretto
                 null,
                 0.5,
-                0.5);
+                0.5); */
 
-    // Istruzioni
+    /* // Istruzioni
     PP.shapes.text_styled_add(s, 
                 PP.game.config.canvas_width / 2,
                 PP.game.config.canvas_height / 5 * 4,
@@ -34,7 +34,7 @@ function create(s) {
                 "0xFFFFFF",
                 null,
                 0.5,
-                0.5);
+                0.5); */
 }
 
 function update(s) {

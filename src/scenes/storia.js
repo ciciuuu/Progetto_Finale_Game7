@@ -27,18 +27,18 @@ let txt_tavola_4;
 let txt_tavola_6;
 
 // --- CONFIGURAZIONE TESTO ---
-const TEXT_SIZE = 35;           // Grandezza font
-const MAX_CARATTERI_RIGA = 45;  // Larghezza riga (influisce sulla larghezza del blocco)
+const TEXT_SIZE = 30;           // Grandezza font
+const MAX_CARATTERI_RIGA = 50;  // Larghezza riga (influisce sulla larghezza del blocco)
 const COLORE_TESTO = "0x000000"; // Nero
 
 
 function preload(s) {
-    // tavolalunga = PP.assets.image.load(s, "assets/images/tavole_storia.jpg");
+    // tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia.jpg");
     tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia_wordless.jpg");
-    home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Cartello_menù.png");
-    arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Freccia_sinistra.png");
-    arrow_right_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Freccia_destra.png");
-    slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/puntitavole_sheet.png", 300, 100);
+    home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Cartello_menù.png");
+    arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_sinistra.png");
+    arrow_right_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_destra.png");
+    slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/Elementi tavole/puntitavole_sheet.png", 300, 100);
 }
 
 function create(s) {
@@ -46,25 +46,41 @@ function create(s) {
 
     // --- FUNZIONE PER MANDARE A CAPO IL TESTO (NO PHASER) ---
     function formatta_testo(testo, max_chars) {
-        let parole = testo.split(" ");
-        let risultato = "";
-        let riga_corrente = "";
+        let paragrafi = testo.split("\n"); // Divide il testo dove hai messo \n
+        let risultato_finale = "";
 
-        for (let i = 0; i < parole.length; i++) {
-            let parola = parole[i];
-            if ((riga_corrente + parola).length > max_chars) {
-                risultato += riga_corrente + "\n";
-                riga_corrente = "";
+        for (let k = 0; k < paragrafi.length; k++) {
+            let parole = paragrafi[k].split(" ");
+            let riga_corrente = "";
+
+            for (let i = 0; i < parole.length; i++) {
+                let parola = parole[i];
+                // Se la parola supera la lunghezza massima, manda a capo la riga corrente
+                if ((riga_corrente + parola).length > max_chars) {
+                    risultato_finale += riga_corrente + "\n";
+                    riga_corrente = "";
+                }
+                riga_corrente += parola + " ";
             }
-            riga_corrente += parola + " ";
+            // Aggiunge l'ultima riga del paragrafo corrente
+            risultato_finale += riga_corrente.trim();
+            
+            // Se non è l'ultimo paragrafo, rimette il 'capo' originale
+            if (k < paragrafi.length - 1) {
+                risultato_finale += "\n"; 
+            }
         }
-        return risultato + riga_corrente;
+        return risultato_finale;
     }
 
-    // --- CONTENUTI DEI TESTI ---
-    let stringa_t2 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio. Tutti lo chiamavano La Grande Fornace, perché il suo calore garantiva la sopravvivenza dell’intero villaggio. Era la loro luce, la loro sicurezza.";
-    let stringa_t4 = "Un giorno, però, la macchina esplose. Nello scoppio, 6 componenti fondamentali furono scagliati lontano, dispersi nelle terre circostanti.";
-    let stringa_t6 = "Il villaggio piombò nel caos. Si decise che sarebbe stata Eren, la tecnica del villaggio, a partire per recuperare i pezzi perduti.";
+    // --- ESEMPIO CONTENUTI CON PARAGRAFI ---
+    // Usa \n per andare a capo normale.
+    // Usa \n\n per lasciare una riga vuota tra i paragrafi.
+    // Usa il MAIUSCOLO per simulare il grassetto (enfasi).
+    
+    let stringa_t2 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio.\n\nTutti lo chiamavano la Grande Fornace, perché il suo calore garantiva la sopravvivenza dell’intero villaggio.\n\nEra la loro luce, la loro sicurezza.";
+    let stringa_t4 = "Un giorno, però, la macchina esplose.\n\nNello scoppio, 6 componenti fondamentali furono scagliati lontano, dispersi nelle terre circostanti.";
+    let stringa_t6 = "Il villaggio piombò nel caos.\n\nSi decise che sarebbe stata Eren, la tecnica del villaggio, a partire per recuperare i pezzi perduti.";
 
     // Creazione oggetti testo
     // NOTA: Gli ultimi due parametri (0.5, 0.5) impostano l'origine al CENTRO del blocco di testo.
@@ -127,7 +143,7 @@ function create(s) {
 
 
     // FRECCIA SINISTRA
-    arrow_left = PP.assets.image.add(s, arrow_left_asset, 50, 400, 0.5, 0.5);
+    arrow_left = PP.assets.image.add(s, arrow_left_asset, 50, 360, 0.5, 0.5);
     setup_bottone(arrow_left, 0.15, 0.18);
 
     PP.interactive.mouse.add(arrow_left, "pointerdown", function (s) {
@@ -138,7 +154,7 @@ function create(s) {
 
 
     // FRECCIA DESTRA
-    arrow_right = PP.assets.image.add(s, arrow_right_asset, 1230, 400, 0.5, 0.5);
+    arrow_right = PP.assets.image.add(s, arrow_right_asset, 1230, 360, 0.5, 0.5);
     setup_bottone(arrow_right, 0.15, 0.18);
 
     PP.interactive.mouse.add(arrow_right, "pointerdown", function (s) {
