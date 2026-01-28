@@ -25,9 +25,9 @@ const X_ATTIVAZIONE_TRAPPOLA = 221 * 32;
 let checkpoint_obj;
 let checkpoint_preso = false;
 
-// --- COORDINATE CHECKPOINT AGGIORNATE (+1 tile a destra) ---
-const X_CHECKPOINT = 78 * 32; 
-const Y_CHECKPOINT = -5 * 32;
+// --- COORDINATE CHECKPOINT ---
+const X_CHECKPOINT = 51 * 32; 
+const Y_CHECKPOINT = 0 * 32;
 
 // Variabile per l'immagine specifica di QUESTO livello
 let img_zona_pietra;
@@ -43,6 +43,9 @@ function preload(s) {
 
     if (typeof preload_zone_segrete === "function") preload_zone_segrete(s);
     if (typeof preload_blueprint === "function") preload_blueprint(s);
+    
+    // [NUOVO] Preload Checkpoint
+    if (typeof preload_checkpoint === "function") preload_checkpoint(s);
 
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52);
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
@@ -130,14 +133,9 @@ function create(s) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
 
-    // [CHECKPOINT] Creazione Trigger Fisico
-    if (!checkpoint_preso) {
-        checkpoint_obj = PP.shapes.rectangle_add(s, X_CHECKPOINT, Y_CHECKPOINT, 100, 500, "0x00FF00", 0); 
-        PP.physics.add(s, checkpoint_obj, PP.physics.type.STATIC);
-        
-        PP.physics.add_overlap_f(s, player, checkpoint_obj, function() {
-            attiva_checkpoint(s);
-        });
+    // [NUOVO CHECKPOINT] Creazione Bandierina
+    if (typeof crea_bandierina_checkpoint === "function") {
+        checkpoint_obj = crea_bandierina_checkpoint(s, X_CHECKPOINT, Y_CHECKPOINT, checkpoint_preso);
     }
 
     PP.camera.start_follow(s, player, 0, 60);
@@ -215,7 +213,7 @@ function create(s) {
         { x: 99*32, y: -7*32, id: "cactus_L3_2", raggio: 400},
         { x: 144*32, y: -2*32, id: "cactus_L3_3", raggio: 400},
         { x: 167*32, y: -8*32, id: "cactus_L3_4", raggio: 400},
-        { x: 191*32, y: 1*32, id: "cactus_L3_5", raggio: 400},
+        { x: 190*32, y: 1*32, id: "cactus_L3_5", raggio: 400},
         { x: 189*32, y: -14*32, id: "cactus_L3_5", raggio: 400},
     ];
     create_cactus(s, muri_livello, cactus_liv1);
@@ -226,6 +224,7 @@ function create(s) {
         { x: 189*32, y: 1*32, id: "bp_3" },
     ];
     if (typeof create_blueprint === "function") create_blueprint(s, bp_liv1, player);
+    
     let ing_liv1 = [
         { x: 41*32, y: 19*32, id: "ing_1" },
         { x: 156*32, y: -15*32, id: "ing_2" },
@@ -233,15 +232,21 @@ function create(s) {
     ];
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player);
 
+    // --- CUORI LIVELLO 1 ---
+    let cuori_liv1 = [
+        { x: 102*32, y: -7*32, id: "cuore_1" }
+    ];
+    if (typeof create_cuore === "function") create_cuore(s, cuori_liv1, player);
+    
     lista_trappole = [];
-    aggiungi_trappola_manuale(s, 6 - 5, 0 + 16, 32 * 2, 32 * 5);
-    aggiungi_trappola_manuale(s, 582 - 5, 960 + 16, 32 * 3, 32 * 8);
-    aggiungi_trappola_manuale(s, 838 - 5, 832 + 16, 32 * 6, 32 * 12);
-    aggiungi_trappola_manuale(s, 3462 - 5, 0 + 16, 70, 160);
-    aggiungi_trappola_manuale(s, 4102 - 5, 0 + 16, 32 * 12, 32 * 5);
-    aggiungi_trappola_manuale(s, 4806 - 5, 0 + 16, 32 * 32, 32 * 8);
-    aggiungi_trappola_manuale(s, 186*32, -11*32, 32 * 8, 32 * 3);
-    aggiungi_trappola_manuale(s, 199*32 , -13*32, 32 * 6, 32 * 17);
+    aggiungi_trappola_manuale(s, 0, 32 * 1 + 16, 32 * 2, 32 * 5);
+    aggiungi_trappola_manuale(s, 32 * 18, 32 * 31 + 16, 32 * 3, 32 * 8);
+    aggiungi_trappola_manuale(s, 32 * 26, 32 * 27 + 16, 32 * 6, 32 * 12);
+    aggiungi_trappola_manuale(s, 32 * 108, 32 * 1 + 16, 32 * 2, 160);
+    aggiungi_trappola_manuale(s, 32 * 128, 32 * 1 + 16, 32 * 12, 32 * 5);
+    aggiungi_trappola_manuale(s, 32 * 150, 32 * 1 + 16, 32 * 32, 32 * 8);
+    aggiungi_trappola_manuale(s, 32 * 186, 32 * -10 + 16, 32 * 8, 32 * 2);
+    aggiungi_trappola_manuale(s, 32 * 199, 32 * -12 + 16, 32 * 6, 32 * 15);
 
     for (let i = 0; i < lista_trappole.length; i++) {
         let tr = lista_trappole[i];
@@ -251,31 +256,16 @@ function create(s) {
     }
 }
 
-// CHECKPOINT
+// CHECKPOINT GLOBALE
 function attiva_checkpoint(s) {
+    // Questa funzione è mantenuta per compatibilità, ma la logica vera
+    // ora è in checkpoint.js
     if (checkpoint_preso) return;
-    checkpoint_preso = true;
-    console.log("CHECKPOINT ATTIVATO!");
-
-    PP.game_state.set_variable("cp_x", player.ph_obj.x);
-    PP.game_state.set_variable("cp_y", player.ph_obj.y);
     
-    // Aggiorniamo anche spawn_x per compatibilità, ma usiamo cp_x per respawn
-    PP.game_state.set_variable("spawn_x", player.ph_obj.x);
-    PP.game_state.set_variable("spawn_y", player.ph_obj.y);
-    
-    let hp_now = PP.game_state.get_variable("HP_player");
-    PP.game_state.set_variable("HP_checkpoint", hp_now);
-
-    // [NUOVO] Salva lo stato dei collezionabili presi fino a qui
-    if (typeof window.salva_collezionabili_al_checkpoint === "function") {
-        window.salva_collezionabili_al_checkpoint();
-    }
-
-    PP.game_state.set_variable("checkpoint_attivo", true);
-
-    if (checkpoint_obj) {
-        checkpoint_obj.ph_obj.y = 99999; 
+    if (typeof controlla_attivazione_checkpoint === "function" && checkpoint_obj) {
+        if (controlla_attivazione_checkpoint(s, player, checkpoint_obj, X_CHECKPOINT, checkpoint_preso)) {
+            checkpoint_preso = true;
+        }
     }
 }
 window.attiva_checkpoint = attiva_checkpoint;
@@ -325,6 +315,14 @@ function update(s) {
     update_cactus(s, player, muri_livello);
     update_blueprint(s);
     update_hud(s);
+
+    // [NUOVO CHECKPOINT] Logica Trigger
+    // Passiamo checkpoint_preso come parametro e lo aggiorniamo se ritorna true
+    if (typeof controlla_attivazione_checkpoint === "function" && checkpoint_obj) {
+        if (controlla_attivazione_checkpoint(s, player, checkpoint_obj, X_CHECKPOINT, checkpoint_preso)) {
+            checkpoint_preso = true;
+        }
+    }
 }
 
 function destroy(s) { destroy_enemy(s); }

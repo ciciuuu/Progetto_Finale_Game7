@@ -30,14 +30,12 @@ function spawna_ragno(s, x, y) {
     // [POLIPHASER] Fisica
     PP.physics.add(s, nuovo_ragno, PP.physics.type.DYNAMIC);
     
-    nuovo_ragno.geometry.scale_x = 1.3;
-    nuovo_ragno.geometry.scale_y = 1.3;
-    
-    // [NATIVO] Impostazioni fisiche specifiche non presenti in PP base
-    if (nuovo_ragno.ph_obj.body) {
-        nuovo_ragno.ph_obj.body.setDrag(0);
-        nuovo_ragno.ph_obj.body.setFriction(0);
-    }
+    nuovo_ragno.geometry.scale_x = 1.7;
+    nuovo_ragno.geometry.scale_y = 1.7;
+
+    // [POLIPHASER] Rettangolo collisione (Larghezza, Altezza, OffsetX, OffsetY)
+    // Modifica questi numeri per cambiare la hitbox
+    PP.physics.set_collision_rectangle(nuovo_ragno, 32, 21, 0, 15);
     
     PP.assets.sprite.animation_play(nuovo_ragno, "camminata");
 

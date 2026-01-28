@@ -1,5 +1,6 @@
 let img_blueprint;
 let img_ingranaggio;
+let img_cuore;
 
 // OBIETTIVO TOTALE: 3 per livello x 2 livelli = 6 Totali per tipo
 const OBIETTIVO_BLUEPRINT = 6;
@@ -8,6 +9,7 @@ const OBIETTIVO_INGRANAGGI = 6;
 function preload_blueprint(s) {
     img_blueprint = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Blueprint_coll.png");
     img_ingranaggio = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Ingranaggio.png");
+    img_cuore = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Cuore.png");
 }
 
 function init_collezionabili_state() {
@@ -128,6 +130,45 @@ function create_ingranaggi(s, lista_spawn, player) {
 
         PP.physics.add(s, item, PP.physics.type.STATIC);
         PP.physics.add_overlap_f(s, player, item, collision_ingranaggio);
+    }
+}
+
+// --- CUORE ---
+function collision_cuore(s, player, item) {
+    let hp_attuale = PP.game_state.get_variable("HP_player") || 0;
+    
+    // Aumenta di 5 ma non superare 10
+    if (hp_attuale < 10) {
+        let nuova_vita = hp_attuale + 5;
+        if (nuova_vita > 10) nuova_vita = 10;
+        
+        PP.game_state.set_variable("HP_player", nuova_vita);
+        console.log("Cuore Preso! Vita: " + nuova_vita);
+        
+        // Il cuore sparisce per sempre quando preso? 
+        // Se vuoi che ritorni quando muori (se non hai salvato), usa id_univoco.
+        // Se vuoi che sparisca per sempre in questo checkpoint, salvalo.
+        if (item.id_univoco) salva_collezionabile_preso(item.id_univoco);
+        
+        PP.assets.destroy(item);
+    }
+}
+
+function create_cuore(s, lista_spawn, player) {
+    init_collezionabili_state();
+    if (!lista_spawn) return;
+
+    for (let i = 0; i < lista_spawn.length; i++) {
+        let pos = lista_spawn[i];
+
+        // Se già preso (temp o perm), non spawnare
+        if (pos.id && is_collezionabile_preso(pos.id)) continue;
+
+        let item = PP.assets.image.add(s, img_cuore, pos.x, pos.y, 0, 0);
+        if (pos.id) item.id_univoco = pos.id;
+
+        PP.physics.add(s, item, PP.physics.type.STATIC);
+        PP.physics.add_overlap_f(s, player, item, collision_cuore);
     }
 }
 

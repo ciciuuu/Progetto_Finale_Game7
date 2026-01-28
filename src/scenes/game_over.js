@@ -29,12 +29,12 @@ function create_game_over(s) {
     };
 
     // Bottone Nuova Partita (Sempre visibile) a sinistra
-    go_btn_rigioca = make_btn(cx - 380, "NUOVA PARTITA");
+    go_btn_rigioca = make_btn(cx - 380, "RICOMINCIA DA CAPO");
 
     // Bottone Checkpoint (Visibile SOLO se c'è un checkpoint attivo)
     let cp_attivo = PP.game_state.get_variable("checkpoint_attivo");
     if (cp_attivo) {
-        go_btn_checkpoint = make_btn(cx, "ULTIMO CHECKPOINT");
+        go_btn_checkpoint = make_btn(cx, "RIPROVA DALL'ULTIMO CHECKPOINT");
     } else {
         go_btn_checkpoint = null; // Non lo creiamo
     }
@@ -65,40 +65,51 @@ function update_game_over(s) {
         }
     };
 
-    // 1. NUOVA PARTITA: RESETTA TUTTO (Checkpoint compreso)
-    check_click(go_btn_rigioca, () => {
-        
+    // Funzione helper interna per resettare tutto a zero (PULIZIA PROFONDA)
+    let resetta_tutto_a_zero = () => {
         PP.game_state.set_variable("checkpoint_attivo", false);
         
-        // Reset variabili
+        // [FIX BUG] Resetta anche qual è l'ultimo livello salvato e le coordinate
+        PP.game_state.set_variable("ultimo_livello", null);
+        PP.game_state.set_variable("cp_x", null);
+        PP.game_state.set_variable("cp_y", null);
+
+        // Reset variabili di gioco
         PP.game_state.set_variable("HP_player", 10);
         PP.game_state.set_variable("HP_checkpoint", 10);
         PP.game_state.set_variable("spawn_x", 150);
         PP.game_state.set_variable("spawn_y", 620);
         
+        // Reset variabili di progressione
         PP.game_state.set_variable("arma_sbloccata", false);
+        PP.game_state.set_variable("arma_equipaggiata", 0);
         PP.game_state.set_variable("tot_blueprint", 0);
         PP.game_state.set_variable("tot_ingranaggi", 0);
         PP.game_state.set_variable("tot_blueprint_checkpoint", 0);
         PP.game_state.set_variable("tot_ingranaggi_checkpoint", 0);
         
-        // Pulisce liste
+        // Pulisce liste collezionabili e nemici
         PP.game_state.set_variable("collezionabili_presi_checkpoint", []);
         PP.game_state.set_variable("collezionabili_presi_temp", []);
+        PP.game_state.set_variable("nemici_uccisi", []);
 
-        // Forza HUD Inquinante
+        // Forza HUD Inquinante (default)
         if (typeof hud_modalita_inquinante !== 'undefined') {
             hud_modalita_inquinante = true;
         }
+    };
 
+    // 1. NUOVA PARTITA: RESETTA TUTTO -> VA A BASE
+    check_click(go_btn_rigioca, () => {
+        resetta_tutto_a_zero();
         PP.scenes.start("base");
     });
 
-    // 2. ULTIMO CHECKPOINT
+    // 2. ULTIMO CHECKPOINT: TIENE PROGRESSI -> VA A LIVELLO SALVATO
     check_click(go_btn_checkpoint, () => {
         let lv_salvato = PP.game_state.get_variable("ultimo_livello") || "base";
         
-        // [IMPORTANTE] Resetta i collezionabili presi dopo il checkpoint
+        // Resetta i collezionabili presi DOPO il checkpoint (torna al valore salvato)
         if (typeof window.resetta_collezionabili_al_respawn === "function") {
             window.resetta_collezionabili_al_respawn();
         }
@@ -106,7 +117,9 @@ function update_game_over(s) {
         PP.scenes.start(lv_salvato);
     });
 
+    // 3. MENU: RESETTA TUTTO -> VA AL MENU
     check_click(go_btn_menu, () => {
+        resetta_tutto_a_zero();
         PP.scenes.start("main_menu");
     });
 }

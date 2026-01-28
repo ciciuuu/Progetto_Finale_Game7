@@ -167,6 +167,7 @@ function morte_player(s, player) {
 }
 
 function manage_player_update(s, player, muri_livello) {
+
     
     // Gestione Fade Morte
     if (is_fading_death && sipario_nero_obj) {
