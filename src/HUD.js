@@ -86,17 +86,17 @@ function create_hud(s) {
 
 
     // --- INGRANAGGIO (Alto a Destra - Alzato di 20px) ---
-    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 885, 190, 0, 0, 0, 0);
+    ingranaggio = PP.assets.image.add(s, asset_ingranaggio_0, 855, 185 , 0, 0, 0, 0);
     ingranaggio.tile_geometry.scroll_factor_x = 0;
     ingranaggio.tile_geometry.scroll_factor_y = 0;
     PP.layers.add_to_layer(livello_HUD, ingranaggio, vignette_dannorosso);
 
 
-    // --- BLUEPRINT (Alto a Destra - Sotto ingranaggio - Alzato di 20px) ---
+    /* // --- BLUEPRINT (Alto a Destra - Sotto ingranaggio - Alzato di 20px) ---
     blueprint = PP.assets.image.add(s, asset_blueprint, 885, 235, 0, 0, 0, 0);
     blueprint.tile_geometry.scroll_factor_x = 0;
     blueprint.tile_geometry.scroll_factor_y = 0;
-    PP.layers.add_to_layer(livello_HUD, blueprint);
+    PP.layers.add_to_layer(livello_HUD, blueprint); */
 
 
     // --- PISTOLA ANIMATA (Alto a Sinistra) ---
