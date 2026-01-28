@@ -2,7 +2,7 @@ let img_sfondo_credits
 
 function preload(s) {
   
-  img_sfondo_credits = PP.assets.image.load(s, "assets/images/credits.jpg");
+  img_sfondo_credits = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/credits.jpg");
 
 }
 

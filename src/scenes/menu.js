@@ -3,7 +3,7 @@ let asset_sfondo_menu;
 let sfondo_menu_obj;
 
 function preload(s) {
-    asset_sfondo_menu = PP.assets.image.load(s, "assets/images/sfondo_menu.jpg");
+    asset_sfondo_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/sfondo_menu.jpg");
 }
 
 function create(s) {

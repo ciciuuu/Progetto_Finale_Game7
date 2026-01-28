@@ -1,21 +1,41 @@
 <!DOCTYPE html>
 <html>
 
+<!DOCTYPE html>
+<html lang="it">
+
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Il Mostro nel deserto</title>
   <style>
     body {
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-image: url('assets/images/pattern_sfondo.jpg');
-      background-size: cover; /* L'immagine si adatta per coprire tutto lo schermo */
-      background-position: center;
+      background-image: url('assets/images/Pattern_piccolo.jpg');
+      background-size: 130px; /* Grandezza Pattern*/
+    }
+
+    #game_area {
+      box-shadow: 0 0 100px 35px rgba(0, 0, 0, 0.7);
     }
   </style>
-
 </head>
+
+<body>
+
+  <div id="game_area"></div>
+
+  <script src="lib/phaser.min.js"></script>
+  <script src="lib/poliphaser.js"></script>
+
+  <script src="main.js"></script>
+
+</body>
+
+</html>
 
 
 <body>
@@ -30,8 +50,8 @@
   <script src="src/collezionabili.js"></script>
   <script src="src/HUD.js"></script>
   <script src="src/zone_segrete.js"></script>
-  <script src="src/checkpoint.js" ></script>
-  
+  <script src="src/checkpoint.js"></script>
+
   <script src="src/personaggi/player.js"></script>
   <script src="src/personaggi/cactus.js"></script>
   <script src="src/personaggi/proiettili.js"></script>

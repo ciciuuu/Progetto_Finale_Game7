@@ -39,16 +39,16 @@ const Y_CHECKPOINT = 0 * 32;
 let img_zona_pietra;
 
 function preload(s) {
-    zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_pietra.png");
-    zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_inizio_sinistra.png");
-    zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/ZS_dopo_vecchietto.png");
-    zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine_lvl1.png");
+    zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png");
+    zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_inizio_sinistra.png");
+    zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_dopo_vecchietto.png");
+    zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine_lvl1.png");
 
 
     img_wasd = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/wasd.png");
 
     // Caricamento Muro (Solo Destra)
-    img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_fine1_destra.png");
+    img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine1_destra.png");
 
     if (typeof preload_zone_segrete === "function") preload_zone_segrete(s);
     if (typeof preload_blueprint === "function") preload_blueprint(s);
@@ -60,7 +60,7 @@ function preload(s) {
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
-    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_pietra.png");
+    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png");
 
     if (window.godot_preload) window.godot_preload(s);
     

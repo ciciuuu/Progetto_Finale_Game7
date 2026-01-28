@@ -28,8 +28,8 @@ let zona3_blocco_terra;
 let zona3_terra_sotterranea;
 
 function preload(s) {
-    zona3_blocco_terra = PP.assets.image.load(s, "assets/images/MAPPA/ZS_blocco_terra.png");
-    zona3_terra_sotterranea = PP.assets.image.load(s, "assets/images/MAPPA/ZS_terra_sotterranea.png");
+    zona3_blocco_terra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_blocco_terra.png");
+    zona3_terra_sotterranea = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_terra_sotterranea.png");
 
     preload_hud(s);
     preload_proiettili(s);
@@ -227,8 +227,8 @@ function create(s) {
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv3, player);
 
     let cuori_liv3 = [
-        { x: 45*32, y: -33*32, id: "cuore_1" },
-        { x: 73*32, y: 65*32, id: "cuore_2" },
+        { x: 45*32, y: -33*32, id: "cuore_L3_1" },
+        { x: 73*32, y: 65*32, id: "cuore_L3_2" },
     ];
     if (typeof create_cuore === "function") create_cuore(s, cuori_liv3, player);
 
