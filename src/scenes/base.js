@@ -2,6 +2,7 @@ let img_player;
 let player;
 let layer_player;
 let muri_livello;
+let muro_invisibile_sinistra;
 
 let parallasse1; let parallasse2;
 let ts_background_1; let ts_background_2;
@@ -187,13 +188,13 @@ function create(s) {
 
 
     //DECORAZIONI CACTUS INDICAZIONI
-    
+
     cactus_destra = PP.assets.image.add(s, img_cactus_destra, 46 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, cactus_destra);
-    
+
     // cactus_sotto = PP.assets.image.add(s, img_cactus_sotto, 25 * 32, 10 * 32, 0, 1);
     // PP.layers.add_to_layer(layer_tutorial, cactus_sotto);
-    
+
     cactus_pericolo = PP.assets.image.add(s, img_cactus_pericolo, 5 * 32, -1 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, cactus_pericolo);
 
@@ -270,6 +271,16 @@ function create(s) {
     if (muri_livello) {
         s.physics.add.collider(player.ph_obj, muri_livello);
     }
+
+    //Muro invisibile sinistra dello spawn
+
+    // --- MURO INVISIBILE LIMITE SINISTRO ---
+    // Lo posizioniamo a X = -35 * 32. È un rettangolo alto 5000px per bloccare ogni salto.
+    muro_invisibile_sinistra = PP.shapes.rectangle_add(s, -41 * 37, 0, 50, 5000, "0x000000", 0);
+    PP.physics.add(s, muro_invisibile_sinistra, PP.physics.type.STATIC);
+
+    // Aggiungiamo la collisione fisica tra il player e questo muro
+    s.physics.add.collider(player.ph_obj, muro_invisibile_sinistra.ph_obj);
 
     // [NUOVO CHECKPOINT] Creazione Bandierina
     if (typeof crea_bandierina_checkpoint === "function") {
