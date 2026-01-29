@@ -205,7 +205,7 @@ const PUNTO_SPAWN = 500; // ID Spawn Player
 // Elenco ID dei blocchi solidi (Muri/Pavimenti Standard - Hitbox 32x32)
 const BLOCCHI_SOLIDI = [
     1, 2, 3, 5, 6, 8, 9, 10,
-    11, 12, 13, 15, 16, 17, 18, 19, 20,
+    11, 12, 13, 15, 16, 18, 19, 20,
     21, 22, 23, 28, 29, 30,
     32, 34, 35, 36, 37, 38, 39, 40,
     44, 45, 46, 47, 48, 49, 50,
@@ -213,12 +213,14 @@ const BLOCCHI_SOLIDI = [
     61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
     71, 72, 73, 74, 76, 77, 78,
     81, 82, 83, 84, 86, 87, 88,
-    91, 92, 93, 94, 96, 97, 98,
-    111, 112, 113
+    91, 92, 93, 96, 97, 98,
+    104, 105, 106, 107,
+    111, 112, 113, 116, 117,
+    121, 123
 ];
 
 // --- NUOVO: Blocchi Piattaforma (Hitbox stretta solo in alto) ---
-const BLOCCHI_PIATTAFORMA = [41, 42, 43];
+const BLOCCHI_PIATTAFORMA = [41, 42, 43, 101, 102, 103];
 const ALTEZZA_PIATTAFORMA = 15;
 
 const TILESET_KEY = "tiles";

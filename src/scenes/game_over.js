@@ -1,14 +1,28 @@
-let img_go_btn;
 let img_bg_gameover;
+
+// Variabili immagini bottoni
+let img_btn_rigioca;
+let img_btn_checkpoint;
+let img_btn_menu;
+
+// Oggetti bottoni scena
 let go_btn_rigioca;
-let go_btn_menu;
 let go_btn_checkpoint;
+let go_btn_menu;
+
 let go_mouse_lock = false;
 
+// --- IMPOSTAZIONI GRAFICHE ---
+const SCALA_BOTTONI = 1.0; // Cambia questo valore (es. 0.8 o 1.2) per ridimensionare senza distorcere
+
 function preload_game_over(s) {
-    img_go_btn = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
-    
     img_bg_gameover = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Game over.jpg");
+
+    // --- CARICAMENTO BOTTONI SPECIFICI ---
+    // Assicurati che i nomi dei file siano esattamente questi nella cartella
+    img_btn_rigioca = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante rigioca.png");
+    img_btn_checkpoint = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante checkpoint.png");
+    img_btn_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
 }
 
 function create_game_over(s) {
@@ -17,72 +31,59 @@ function create_game_over(s) {
     let h = PP.game.config.canvas_height;
     let cx = w / 2;
 
-    // 1. SFONDO IMMAGINE (Al posto del rettangolo nero)
+    // 1. SFONDO
     let bg = PP.assets.image.add(s, img_bg_gameover, cx, h / 2, 0.5, 0.5);
-    
-    // Adatta l'immagine allo schermo (opzionale, per sicurezza)
+    // Adatta lo sfondo
     bg.geometry.scale_x = w / bg.ph_obj.width;
     bg.geometry.scale_y = h / bg.ph_obj.height;
 
-
-    // 2. TITOLO
+    // 2. TITOLO E SOTTOTITOLO (Causa morte)
     let titolo = PP.shapes.text_styled_add(s, cx, h / 4, "GAME OVER", 60, "Helvetica", "bold", "0xFFFFFF", null, 0.5, 0.5);
-
-
-    // 3. CAUSA DELLA MORTE
-    // Recuperiamo la variabile impostata prima di morire
+    
     let causa_raw = PP.game_state.get_variable("causa_morte");
     let testo_causa = "";
 
-    // Mappatura delle cause
-    if (causa_raw === "suicidio") {
-        testo_causa = "L'inquinamento ti si è ritorto contro.";
-    } else if (causa_raw === "sabbie") {
-        testo_causa = "Un po' troppo denso per nuotare?";
-    } else if (causa_raw === "ragno") {
-        testo_causa = "Spuntino per ragni.";
-    } else if (causa_raw === "cactus_contatto") {
-        testo_causa = "Agopuntura estrema.";
-    } else if (causa_raw === "cactus_proiettile") {
-        testo_causa = "Spina nel fianco.";
-    } else {
-        testo_causa = "L'INQUINAMENTO HA VINTO!"; // Default
-    }
+    if (causa_raw === "suicidio") testo_causa = "L'inquinamento ti si è ritorto contro.";
+    else if (causa_raw === "sabbie") testo_causa = "Un po' troppo denso per nuotare?";
+    else if (causa_raw === "ragno") testo_causa = "Spuntino per ragni.";
+    else if (causa_raw === "cactus_contatto") testo_causa = "Agopuntura estrema.";
+    else if (causa_raw === "cactus_proiettile") testo_causa = "Spina nel fianco.";
+    else testo_causa = "L'INQUINAMENTO HA VINTO!";
 
-    // Mostra il testo della causa
     let sottotitolo = PP.shapes.text_styled_add(s, cx, h / 2.5, testo_causa, 40, "Helvetica", "bold", "0xFFFFFF", null, 0.5, 0.5);
     sottotitolo.ph_obj.setAlign('center');
 
 
-    // Helper Bottoni
-    let make_btn = (x, label) => {
-        let b = PP.assets.image.add(s, img_go_btn, x, h / 1.2, 0.5, 0.5);
-        b.geometry.scale_x = 3; 
-        b.geometry.scale_y = 1.5;
-        // Testo bottone
-        let t = PP.shapes.text_styled_add(s, x, h / 1.2, label, 20, "Arial", "bold", "0xFFFFFF", null, 0.5, 0.5);
-        t.ph_obj.setStroke('#000000', 3);
-        return b;
-    };
+    // 3. POSIZIONAMENTO BOTTONI
+    // Altezza bottoni
+    let y_btn = h / 1.2; 
 
-    // Bottone Nuova Partita (Sempre visibile) a sinistra
-    go_btn_rigioca = make_btn(cx - 300, "RICOMINCIA DA CAPO");
+    // --- BOTTONE RIGIOCA (Sinistra) ---
+    go_btn_rigioca = PP.assets.image.add(s, img_btn_rigioca, cx - 300, y_btn, 0.5, 0.5);
+    go_btn_rigioca.geometry.scale_x = SCALA_BOTTONI;
+    go_btn_rigioca.geometry.scale_y = SCALA_BOTTONI; // Scala uguale per non distorcere
 
-    // Bottone Checkpoint (Visibile SOLO se c'è un checkpoint attivo)
+    // --- BOTTONE MENU (Destra) ---
+    go_btn_menu = PP.assets.image.add(s, img_btn_menu, cx + 300, y_btn, 0.5, 0.5);
+    go_btn_menu.geometry.scale_x = SCALA_BOTTONI;
+    go_btn_menu.geometry.scale_y = SCALA_BOTTONI;
+
+    // --- BOTTONE CHECKPOINT (Centro - Solo se attivo) ---
     let cp_attivo = PP.game_state.get_variable("checkpoint_attivo");
     if (cp_attivo) {
-        go_btn_checkpoint = make_btn(cx, "RIPROVA (CHECKPOINT)");
+        go_btn_checkpoint = PP.assets.image.add(s, img_btn_checkpoint, cx, y_btn, 0.5, 0.5);
+        go_btn_checkpoint.geometry.scale_x = SCALA_BOTTONI;
+        go_btn_checkpoint.geometry.scale_y = SCALA_BOTTONI;
     } else {
-        go_btn_checkpoint = null; // Non lo creiamo
+        go_btn_checkpoint = null;
     }
-
-    // Bottone Menu (Sempre visibile) a destra
-    go_btn_menu = make_btn(cx + 300, "MENÙ PRINCIPALE");
 }
 
 function update_game_over(s) {
+    
+    // Funzione helper per gestire il click
     let check_click = (btn_pp, action) => {
-        if (!btn_pp) return; // Se il bottone non esiste, esci
+        if (!btn_pp) return;
         if (!s.input.activePointer) return;
         
         let mx = s.input.activePointer.x;
@@ -90,11 +91,15 @@ function update_game_over(s) {
         let down = s.input.activePointer.isDown;
         
         let b = btn_pp.ph_obj;
-        // Semplice bounding box check per il click
-        if (mx > b.x - (b.width * b.scaleX)/2 && mx < b.x + (b.width * b.scaleX)/2 && 
-            my > b.y - (b.height * b.scaleY)/2 && my < b.y + (b.height * b.scaleY)/2) {
+        
+        // Calcolo area click basato sulla scala
+        let width = b.width * b.scaleX;
+        let height = b.height * b.scaleY;
+
+        if (mx > b.x - width/2 && mx < b.x + width/2 && 
+            my > b.y - height/2 && my < b.y + height/2) {
             
-            b.setTint(0x888888); 
+            b.setTint(0x888888); // Effetto hover scuro
             if (down) {
                 if (!go_mouse_lock) { go_mouse_lock = true; action(); }
             } else { go_mouse_lock = false; }
@@ -103,59 +108,45 @@ function update_game_over(s) {
         }
     };
 
-    // Funzione helper interna per resettare tutto a zero (PULIZIA PROFONDA)
     let resetta_tutto_a_zero = () => {
         PP.game_state.set_variable("checkpoint_attivo", false);
-        
-        // [FIX BUG] Resetta anche qual è l'ultimo livello salvato e le coordinate
         PP.game_state.set_variable("ultimo_livello", null);
         PP.game_state.set_variable("cp_x", null);
         PP.game_state.set_variable("cp_y", null);
-
-        // Reset variabili di gioco
         PP.game_state.set_variable("HP_player", 10);
         PP.game_state.set_variable("HP_checkpoint", 10);
-        
-        // Non forziamo spawn_x/y qui, lasciamo che lo faccia il livello Base
-        
-        // Reset variabili di progressione
         PP.game_state.set_variable("arma_sbloccata", false);
         PP.game_state.set_variable("arma_equipaggiata", 0);
         PP.game_state.set_variable("tot_blueprint", 0);
         PP.game_state.set_variable("tot_ingranaggi", 0);
         PP.game_state.set_variable("tot_blueprint_checkpoint", 0);
         PP.game_state.set_variable("tot_ingranaggi_checkpoint", 0);
-        
-        // Pulisce liste collezionabili e nemici
         PP.game_state.set_variable("collezionabili_presi_checkpoint", []);
         PP.game_state.set_variable("collezionabili_presi_temp", []);
         PP.game_state.set_variable("nemici_uccisi", []);
-
-        // Forza HUD Inquinante (default)
         if (typeof hud_modalita_inquinante !== 'undefined') {
             hud_modalita_inquinante = true;
         }
     };
 
-    // 1. NUOVA PARTITA
+    // AZIONI BOTTONI
+    
+    // 1. Rigioca
     check_click(go_btn_rigioca, () => {
         resetta_tutto_a_zero();
         PP.scenes.start("base");
     });
 
-    // 2. ULTIMO CHECKPOINT
+    // 2. Checkpoint
     check_click(go_btn_checkpoint, () => {
         let lv_salvato = PP.game_state.get_variable("ultimo_livello") || "base";
-        
-        // Resetta i collezionabili presi DOPO il checkpoint
         if (typeof window.resetta_collezionabili_al_respawn === "function") {
             window.resetta_collezionabili_al_respawn();
         }
-
         PP.scenes.start(lv_salvato);
     });
 
-    // 3. MENU
+    // 3. Menu
     check_click(go_btn_menu, () => {
         resetta_tutto_a_zero();
         PP.scenes.start("main_menu");

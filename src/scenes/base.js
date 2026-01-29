@@ -307,7 +307,7 @@ function create(s) {
             img_x: 448 - 64,
             img_y: 0,
             trigger_x: 449,
-            trigger_y: 0,
+            trigger_y: 1,
             trigger_w: 32 * 15,
             trigger_h: 32 * 11
         },
