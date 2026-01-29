@@ -7,6 +7,20 @@ let ts_background_1; let ts_background_2;
 let lista_trappole = [];
 
 let fine_livello_triggerata = false;
+let layer_tutorial;
+
+//DECORAZIONI CACTUS DIREZIONI
+let img_cactus_destra
+let cactus_destra;
+
+let img_cactus_sotto
+let cactus_sotto;
+
+let img_cactus_pericolo
+let cactus_pericolo;
+
+
+
 
 const X_FINE_LIVELLO = 152 * 32;
 
@@ -36,6 +50,11 @@ function preload(s) {
     zona3_palazzo = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_palazzo2.png");
     zona3_igresso_caverna_lvl2 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_igresso_caverna_lvl2.png");
 
+    img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png");
+    img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus sotto.png");
+    img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus pericolo.png");
+
+
     preload_hud(s);
     preload_proiettili(s);
     preload_enemy(s);
@@ -56,6 +75,21 @@ function preload(s) {
 }
 
 function create(s) {
+
+    layer_tutorial = PP.layers.create(s);
+    PP.layers.set_z_index(layer_tutorial, 1);
+
+    cactus_destra = PP.assets.image.add(s, img_cactus_destra, 28 * 32, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, cactus_destra);
+    
+    cactus_sotto = PP.assets.image.add(s, img_cactus_sotto, 73 * 32-10, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, cactus_sotto);
+    
+    // cactus_pericolo = PP.assets.image.add(s, img_cactus_pericolo, 5 * 32, -1 * 32, 0, 1);
+    // PP.layers.add_to_layer(layer_tutorial, cactus_pericolo);
+
+
+
 
     // [CHECKPOINT SYSTEM] Gestione Spawn Sicuro
     let final_spawn_x, final_spawn_y;

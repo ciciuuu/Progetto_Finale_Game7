@@ -39,6 +39,31 @@ let EE;
 let img_casetta_inizio;
 let casetta_inizio;
 
+let img_mura_città;
+let mura_città;
+
+let img_arco_città;
+let arco_città;
+
+let img_arco_città_davanti;
+let arco_città_davanti;
+
+
+
+
+//DECORAZIONI CACTUS DIREZIONI
+let img_cactus_destra
+let cactus_destra;
+
+let img_cactus_sotto
+let cactus_sotto;
+
+let img_cactus_pericolo
+let cactus_pericolo;
+
+
+
+
 // --- COORDINATE CHECKPOINT ---
 const X_CHECKPOINT = 51 * 32;
 const Y_CHECKPOINT = 0 * 32;
@@ -60,12 +85,24 @@ function preload(s) {
     zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_caverna_finale_lvl1.png");
     img_EE = PP.assets.image.load(s, "assets/images/MAPPA/EE.png");
 
-    img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Casetta_inizio.png");
+    img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/Casetta_inizio.png");
+    img_mura_città = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/muro città.png");
+    img_arco_città = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/arco città.png");
+    img_arco_città_davanti = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/arco città davanti.png");
+
 
     img_wasd = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/wasd.png");
     img_spazio = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/Salto.png");
     img_tasto_N = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/colpo.png");
     img_doppio_salto = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/Doppio_salto.png");
+
+
+    img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png");
+    img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus sotto.png");
+    img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus pericolo.png");
+
+
+
 
 
     // Caricamento Muro (Solo Destra)
@@ -94,10 +131,26 @@ function preload(s) {
 
 function create(s) {
 
+    let layer_sfondo = PP.layers.create(s);
+    PP.layers.set_z_index(layer_sfondo, -10);
 
+    // MURA CITTÀ (Davanti allo sfondo, Dietro alla Mappa che è 0)
+    let layer_mura = PP.layers.create(s);
+    PP.layers.set_z_index(layer_mura, -5);
+
+    // TUTORIAL (Scritte a terra, appena sopra la mappa)
     layer_tutorial = PP.layers.create(s);
     PP.layers.set_z_index(layer_tutorial, 1);
 
+    // ARCO CITTÀ (Davanti alla mappa, Dietro al Player che è 10)
+    let layer_arco = PP.layers.create(s);
+    PP.layers.set_z_index(layer_arco, 5);
+    let layer_arco_davanti = PP.layers.create(s);
+    PP.layers.set_z_index(layer_arco_davanti, 200);
+
+
+
+    //TUTORIAL
     wasd = PP.assets.image.add(s, img_wasd, -25 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, wasd);
 
@@ -106,16 +159,43 @@ function create(s) {
 
     doppio_salto = PP.assets.image.add(s, img_doppio_salto, -13 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, doppio_salto);
-    
-    tasto_N = PP.assets.image.add(s, img_tasto_N, 10 * 32+9, 30 * 32, 0, 1);
+
+    tasto_N = PP.assets.image.add(s, img_tasto_N, 10 * 32 + 9, 30 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, tasto_N);
 
 
+
+    //ELEMENTI GRANDI
     casetta_inizio = PP.assets.image.add(s, img_casetta_inizio, -36 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, casetta_inizio);
 
+    // MURA (Nel layer dietro la mappa)
+    mura_città = PP.assets.image.add(s, img_mura_città, 57 * 32, 0 * 32, 1, 1);
+    PP.layers.add_to_layer(layer_mura, mura_città);
+
+    // ARCO (Nel layer davanti alla mappa ma dietro al player)
+    arco_città = PP.assets.image.add(s, img_arco_città, 57 * 32, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_arco, arco_città);
+
+    arco_città_davanti = PP.assets.image.add(s, img_arco_città_davanti, 63 * 32, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_arco_davanti, arco_città_davanti);
+
     EE = PP.assets.image.add(s, img_EE, 25 * 32, 10 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, EE);
+
+
+    //DECORAZIONI CACTUS INDICAZIONI
+    
+    cactus_destra = PP.assets.image.add(s, img_cactus_destra, 46 * 32, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, cactus_destra);
+    
+    // cactus_sotto = PP.assets.image.add(s, img_cactus_sotto, 25 * 32, 10 * 32, 0, 1);
+    // PP.layers.add_to_layer(layer_tutorial, cactus_sotto);
+    
+    cactus_pericolo = PP.assets.image.add(s, img_cactus_pericolo, 5 * 32, -1 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, cactus_pericolo);
+
+
 
 
     // [CHECKPOINT SYSTEM] Gestione Caricamento o Reset
@@ -163,9 +243,11 @@ function create(s) {
 
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6;
+    PP.layers.add_to_layer(layer_sfondo, ts_background_1); // <--- IMPORTANTE
 
     ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6;
+    PP.layers.add_to_layer(layer_sfondo, ts_background_2); // <--- IMPORTANTE
 
     ts_background_1.tile_geometry.scroll_factor_x = 0;
     ts_background_2.tile_geometry.scroll_factor_x = 0;
@@ -364,7 +446,7 @@ function update(s) {
 
     // --- TRIGGER MESSAGGIO EE (Coordinate: 25 * 32, 9 * 32) ---
     let EE_trovato = PP.game_state.get_variable("ee_trovato");
-    
+
     if (!EE_trovato) {
         let target_x = 25 * 32;
         let target_y = 10 * 32;
@@ -391,9 +473,9 @@ function update(s) {
             testo_segreto.tile_geometry.scroll_factor_x = 0;
             testo_segreto.tile_geometry.scroll_factor_y = 0;
             PP.layers.add_to_layer(layer_ee, testo_segreto);
-            
+
             // Timer per distruggere tutto dopo 3 secondi
-            PP.timers.add_timer(s, 3000, function() {
+            PP.timers.add_timer(s, 3000, function () {
                 PP.assets.destroy(testo_segreto);
                 PP.assets.destroy(sfondo_ee);
             }, false);

@@ -1,15 +1,13 @@
 let img_go_btn;
-let img_bg_gameover; // Nuova variabile per lo sfondo
-let go_btn_rigioca, go_btn_menu, go_btn_checkpoint;
+let img_bg_gameover;
+let go_btn_rigioca;
+let go_btn_menu;
+let go_btn_checkpoint;
 let go_mouse_lock = false;
 
 function preload_game_over(s) {
-    // Caricamento bottone
-    img_go_btn = PP.assets.image.load(s, "assets/images/PLAYER/sparo 52x52.png");
+    img_go_btn = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
     
-    // Caricamento Sfondo Game Over
-    // Nota: Ho aggiunto "assets/images/" all'inizio come per gli altri file. 
-    // Se il percorso è diverso, modificalo qui.
     img_bg_gameover = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Game over.jpg");
 }
 
