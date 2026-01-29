@@ -151,10 +151,10 @@ function create(s) {
 
 
     //TUTORIAL
-    wasd = PP.assets.image.add(s, img_wasd, -25 * 32, 0 * 32, 0, 1);
+    wasd = PP.assets.image.add(s, img_wasd, -34 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, wasd);
 
-    spazio = PP.assets.image.add(s, img_spazio, -20 * 32, 0 * 32, 0, 1);
+    spazio = PP.assets.image.add(s, img_spazio, -28 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, spazio);
 
     doppio_salto = PP.assets.image.add(s, img_doppio_salto, -13 * 32, 0 * 32, 0, 1);
