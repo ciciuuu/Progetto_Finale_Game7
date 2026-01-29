@@ -33,6 +33,9 @@ let doppio_salto;
 let img_tasto_N;
 let tasto_N;
 
+let img_EE;
+let EE;
+
 let img_casetta_inizio;
 let casetta_inizio;
 
@@ -55,7 +58,7 @@ function preload(s) {
     zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine_lvl1.png");
     img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png");
     zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_caverna_finale_lvl1.png");
-
+    img_EE = PP.assets.image.load(s, "assets/images/MAPPA/EE.png");
 
     img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Casetta_inizio.png");
 
@@ -110,6 +113,9 @@ function create(s) {
 
     casetta_inizio = PP.assets.image.add(s, img_casetta_inizio, -36 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, casetta_inizio);
+
+    EE = PP.assets.image.add(s, img_EE, 25 * 32, 10 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, EE);
 
 
     // [CHECKPOINT SYSTEM] Gestione Caricamento o Reset
@@ -352,6 +358,45 @@ function update(s) {
         } else {
             PP.physics.set_velocity_y(muro_destra_obj, 0);
             muro_destra_obj.ph_obj.y = targetY;
+        }
+    }
+
+
+    // --- TRIGGER MESSAGGIO EE (Coordinate: 25 * 32, 9 * 32) ---
+    let EE_trovato = PP.game_state.get_variable("ee_trovato");
+    
+    if (!EE_trovato) {
+        let target_x = 25 * 32;
+        let target_y = 10 * 32;
+        let dx = player.geometry.x - target_x;
+        let dy = player.geometry.y - target_y;
+        let distanza = Math.sqrt(dx * dx + dy * dy);
+
+        if (distanza < 50) {
+            PP.game_state.set_variable("ee_trovato", true);
+
+            // 1. Creiamo un layer specifico con Z-Index altissimo (es. 2000) 
+            // per assicurarci che sia davanti al Player (che di solito è 10)
+            let layer_ee = PP.layers.create(s);
+            PP.layers.set_z_index(layer_ee, 2000);
+
+            // 2. Sfondo (Creato per PRIMO -> sta DIETRO al testo)
+            let sfondo_ee = PP.shapes.rectangle_add(s, 640, 360, 800, 80, "0x000000", 0.3);
+            sfondo_ee.tile_geometry.scroll_factor_x = 0;
+            sfondo_ee.tile_geometry.scroll_factor_y = 0;
+            PP.layers.add_to_layer(layer_ee, sfondo_ee);
+
+            // 3. Testo (Creato per SECONDO -> sta DAVANTI allo sfondo)
+            let testo_segreto = PP.shapes.text_styled_add(s, 640, 360, "In memoria degli studenti che hanno lavorato a questo progetto!", 20, "Arial", "bold", "0xFFFFFF", null, 0.5, 0.5);
+            testo_segreto.tile_geometry.scroll_factor_x = 0;
+            testo_segreto.tile_geometry.scroll_factor_y = 0;
+            PP.layers.add_to_layer(layer_ee, testo_segreto);
+            
+            // Timer per distruggere tutto dopo 3 secondi
+            PP.timers.add_timer(s, 3000, function() {
+                PP.assets.destroy(testo_segreto);
+                PP.assets.destroy(sfondo_ee);
+            }, false);
         }
     }
 
