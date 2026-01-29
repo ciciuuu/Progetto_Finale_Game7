@@ -161,7 +161,7 @@ function create(s) {
     });
 
     // INDICATORE TAVOLE
-    slide_curr = PP.assets.sprite.add(s, slide_curr_sheet, 490, 625, 0, 0);
+    slide_curr = PP.assets.sprite.add(s, slide_curr_sheet, 490, 608, 0, 0);
     
     PP.assets.sprite.animation_add_list(slide_curr, "slide_1", [0], 1, 0);
     PP.assets.sprite.animation_add_list(slide_curr, "slide_2", [1], 1, 0);
