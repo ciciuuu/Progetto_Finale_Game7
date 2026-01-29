@@ -8,11 +8,7 @@ let ts_background_1; let ts_background_2;
 
 let lista_trappole = [];
 
-// caricamento assets zone segrete
-let zona_pietra;
-let zona_inizio_sinistra;
-let zona_dopo_vecchietto;
-let zona_fine_lvl1;
+
 
 // Variabili Trappola Muri (Solo Destra rimasto)
 let img_muro_destra;
@@ -27,30 +23,47 @@ let checkpoint_obj;
 let checkpoint_preso = false;
 
 let layer_tutorial;
+
 let img_wasd;
 let wasd;
 let img_spazio;
 let spazio;
+let img_doppio_salto;
+let doppio_salto;
 let img_tasto_N;
 let tasto_N;
+
+let img_casetta_inizio;
+let casetta_inizio;
 
 // --- COORDINATE CHECKPOINT ---
 const X_CHECKPOINT = 51 * 32;
 const Y_CHECKPOINT = 0 * 32;
 
-// Variabile per l'immagine specifica di QUESTO livello
 let img_zona_pietra;
+
+let zona_pietra;
+let zona_inizio_sinistra;
+let zona_dopo_vecchietto;
+let zona_fine_lvl1;
+let zona_caverna_finale_lvl1;
 
 function preload(s) {
     zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png");
     zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_inizio_sinistra.png");
     zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_dopo_vecchietto.png");
     zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine_lvl1.png");
+    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png");
+    zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_caverna_finale_lvl1.png");
 
+
+    img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Casetta_inizio.png");
 
     img_wasd = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/wasd.png");
     img_spazio = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/Salto.png");
     img_tasto_N = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/colpo.png");
+    img_doppio_salto = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/Doppio_salto.png");
+
 
     // Caricamento Muro (Solo Destra)
     img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine1_destra.png");
@@ -65,7 +78,6 @@ function preload(s) {
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png");
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png");
 
-    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png");
 
     if (window.godot_preload) window.godot_preload(s);
 
@@ -89,17 +101,16 @@ function create(s) {
     spazio = PP.assets.image.add(s, img_spazio, -20 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, spazio);
 
-    tasto_N = PP.assets.image.add(s, img_tasto_N, 7 * 32, 29 * 32, 0, 1);
-    PP.layers.add_to_layer(layer_tutorial, tasto_N );
+    doppio_salto = PP.assets.image.add(s, img_doppio_salto, -13 * 32, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, doppio_salto);
+    
+    tasto_N = PP.assets.image.add(s, img_tasto_N, 10 * 32+9, 30 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, tasto_N);
 
 
-    /*  layer_player = PP.layers.create(s);
-     PP.layers.set_z_index(layer_player, 5);
-     
-     PP.layers.add_to_layer(layer_player, player);
- 
- 
-     //layer_trappole = PP.layers.create(s); */
+    casetta_inizio = PP.assets.image.add(s, img_casetta_inizio, -36 * 32, 0 * 32, 0, 1);
+    PP.layers.add_to_layer(layer_tutorial, casetta_inizio);
+
 
     // [CHECKPOINT SYSTEM] Gestione Caricamento o Reset
     let final_spawn_x, final_spawn_y;
@@ -129,8 +140,8 @@ function create(s) {
         PP.game_state.set_variable("collezionabili_presi", []);
 
         // --- COORDINATE SPAWN INIZIALE AGGIORNATE ---
-        final_spawn_x = -20 * 32;
-        final_spawn_y = -2 * 32;
+        final_spawn_x = -27 * 32;
+        final_spawn_y = -1 * 32;
 
         checkpoint_preso = false;
     }
@@ -229,7 +240,16 @@ function create(s) {
             trigger_y: -15 * 32,
             trigger_w: 32 * 5,
             trigger_h: 32 * 32
-        }
+        },
+        {
+            asset: zona_caverna_finale_lvl1,
+            img_x: 182 * 32,
+            img_y: -6 * 32,
+            trigger_x: 182 * 32,
+            trigger_y: -4 * 32,
+            trigger_w: 32 * 11,
+            trigger_h: 32 * 6
+        },
     ];
 
     if (typeof create_zone_segrete === "function") create_zone_segrete(s, player, zone_liv1);
