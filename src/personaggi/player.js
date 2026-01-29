@@ -15,38 +15,43 @@ let sipario_nero_obj = null;
 let is_fading_death = false;
 
 let layer_effetti;
-let layer_player; // [NUOVO] Variabile per il layer del giocatore
+let layer_player; 
+
+// [NUOVO] Variabile per l'immagine della nuvoletta
+let img_nuvoletta; 
 
 
 function preload_player(s) {
-    // Caricamenti player se servono
+    // Carico lo spritesheet della nuvoletta (39x21)
+    img_nuvoletta = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Nuvoletta doppio salto.png", 39, 21);
 }
 
 
 function configure_player_animations(s, player) {
     
-    // --- [MODIFICA IMPORTANTE] GESTIONE LIVELLI (Z-INDEX) ---
-    
-    // 1. Creiamo un layer specifico per il Player
-    // Z-Index 10 è maggiore del Tutorial (che è 1), quindi il player starà davanti
+    // --- GESTIONE LIVELLI (Z-INDEX) ---
     layer_player = PP.layers.create(s);
     PP.layers.set_z_index(layer_player, 10);
     PP.layers.add_to_layer(layer_player, player);
 
-    // 2. Layer per effetti globali (es. Sipario nero morte)
-    // Questo deve essere altissimo per coprire TUTTO (HUD, Player, Tutorial)
     layer_effetti = PP.layers.create(s);
     PP.layers.set_z_index(layer_effetti, 9999);
+    // ----------------------------------
 
-
-    // --- FINE MODIFICA ---
-
-
-    // Animazioni
+    // Animazioni Player Base
     PP.assets.sprite.animation_add_list(player, "run", [0, 1, 2, 3, 4, 5, 6, 7, 8], 13, -1);
     PP.assets.sprite.animation_add_list(player, "idle", [10, 11, 12, 13, 14, 15], 8, -1);
+    
+    // Salto Normale
     PP.assets.sprite.animation_add(player, "jump_up", 3, 4, 10, 0);
     PP.assets.sprite.animation_add(player, "jump_down", 6, 7, 10, 0);
+
+    // [MODIFICA RICHIESTA] Animazioni Doppio Salto
+    // Doppio salto su: aggiungo frame 2 davanti a 3 e 4
+    PP.assets.sprite.animation_add_list(player, "double_jump_up", [2, 3, 4], 10, 0);
+    // Doppio salto giù: identica a jump_down (6, 7)
+    PP.assets.sprite.animation_add_list(player, "double_jump_down", [6, 7], 10, 0);
+
     PP.assets.sprite.animation_add(player, "stop", 21, 21, 10, 0);
     
     PP.assets.sprite.animation_add_list(player, "parla", [25, 29, 30, 34, 35, 39], 8, -1);
@@ -87,6 +92,18 @@ function configure_player_animations(s, player) {
     is_fading_death = false;
 }
 
+// Funzione "Usa e Getta" per la nuvoletta
+function spawn_nuvoletta(s, x, y) {
+    let nuvola = PP.assets.sprite.add(s, img_nuvoletta, x, y, 0.5, 0.5);
+    PP.layers.add_to_layer(layer_player, nuvola);
+    PP.assets.sprite.animation_add_list(nuvola, "poof", [0, 1, 2, 3], 15, 0);
+    PP.assets.sprite.animation_play(nuvola, "poof");
+
+    nuvola.ph_obj.on('animationcomplete', function() {
+        PP.assets.destroy(nuvola);
+    });
+}
+
 function damage_player(s, player) {
     if (!player_vulnerable || player.is_dead || player.god_mode) return;
 
@@ -111,7 +128,6 @@ function damage_player(s, player) {
         });
     }
 
-    // [NATIVO NECESSARIO] Feedback Player
     if (player.ph_obj) {
         player.ph_obj.setTint(0xff523b);
     }
@@ -174,7 +190,6 @@ function morte_player(s, player) {
         0
     );
     
-    // Aggiungiamo il sipario al layer effetti (che è altissimo, 9999)
     if (layer_effetti) {
         PP.layers.add_to_layer(layer_effetti, sipario_nero_obj);
     }
@@ -185,7 +200,6 @@ function morte_player(s, player) {
 
 function manage_player_update(s, player, muri_livello) {
 
-    
     // Gestione Fade Morte
     if (is_fading_death && sipario_nero_obj) {
         if (sipario_nero_obj.visibility.alpha < 1) {
@@ -200,8 +214,6 @@ function manage_player_update(s, player, muri_livello) {
 
     if (player.is_frozen) {
         PP.physics.set_velocity_x(player, 0);
-        
-        // Permettiamo l'animazione "parla" anche se il player è bloccato
         if (player.ph_obj.anims.currentAnim && 
             player.ph_obj.anims.currentAnim.key !== "idle" && 
             player.ph_obj.anims.currentAnim.key !== "parla") {
@@ -217,17 +229,12 @@ function manage_player_update(s, player, muri_livello) {
         if (j_pressed == false) {
             player.god_mode = !player.god_mode;
             j_pressed = true;
-            
             if (player.god_mode) {
-                console.log("GOD MODE: ON");
                 PP.physics.set_allow_gravity(player, false);
                 PP.physics.set_velocity_y(player, 0);
-                // [NATIVO] Tint Giallo
                 player.ph_obj.setTint(0xFFFF00);
             } else {
-                console.log("GOD MODE: OFF");
                 PP.physics.set_allow_gravity(player, true);
-                // [NATIVO] Clear Tint
                 player.ph_obj.clearTint();
             }
         }
@@ -238,33 +245,27 @@ function manage_player_update(s, player, muri_livello) {
     // --- MOVIMENTO GOD MODE ---
     if (player.god_mode) {
         let speed_fly = 1200;
-        
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
             PP.physics.set_velocity_x(player, speed_fly);
             player.geometry.flip_x = false;
-        }
-        else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
+        } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
             PP.physics.set_velocity_x(player, -speed_fly);
             player.geometry.flip_x = true;
-        }
-        else {
+        } else {
             PP.physics.set_velocity_x(player, 0);
         }
 
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.W) || PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
             PP.physics.set_velocity_y(player, -speed_fly);
-        }
-        else if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
+        } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
             PP.physics.set_velocity_y(player, speed_fly);
-        }
-        else {
+        } else {
             PP.physics.set_velocity_y(player, 0);
         }
         return; 
     }
 
     // --- MOVIMENTO STANDARD ---
-
     let next_anim = curr_anim;
 
     if (typeof hud_modalita_inquinante !== 'undefined') {
@@ -293,25 +294,21 @@ function manage_player_update(s, player, muri_livello) {
 
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
         target_velocity_x = player_speed;
-        
         if (player.facing_right === false) {
             player.geometry.flip_x = false;
             PP.physics.set_collision_rectangle(player, 20, 44, 14, 8);
             player.facing_right = true; 
         }
         is_moving = true;
-    }
-    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
+    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
         target_velocity_x = -player_speed;
-        
         if (player.facing_right === true) {
             player.geometry.flip_x = true;
             PP.physics.set_collision_rectangle(player, 20, 44, 20, 8);
             player.facing_right = false;
         }
         is_moving = true;
-    }
-    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
+    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
         target_velocity_x = player_speed2;
         if (player.facing_right === false) {
             player.geometry.flip_x = false;
@@ -319,8 +316,7 @@ function manage_player_update(s, player, muri_livello) {
             player.facing_right = true;
         }
         is_moving = true;
-    }
-    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.Z)) {
+    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.Z)) {
         target_velocity_x = -player_speed2;
         if (player.facing_right === true) {
             player.geometry.flip_x = true;
@@ -337,16 +333,21 @@ function manage_player_update(s, player, muri_livello) {
 
     PP.physics.set_velocity_x(player, target_velocity_x);
 
-    // Salto e Coyote Time
+    // ==========================================
+    // --- GESTIONE SALTO E NUVOLA ---
+    // ==========================================
+    
     let is_on_solid_ground = player.ph_obj.body.blocked.down;
 
+    // 1. A TERRA (Reset)
     if (is_on_solid_ground) {
         player.coyote_counter = 10;
-        mid_jump = true; 
+        mid_jump = true; // Ricarica il doppio salto
     } else {
         if (player.coyote_counter > 0) player.coyote_counter--;
     }
 
+    // 2. PRIMO SALTO (Da terra o coyote)
     if (player.coyote_counter > 0) {
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false) {
             space_pressed = true;
@@ -355,14 +356,20 @@ function manage_player_update(s, player, muri_livello) {
         }
     }
 
+    // 3. SECONDO SALTO (In aria)
     if (!is_on_solid_ground) {
         if (PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE) && space_pressed == false && mid_jump == true) {
+            
+            // Spawn Nuvola
+            spawn_nuvoletta(s, player.ph_obj.x, player.ph_obj.y);
+
             space_pressed = true;
             PP.physics.set_velocity_y(player, -jump_init_speed);
-            mid_jump = false;
+            mid_jump = false; // Consuma il doppio salto
         }
     }
 
+    // Rilascio tasto
     if (PP.interactive.kb.is_key_up(s, PP.key_codes.SPACE)) {
         if (space_pressed) {
             let current_vy = player.ph_obj.body.velocity.y; 
@@ -373,7 +380,8 @@ function manage_player_update(s, player, muri_livello) {
         }
     }
 
-    // Animazioni Standard
+    // --- GESTIONE ANIMAZIONI (STANDARD vs DOPPIO SALTO) ---
+    
     let anim_sparo_corsa = player.anim_sparo_corrente; 
     let anim_sparo_fermo = player.modalita_inquinante ? "sparo_inquinante_fermo" : "sparo_rinnovabile_fermo";
     let anim_sparo_salto_su = player.modalita_inquinante ? "sparo_inquinante_salto_su" : "sparo_rinnovabile_salto_su";
@@ -384,8 +392,18 @@ function manage_player_update(s, player, muri_livello) {
         if (player.sparo_attivo) {
             next_anim = (v_y < 0) ? anim_sparo_salto_su : anim_sparo_salto_giu;
         } else {
-            if (v_y < 0) next_anim = "jump_up";
-            else if (v_y > 0) next_anim = "jump_down";
+            // [MODIFICA LOGICA SALTO]
+            // Se mid_jump è true siamo nel PRIMO salto. 
+            // Se mid_jump è false, abbiamo usato il DOPPIO salto.
+            
+            if (v_y < 0) {
+                // Sto salendo
+                next_anim = mid_jump ? "jump_up" : "double_jump_up";
+            } 
+            else if (v_y > 0) {
+                // Sto scendendo
+                next_anim = mid_jump ? "jump_down" : "double_jump_down";
+            }
         }
     } else {
         if (player.sparo_attivo) {
@@ -398,12 +416,5 @@ function manage_player_update(s, player, muri_livello) {
     if (next_anim != curr_anim) {
         PP.assets.sprite.animation_play(player, next_anim);
         curr_anim = next_anim;
-    }
-
-    // Debug Coordinate
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.P)) {
-        let coord_x = Math.round(player.ph_obj.x);
-        let coord_y = Math.round(player.ph_obj.y);
-        console.log(`POS: ${coord_x}, ${coord_y}`);
     }
 }
