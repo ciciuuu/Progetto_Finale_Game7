@@ -166,8 +166,10 @@ function create(s) {
 
 
     //ELEMENTI GRANDI
-    casetta_inizio = PP.assets.image.add(s, img_casetta_inizio, -36 * 32, 0 * 32, 0, 1);
+    casetta_inizio = PP.assets.image.add(s, img_casetta_inizio, -45 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, casetta_inizio);
+
+    //PP.physics.set_collision_rectangle(s, width, height, offset_x, offset_y)
 
     // MURA (Nel layer dietro la mappa)
     mura_città = PP.assets.image.add(s, img_mura_città, 57 * 32, 0 * 32, 1, 1);
@@ -278,9 +280,7 @@ function create(s) {
     create_hud(s);
     create_vecchietto(s);
 
-    // ===============================================
     // --- TRAPPOLA MURI CADENTI ---
-    // ===============================================
 
     muro_destra_obj = PP.assets.image.add(s, img_muro_destra, 218 * 32, -27 * 32, 0, 0);
     PP.physics.add(s, muro_destra_obj, PP.physics.type.DYNAMIC);
