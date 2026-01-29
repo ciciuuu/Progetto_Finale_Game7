@@ -1,5 +1,7 @@
 let img_blueprint;
-let img_ingranaggio;
+let img_ingranaggio_1;
+let img_ingranaggio_2;
+let img_ingranaggio_3;
 let img_cuore;
 
 // OBIETTIVO TOTALE: 3 per livello x 2 livelli = 6 Totali per tipo
@@ -8,7 +10,9 @@ const OBIETTIVO_INGRANAGGI = 6;
 
 function preload_blueprint(s) {
     img_blueprint = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Blueprint_coll.png");
-    img_ingranaggio = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Ingranaggio.png");
+    img_ingranaggio_1 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/ingranaggio_coll_1.png");
+    img_ingranaggio_2 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/ingranaggio_coll_2.png");
+    img_ingranaggio_3 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/ingranaggio_coll_3.png");
     img_cuore = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Cuore.png");
 }
 
@@ -127,7 +131,19 @@ function create_ingranaggi(s, lista_spawn, player) {
 
         if (pos.id && is_collezionabile_preso(pos.id)) continue;
 
-        let item = PP.assets.image.add(s, img_ingranaggio, pos.x, pos.y, 0, 0);
+        // --- SCELTA DELL'IMMAGINE IN BASE ALL'ID ---
+        let img_da_usare = img_ingranaggio_1; // Default
+
+        // Se l'ID contiene "2" (es. ing_2 o ing_L3_2), usa la seconda immagine
+        if (pos.id.includes("2")) {
+            img_da_usare = img_ingranaggio_2;
+        } 
+        // Se l'ID contiene "3", usa la terza
+        else if (pos.id.includes("3")) {
+            img_da_usare = img_ingranaggio_3;
+        }
+
+        let item = PP.assets.image.add(s, img_da_usare, pos.x, pos.y, 0, 0);
         if (pos.id) item.id_univoco = pos.id;
 
         PP.physics.add(s, item, PP.physics.type.STATIC);
