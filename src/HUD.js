@@ -78,12 +78,14 @@ function create_hud(s) {
     vignette_dannorosso.geometry.scale_x = 0.5; vignette_dannorosso.geometry.scale_y = 0.5;
     vignette_dannorosso.tile_geometry.scroll_factor_x = 0; vignette_dannorosso.tile_geometry.scroll_factor_y = 0;
     vignette_dannorosso.ph_obj.alpha = 0;
+    PP.layers.add_to_layer(livello_HUD, vignette_dannorosso);
 
     vignette_dannoviola = PP.assets.image.add(s, asset_bordo_dannoviola, 640, 360, 0.5, 0.5);
     vignette_dannoviola.geometry.scale_x = 0.5; vignette_dannoviola.geometry.scale_y = 0.5;
     vignette_dannoviola.tile_geometry.scroll_factor_x = 0; vignette_dannoviola.tile_geometry.scroll_factor_y = 0;
     vignette_dannoviola.ph_obj.alpha = 0;
-
+    PP.layers.add_to_layer(livello_HUD, vignette_dannoviola);
+    
     // --- INGRANAGGI (Logica HUD2 inserita qui) ---
     // Usiamo le coordinate di HUD2 (855, 192) per i pezzi separati
     
