@@ -175,14 +175,12 @@ function create_hud(s) {
 
 function update_hud(s, player) {
 
-    // --- 1. GESTIONE GRAFICA INGRANAGGI (Logica presa da HUD2) ---
+    // --- 1. GESTIONE GRAFICA INGRANAGGI ---
     if (typeof is_collezionabile_preso === "function") {
-        
         if (s.scene.key === "base") {
             ingranaggio_1.ph_obj.alpha = is_collezionabile_preso("ing_1") ? 1 : 0;
             ingranaggio_2.ph_obj.alpha = is_collezionabile_preso("ing_2") ? 1 : 0;
             ingranaggio_3.ph_obj.alpha = is_collezionabile_preso("ing_3") ? 1 : 0;
-
             blueprint_1.ph_obj.alpha = is_collezionabile_preso("bp_1") ? 1 : 0;
             blueprint_2.ph_obj.alpha = is_collezionabile_preso("bp_2") ? 1 : 0;
             blueprint_3.ph_obj.alpha = is_collezionabile_preso("bp_3") ? 1 : 0;
@@ -191,7 +189,6 @@ function update_hud(s, player) {
             ingranaggio_1.ph_obj.alpha = is_collezionabile_preso("ing_L3_1") ? 1 : 0;
             ingranaggio_2.ph_obj.alpha = is_collezionabile_preso("ing_L3_2") ? 1 : 0;
             ingranaggio_3.ph_obj.alpha = is_collezionabile_preso("ing_L3_3") ? 1 : 0;
-
             blueprint_1.ph_obj.alpha = is_collezionabile_preso("bp_L3_1") ? 1 : 0;
             blueprint_2.ph_obj.alpha = is_collezionabile_preso("bp_L3_2") ? 1 : 0;
             blueprint_3.ph_obj.alpha = is_collezionabile_preso("bp_L3_3") ? 1 : 0;
@@ -200,7 +197,6 @@ function update_hud(s, player) {
     
     // --- 2. CONTROLLO ARMA ---
     let is_arma_sbloccata = PP.game_state.get_variable("arma_sbloccata");
-
     if (is_arma_sbloccata) {
         pistola_fissa.visibility.hidden = true;
         pistola.visibility.hidden = false;
@@ -227,25 +223,33 @@ function update_hud(s, player) {
         hud_modalita_inquinante = true;
     }
 
-    // --- 3. HEALTH BAR (Logica presa da HUD1 che NON crasha) ---
-    let vita_attuale = PP.game_state.get_variable("HP_player");
+    // --- 3. HEALTH BAR (FIXED ARROTONDAMENTO) ---
+    let vita_raw = PP.game_state.get_variable("HP_player");
     
-    // Questo controllo if(vita_attuale !== undefined) era presente nel codice che hai indicato come funzionante
-    if (vita_attuale !== undefined) {
+    if (vita_raw !== undefined && vita_raw !== null) {
+        // [FIX] Forziamo un numero intero. Se è 4.5 diventa 5. Se è "4" diventa 4.
+        let vita_int = Math.round(Number(vita_raw));
         let anim_target = "";
 
-        if (vita_attuale === 1) {
+        if (vita_int <= 1 && vita_int > 0) {
             anim_target = "health_critical";
         } 
-        else if (vita_attuale >= 0 && vita_attuale <= 10) {
-            anim_target = "health_" + vita_attuale;
+        else if (vita_int > 1 && vita_int <= 10) {
+            anim_target = "health_" + vita_int;
+        }
+        else if (vita_int <= 0) {
+            anim_target = "health_0";
         }
 
-        // Logica di controllo per non riavviare l'animazione se è già in corso
-        let anim_corrente = health_bar.ph_obj.anims.currentAnim ? health_bar.ph_obj.anims.currentAnim.key : "";
-
-        if (anim_target !== "" && anim_corrente !== anim_target) {
-            PP.assets.sprite.animation_play(health_bar, anim_target);
+        // Se l'animazione calcolata è valida, controlliamo se dobbiamo cambiarla
+        if (anim_target !== "") {
+            let anim_corrente = health_bar.ph_obj.anims.currentAnim ? health_bar.ph_obj.anims.currentAnim.key : "";
+            
+            // Aggiorna solo se diverso
+            if (anim_corrente !== anim_target) {
+                console.log("HUD UPDATE: Vita " + vita_int + " -> Anim: " + anim_target);
+                PP.assets.sprite.animation_play(health_bar, anim_target);
+            }
         }
     }
 }
