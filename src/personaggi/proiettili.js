@@ -24,7 +24,7 @@ function gestisci_sparo(s, entita, muri_livello) {
 
   if (time_now > entita.last_fired + entita.fire_rate) {
     entita.last_fired = time_now;
-    let Y_OFFSET_SPARO = 36;
+    let Y_OFFSET_SPARO = 33;
     let velocita = 600;
 
     let img_da_usare = asset_proiettile_normale;

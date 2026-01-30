@@ -40,14 +40,16 @@ const Y_CHECKPOINT_L3_TRIGGER = -3 * 32;
 
 let zona3_blocco_terra;
 let zona3_terra_sotterranea;
-let zona3_palazzo;
+let zona3_palazzo1;
+let zona3_palazzo2;
 let zona3_igresso_caverna_lvl2;
 
 
 function preload(s) {
     zona3_blocco_terra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_blocco_terra.png");
     zona3_terra_sotterranea = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_terra_sotterranea.png");
-    zona3_palazzo = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_palazzo2.png");
+    zona3_palazzo1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_palazzo1.png");
+    zona3_palazzo2 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_palazzo2.png");
     zona3_igresso_caverna_lvl2 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_igresso_caverna_lvl2.png");
 
     img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png");
@@ -82,7 +84,7 @@ function create(s) {
     cactus_destra = PP.assets.image.add(s, img_cactus_destra, 28 * 32, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, cactus_destra);
     
-    cactus_sotto = PP.assets.image.add(s, img_cactus_sotto, 73 * 32-10, 0 * 32, 0, 1);
+    cactus_sotto = PP.assets.image.add(s, img_cactus_sotto, 71 * 32-10, 0 * 32, 0, 1);
     PP.layers.add_to_layer(layer_tutorial, cactus_sotto);
     
     // cactus_pericolo = PP.assets.image.add(s, img_cactus_pericolo, 5 * 32, -1 * 32, 0, 1);
@@ -229,7 +231,16 @@ function create(s) {
             trigger_h: 32 * 19
         },
         {
-            asset: zona3_palazzo,
+            asset: zona3_palazzo1,
+            img_x: 32 * 4-10,
+            img_y: 32 * -28,
+            trigger_x: 32 * 9,
+            trigger_y: 32 * -25,
+            trigger_w: 32 * 9,
+            trigger_h: 32 * 17
+        },
+        {
+            asset: zona3_palazzo2,
             img_x: 32 * 33,
             img_y: 32 * -25,
             trigger_x: 32 * 33,
@@ -285,7 +296,7 @@ function create(s) {
     create_cactus(s, muri_livello, cactus_liv3);
 
     let bp_liv3 = [
-        { x: 14 * 32 + 6, y: -34 * 32 + 5, id: "bp_L3_1" },
+        { x: 14 * 32 + 6, y: -33 * 32 + 5, id: "bp_L3_1" },
         { x: 98 * 32 + 6, y: -22 * 32 + 5, id: "bp_L3_2" },
         { x: 43 * 32 + 6, y: 54 * 32 + 5, id: "bp_L3_3" },
     ];
@@ -299,7 +310,7 @@ function create(s) {
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv3, player);
 
     let cuori_liv3 = [
-        { x: 45 * 32, y: -33 * 32, id: "cuore_L3_1" },
+        { x: 32 * 32, y: -28 * 32, id: "cuore_L3_1" },
         { x: 73 * 32, y: 65 * 32, id: "cuore_L3_2" },
     ];
     if (typeof create_cuore === "function") create_cuore(s, cuori_liv3, player);
