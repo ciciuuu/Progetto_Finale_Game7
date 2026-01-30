@@ -7,6 +7,10 @@ let parallasse1; let parallasse2;
 let ts_background_1; let ts_background_2;
 let parallasse_nuvole; 
 let ts_nuvole;
+
+let asset_tile_sotto;
+let tile_riempimento;
+
 let lista_trappole = [] // Lava/Sabbie
 
 // Trigger di fine livello
@@ -53,6 +57,7 @@ function preload(s) {
     img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png")
     img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus sotto.png")
     img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus pericolo.png")
+    asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO CAVERNE/cave_pattern.png");
 
     // Preload entità esterne
     preload_hud(s)
@@ -76,6 +81,9 @@ function preload(s) {
 }
 
 function create(s) {
+
+    let layer_sfondo = PP.layers.create(s)
+    PP.layers.set_z_index(layer_sfondo, -10)
 
     // Layer per decorazioni sopra lo sfondo ma sotto il gioco
     layer_tutorial = PP.layers.create(s)
@@ -171,12 +179,15 @@ function create(s) {
 
     ts_nuvole = PP.assets.tilesprite.add(s, parallasse_nuvole, 0, -90, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
     ts_nuvole.geometry.scale_x = 0.5; ts_nuvole.geometry.scale_y = 0.5
+    PP.layers.add_to_layer(layer_sfondo, ts_nuvole)
 
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
     ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6
+    PP.layers.add_to_layer(layer_sfondo, ts_background_1)
 
     ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 550, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6
+    PP.layers.add_to_layer(layer_sfondo, ts_background_2)
 
     
     // [PHASER] Scroll factor 0 per muoverlo manualmente
@@ -340,6 +351,12 @@ function create(s) {
             morte_player(s, player)
         })
     }
+
+    // Riempimento sotto la mappa con tile ripetute
+    tile_riempimento = PP.assets.tilesprite.add(s, asset_tile_sotto, 1600, 0, 5000, 3000, 0, 0);
+    
+    // Lo aggiungiamo al layer di sfondo
+    PP.layers.add_to_layer(layer_sfondo, tile_riempimento);
 }
 
 function update(s) {
