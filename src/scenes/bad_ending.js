@@ -57,7 +57,7 @@ function setup_bottone(oggetto, scala_base, scala_zoom) {
 function create(s) {
   bad_ending_obj = PP.assets.image.add(s, img_bad_ending_asset, 0, 0, 0, 0);
 
-  home_button4 = PP.assets.image.add(s, home_asset4, -70, 570, 0, 0);
+  home_button4 = PP.assets.image.add(s, home_asset4, 100, 625, 0.5, 0.5);
 
   setup_bottone(home_button4, 1, 1.01);
 

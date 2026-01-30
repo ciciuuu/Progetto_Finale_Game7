@@ -139,7 +139,7 @@ function create_vecchietto(s) {
     }
 
     // 4. Creo il rettangolo di sfondo al testo
-    sfondo_testo = PP.shapes.rectangle_add(s, 640, 360, BOX_WIDTH, BOX_HEIGHT, BOX_COLOR, BOX_ALPHA)
+    sfondo_testo = PP.shapes.rectangle_add(s, 640, 328, BOX_WIDTH, BOX_HEIGHT, BOX_COLOR, BOX_ALPHA)
     PP.layers.add_to_layer(layer_bg_ui, sfondo_testo)
 
     // Fisso l'elemento allo schermo (HUD)
@@ -151,7 +151,7 @@ function create_vecchietto(s) {
     if (sfondo_testo.visibility) sfondo_testo.visibility.hidden = true
 
     // Creo l'oggetto testo vuoto, lo riempiremo dinamicamente
-    testo_schermo = PP.shapes.text_styled_add(s, 640, 360, "", 20, "Arial", "bold", "0xFFFFFF", null, 0.5, 0.5)
+    testo_schermo = PP.shapes.text_styled_add(s, 640, 328, "", 20, "Arial", "bold", "0xFFFFFF", null, 0.5, 0.5)
 
     // [PHASER] = Imposto l'interlinea (spazio tra le righe)
     // Questa funzione specifica di formattazione non è esposta in PoliPhaser

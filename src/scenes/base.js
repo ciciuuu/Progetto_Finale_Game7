@@ -6,8 +6,8 @@ let muro_invisibile_sinistra
 
 let parallasse1; let parallasse2
 let ts_background_1; let ts_background_2
-let parallasse_nuvole; 
-let ts_nuvole;         
+let parallasse_nuvole;
+let ts_nuvole;
 
 let lista_trappole = [] // Sabbie mobili
 let asset_tile_sotto;
@@ -55,7 +55,7 @@ function preload(s) {
     zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine_lvl1.png")
     img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png")
     zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_caverna_finale_lvl1.png")
-    
+
     img_EE = PP.assets.image.load(s, "assets/images/MAPPA/EE.png")
 
     // Elementi Giganti di sfondo
@@ -118,12 +118,12 @@ function create(s) {
 
     let layer_arco = PP.layers.create(s)
     PP.layers.set_z_index(layer_arco, 5)
-    
+
     let layer_arco_davanti = PP.layers.create(s)
     PP.layers.set_z_index(layer_arco_davanti, 200) // Davanti al player
 
     // POSIZIONAMENTO ELEMENTI VISUALI
-    
+
     // Tutorial
     wasd = PP.assets.image.add(s, img_wasd, -34 * 32, 0 * 32, 0, 1)
     PP.layers.add_to_layer(layer_tutorial, wasd)
@@ -206,7 +206,7 @@ function create(s) {
     const PARALLAX_WIDTH = 15800
     const PARALLAX_HEIGHT = 3000
 
-     ts_nuvole = PP.assets.tilesprite.add(s, parallasse_nuvole, 0, -90, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
+    ts_nuvole = PP.assets.tilesprite.add(s, parallasse_nuvole, 0, -90, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
     PP.layers.add_to_layer(layer_sfondo, ts_nuvole);
     ts_nuvole.geometry.scale_x = 0.5; ts_nuvole.geometry.scale_y = 0.5;
 
@@ -218,8 +218,8 @@ function create(s) {
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6
     PP.layers.add_to_layer(layer_sfondo, ts_background_2)
 
-   
-    
+
+
 
     // [PHASER] Imposto scroll factor a 0 perché lo muovo manualmente nell'update
     ts_background_1.tile_geometry.scroll_factor_x = 0
@@ -239,10 +239,10 @@ function create(s) {
     // PLAYER
     player = PP.assets.sprite.add(s, img_player, final_spawn_x, final_spawn_y, 0.5, 1)
     PP.physics.add(s, player, PP.physics.type.DYNAMIC)
-    
+
     // Configuro animazioni e fisica player
     configure_player_animations(s, player)
-    
+
     // [PHASER] Tile Bias per evitare compenetrazioni veloci
     s.physics.world.TILE_BIAS = 32
 
@@ -263,7 +263,7 @@ function create(s) {
 
     // Camera segue il player
     PP.camera.start_follow(s, player, 0, 60)
-    
+
     // Inizializzazione Entità
     create_hud(s)
     create_vecchietto(s)
@@ -292,7 +292,7 @@ function create(s) {
             img_x: 448 - 64,
             img_y: 0,
             trigger_x: 449,
-            trigger_y: 1*32,
+            trigger_y: 1 * 32,
             trigger_w: 32 * 15,
             trigger_h: 32 * 11
         },
@@ -347,7 +347,7 @@ function create(s) {
         { x: 190 * 32, y: 1 * 32, id: "cactus_L3_5", raggio: 400 },
         { x: 189 * 32, y: -14 * 32, id: "cactus_L3_5", raggio: 400 },
     ]
-    create_cactus(s, muri_livello, cactus_liv1)
+    create_cactus(s, muri_livello, cactus_liv1, player);
 
     // COLLEZIONABILI
     let bp_liv1 = [
@@ -360,7 +360,7 @@ function create(s) {
     let ing_liv1 = [
         { x: 41 * 32, y: 19 * 32, id: "ing_1" },
         { x: 156 * 32, y: -13 * 32, id: "ing_2" },
-        { x: 210 * 32, y: -18 * 32+8, id: "ing_3" },
+        { x: 210 * 32, y: -18 * 32 + 8, id: "ing_3" },
     ]
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player)
 
@@ -392,11 +392,11 @@ function create(s) {
     }
     // Parametri TileSprite:
     // s, asset, x, y, larghezza, altezza, anchor_x, anchor_y
-    
+
     // Calcoliamo una larghezza molto grande (es. 20.000) per coprire tutto il livello
     // e un'altezza generosa (es. 3.000) per riempire il fondo
     tile_riempimento = PP.assets.tilesprite.add(s, asset_tile_sotto, 0, 0, 2000, 3000, 0, 0);
-    
+
     // Lo aggiungiamo al layer di sfondo (già presente nel tuo codice)
     PP.layers.add_to_layer(layer_sfondo, tile_riempimento);
 }
@@ -414,7 +414,10 @@ function attiva_checkpoint(s) {
 window.attiva_checkpoint = attiva_checkpoint
 
 function update(s) {
-    // Zoom Cheat
+ /*    PP.camera.start_follow(s, player, 50, 60);
+    s.cameras.main.setZoom(2) */
+
+    // Zoom 
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2)
     } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
@@ -437,7 +440,7 @@ function update(s) {
     if (trappola_attivata) {
         let velocityY = 5 * 32 / 0.1 // Calcolo velocità caduta
         let targetY = -23 * 32
-        
+
         // Se non è ancora arrivato giù, cade
         if (muro_destra_obj.ph_obj.y < targetY) {
             PP.physics.set_velocity_y(muro_destra_obj, velocityY)
@@ -455,7 +458,7 @@ function update(s) {
     if (!EE_trovato) {
         let target_x = 25 * 32
         let target_y = 10 * 32
-        
+
         // Calcolo distanza player-EE
         let dx = player.geometry.x - target_x
         let dy = player.geometry.y - target_y

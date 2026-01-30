@@ -118,7 +118,7 @@ function create(s) {
     }
 
     // HOME BUTTON
-    home_button = PP.assets.image.add(s, home_asset, -70, 570, 0, 0);
+    home_button = PP.assets.image.add(s, home_asset, 100, 625, 0.5, 0.5);
     setup_bottone(home_button, 1, 1.01);
     
     
@@ -128,7 +128,7 @@ function create(s) {
 
 
     // END BUTTON
-    gioca_button = PP.assets.image.add(s, gioca_asset, 1050, 570, 0, 0);
+    gioca_button = PP.assets.image.add(s, gioca_asset, 1180, 625, 0.5, 0.5);
     gioca_button.visibility.hidden = true;
     setup_bottone(gioca_button, 1, 1.01);
     

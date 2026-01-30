@@ -340,24 +340,6 @@ function manage_player_update(s, player, muri_livello) {
         }
         is_moving = true
     }
-    // Corsa Veloce
-    /* else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
-        target_velocity_x = player_speed2
-        if (player.facing_right === false) {
-            player.geometry.flip_x = false
-            PP.physics.set_collision_rectangle(player, 20, 44, 14, 8)
-            player.facing_right = true
-        }
-        is_moving = true
-    } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.Z)) {
-        target_velocity_x = -player_speed2
-        if (player.facing_right === true) {
-            player.geometry.flip_x = true
-            PP.physics.set_collision_rectangle(player, 20, 44, 20, 8)
-            player.facing_right = false
-        }
-        is_moving = true
-    } */
 
     // Se sparo mentre corro il player rallenta un po'
     if (player.sparo_attivo && is_moving) {

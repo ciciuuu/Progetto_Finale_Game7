@@ -30,15 +30,20 @@ function create_cactus(s, muri, spawn_list, player) {
         gruppo_cactus.add(nemico.ph_obj);
 
         // Gestione Danno al contatto col Player
-        if (player) {
-            PP.physics.add_overlap_f(s, player, nemico, function(player_obj, cactus_obj) {
-                // Recupero il "wrapper" (l'oggetto PoliPhaser) collegato allo sprite fisico
-                let wrapper = cactus_obj.wrapper; 
+        if (player && player.ph_obj) {
+            // [PHASER] = Uso overlap nativo diretto tra i corpi fisici per massima affidabilità
+            // PoliPhaser a volte ignora l'overlap se l'oggetto nemico è "Immovable"
+            s.physics.add.overlap(player.ph_obj, nemico.ph_obj, function(player_native, cactus_native) {
                 
-                // Se il cactus è vivo e attivo, fa danno al player
-                if (wrapper && !wrapper.is_dead && cactus_obj.active) {
+                // Recupero il wrapper PoliPhaser che abbiamo collegato in spawna_singolo_cactus
+                let wrapper = cactus_native.wrapper; 
+                
+                // Controllo se il cactus è vivo, attivo e ha la fisica abilitata
+                if (wrapper && !wrapper.is_dead && cactus_native.active && cactus_native.body.enable) {
+                    
                     PP.game_state.set_variable("causa_morte", "cactus_contatto");
-                    // Chiamo la funzione globale di danno presente in player.js
+                    
+                    // Chiamo la funzione di danno passando l'oggetto player di PoliPhaser
                     if (typeof damage_player === "function") damage_player(s, player);
                 }
             });
