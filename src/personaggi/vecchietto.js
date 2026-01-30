@@ -43,12 +43,13 @@ let frasi_vecchietto = [
     { id: "GEM", testo: "GEM: Ciao giovane macchinista, cosa fai fuori dalle mura?" },
     { id: "EREN", testo: "EREN: Sto andando a cercare i meccanismi andati perduti nell’esplosione della Grande Fornace." },
     { id: "GEM", testo: "GEM: Ho capito, ho visto l’esplosione." },
-    { id: "GEM", testo: "GEM: Allora ti potrebbero essere utili i miei progetti per migliorare la Grande Fornace, sono nascosti nelle vicinanze." },
+    { id: "GEM", testo: "GEM: Allora ti potrebbero essere utili i miei progetti per rendere la Grande Fornace alimentata dalle risorse naturali, non dal petrolio." },
+    { id: "GEM", testo: "GEM: Questi progetti sono nascosti nelle vicinanze." },
     { id: "GEM", testo: "GEM: Io non posso venire con te: sono troppo vecchio e i mostri del deserto mi hanno ferito alla gamba." },
     { id: "GEM", testo: "GEM: Ma posso darti questa quest’arma a carica solare." },
     { id: "GEM", testo: "GEM: Non sarà potente come la pistola a combustione che hai con te adesso, ma quantomeno non ti danneggia con la sua fiammata tossica." },
     { id: "GEM", testo: "GEM: Vai adesso, che il destino sia con te!" },
-    { id: "EREN", testo: "EREN: Ok grazie mille." }
+    // { id: "EREN", testo: "EREN: Ok grazie mille." }
 ];
 
 // Funzione per mandare a capo il testo automaticamente

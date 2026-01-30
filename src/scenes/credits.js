@@ -48,7 +48,7 @@ function create(s) {
   img_sfondo_credits = PP.assets.image.add(s, img_sfondo_credits, 0, 0, 0, 0);
 
   home_button2 = PP.assets.image.add(s, home_asset2, 100, 625, 0.5, 0.5);
-  setup_bottone(home_button2, 1, 1.01);
+  setup_bottone(home_button2, 1, 1.1);
 
   PP.interactive.mouse.add(home_button2, "pointerup", function (s) {
     PP.scenes.start("main_menu");

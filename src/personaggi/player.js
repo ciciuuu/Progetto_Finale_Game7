@@ -247,47 +247,6 @@ function manage_player_update(s, player, muri_livello) {
     
     if (player.is_dead) return
 
-    /* // GOD MODE da attivare nel caso ci serva durante i test
-    // Si attiva con J. Permette di volare attraverso i muri per testare.
-    if (PP.interactive.kb.is_key_down(s, PP.key_codes.J)) {
-        if (j_pressed == false) {
-            player.god_mode = !player.god_mode
-            j_pressed = true
-            if (player.god_mode) {
-                PP.physics.set_allow_gravity(player, false) // Niente gravità
-                PP.physics.set_velocity_y(player, 0)
-                player.ph_obj.setTint(0xFFFF00) // Diventa giallo
-            } else {
-                PP.physics.set_allow_gravity(player, true) // Torna normale
-                player.ph_obj.clearTint()
-            }
-        }
-    } else {
-        j_pressed = false
-    } */
-
-    // Logica di movimento God Mode (WASD per muoversi in aria)
-    if (player.god_mode) {
-        let speed_fly = 1200
-        if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
-            PP.physics.set_velocity_x(player, speed_fly)
-            player.geometry.flip_x = false
-        } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.A)) {
-            PP.physics.set_velocity_x(player, -speed_fly)
-            player.geometry.flip_x = true
-        } else {
-            PP.physics.set_velocity_x(player, 0)
-        }
-
-        if (PP.interactive.kb.is_key_down(s, PP.key_codes.W) || PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
-            PP.physics.set_velocity_y(player, -speed_fly)
-        } else if (PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
-            PP.physics.set_velocity_y(player, speed_fly)
-        } else {
-            PP.physics.set_velocity_y(player, 0)
-        }
-        return // Esco perché il resto del codice è per la fisica normale
-    }
 
     // MOVIMENTO
     let next_anim = curr_anim

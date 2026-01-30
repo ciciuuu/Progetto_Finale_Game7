@@ -14,39 +14,40 @@ let asset_tile_sotto;
 let tile_riempimento;
 
 
-let img_muro_destra
-let muro_destra_obj
-let trappola_attivata = false
-const X_ATTIVAZIONE_TRAPPOLA = 221 * 32 // Dove scatta la trappola
+let img_muro_destra;
+let muro_destra_obj;
+let trappola_attivata = false;
+const X_ATTIVAZIONE_TRAPPOLA = 221 * 32; // Dove scatta la trappola
 
 // Checkpoint
-let checkpoint_obj
-let checkpoint_preso = false
-const X_CHECKPOINT = 51 * 32
-const Y_CHECKPOINT = 0 * 32
+let checkpoint_obj;
+let checkpoint_preso = false;
+const X_CHECKPOINT = 51 * 32;
+const Y_CHECKPOINT = 0 * 32;
 
 // Elementi Tutorial e Ambiente
-let layer_tutorial
-let img_wasd; let wasd
-let img_spazio; let spazio
-let img_doppio_salto; let doppio_salto
-let img_tasto_N; let tasto_N
-let img_EE; let EE
+let layer_tutorial;
+let img_wasd; let wasd;
+let img_spazio; let spazio;
+let img_doppio_salto; let doppio_salto;
+let img_tasto_N; let tasto_N;
+let img_EE; let EE;
+let img_EE2; let EE2;
 
-let img_casetta_inizio; let casetta_inizio
-let img_mura_città; let mura_città
-let img_arco_città; let arco_città
-let img_arco_città_davanti; let arco_città_davanti
+let img_casetta_inizio; let casetta_inizio;
+let img_mura_città; let mura_città;
+let img_arco_città; let arco_città;
+let img_arco_città_davanti; let arco_città_davanti;
 
 // Decorazioni
-let img_cactus_destra; let cactus_destra
-let img_cactus_sotto; let cactus_sotto
-let img_cactus_pericolo; let cactus_pericolo
+let img_cactus_destra; let cactus_destra;
+let img_cactus_sotto; let cactus_sotto;
+let img_cactus_pericolo; let cactus_pericolo;
 
 // Zone Segrete
-let img_zona_pietra
-let zona_pietra; let zona_inizio_sinistra; let zona_dopo_vecchietto
-let zona_fine_lvl1; let zona_caverna_finale_lvl1
+let img_zona_pietra;
+let zona_pietra; let zona_inizio_sinistra; let zona_dopo_vecchietto;
+let zona_fine_lvl1; let zona_caverna_finale_lvl1;
 
 function preload(s) {
     zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png")
@@ -57,6 +58,7 @@ function preload(s) {
     zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_caverna_finale_lvl1.png")
 
     img_EE = PP.assets.image.load(s, "assets/images/MAPPA/EE.png")
+    img_EE2 = PP.assets.sprite.load_spritesheet(s, "assets/images/MAPPA/Torcia EE.png", 32, 32)
 
     // Elementi Giganti di sfondo
     img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/Casetta_inizio.png")
@@ -152,9 +154,15 @@ function create(s) {
     arco_città_davanti = PP.assets.image.add(s, img_arco_città_davanti, 63 * 32, 0 * 32, 0, 1)
     PP.layers.add_to_layer(layer_arco_davanti, arco_città_davanti)
 
-    // Easter Egg
+    // EE
     EE = PP.assets.image.add(s, img_EE, 25 * 32, 10 * 32, 0, 1)
     PP.layers.add_to_layer(layer_tutorial, EE)
+
+    EE2 = PP.assets.sprite.add(s, img_EE2, 24 * 32, 8 * 32, 0, 1)
+    PP.layers.add_to_layer(layer_tutorial, EE2)
+    
+    PP.assets.sprite.animation_add_list(EE2, "brucia", [0, 1, 2, 3], 10, -1)
+    PP.assets.sprite.animation_play(EE2, "brucia")
 
     // Cactus Decorativi
     cactus_destra = PP.assets.image.add(s, img_cactus_destra, 46 * 32, 0 * 32, 0, 1)

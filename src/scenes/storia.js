@@ -31,7 +31,7 @@ let txt_tavola_5;
 
 // CONFIGURAZIONE STILE TESTO
 const TEXT_SIZE = 30;           
-const MAX_CARATTERI_RIGA = 50;  // Per l'a capo automatico
+const MAX_CARATTERI_RIGA = 55;  // Per l'a capo automatico
 const COLORE_TESTO = "0x000000"; 
 
 
@@ -75,9 +75,9 @@ function create(s) {
     }
 
     // --- CONTENUTI NARRATIVI ---
-    let stringa_t1 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio.\n\nTutti lo chiamavano la Grande Fornace, perché il suo calore garantiva la regolazione termica dell'interno villaggio durante le gelide notti del deserto.\n\nEra la loro luce, la loro sicurezza.";
+    let stringa_t1 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio.\n\nTutti lo chiamavano la Grande Fornace, perché il suo calore garantiva la regolazione termica dell'intero villaggio durante le gelide notti del deserto.\n\nEra la loro luce, la loro sicurezza.";
     let stringa_t3 = "Un giorno, però, la Grande Fornace esplose.\n\nNello scoppio, dei componenti fondamentali furono scagliati lontano, dispersi nelle terre circostanti.";
-    let stringa_t5 = "Il villaggio piombò nel caos.\n\nSi decise che sarebbe stata Eren, la tecnica del villaggio, a partire per recuperare i pezzi perduti.";
+    let stringa_t5 = "Il villaggio piombò nel caos.\n\nSi decise che sarebbe stata Eren, la macchinista del villaggio, a partire per recuperare i pezzi perduti.";
 
     // Creazione oggetti testo con stile
     txt_tavola_1 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t1, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
@@ -119,7 +119,7 @@ function create(s) {
 
     // HOME BUTTON
     home_button = PP.assets.image.add(s, home_asset, 100, 625, 0.5, 0.5);
-    setup_bottone(home_button, 1, 1.01);
+    setup_bottone(home_button, 1, 1.1);
     
     
     PP.interactive.mouse.add(home_button, "pointerup", function (s) {
@@ -130,7 +130,7 @@ function create(s) {
     // END BUTTON
     gioca_button = PP.assets.image.add(s, gioca_asset, 1180, 625, 0.5, 0.5);
     gioca_button.visibility.hidden = true;
-    setup_bottone(gioca_button, 1, 1.01);
+    setup_bottone(gioca_button, 1, 1.1);
     
 
     PP.interactive.mouse.add(gioca_button, "pointerup", function (s) {
@@ -140,7 +140,7 @@ function create(s) {
 
     // FRECCIA SINISTRA
     arrow_left = PP.assets.image.add(s, arrow_left_asset, 50, 360, 0.5, 0.5);
-    setup_bottone(arrow_left, 0.80, 0.85);
+    setup_bottone(arrow_left, 0.8, 0.9);
 
     PP.interactive.mouse.add(arrow_left, "pointerdown", function (s) {
         if (tavola_attiva.geometry.x < 0) {
@@ -151,7 +151,7 @@ function create(s) {
 
     // FRECCIA DESTRA
     arrow_right = PP.assets.image.add(s, arrow_right_asset, 1230, 360, 0.5, 0.5);
-    setup_bottone(arrow_right, 0.80, 0.85);
+    setup_bottone(arrow_right, 0.8, 0.9);
 
     PP.interactive.mouse.add(arrow_right, "pointerdown", function (s) {
         if (tavola_attiva.geometry.x > LIMITE_SCROLL) {

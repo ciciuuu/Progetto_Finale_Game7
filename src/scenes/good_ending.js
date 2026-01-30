@@ -57,7 +57,7 @@ function create(s) {
 
     home_button3 = PP.assets.image.add(s, home_asset3, 100, 625, 0.5, 0.5);
     
-    setup_bottone(home_button3, 1, 1.01);
+    setup_bottone(home_button3, 1, 1.1);
 
     // Al click torno al menu principale
     PP.interactive.mouse.add(home_button3, "pointerup", function (s) {

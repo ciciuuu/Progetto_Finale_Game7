@@ -357,13 +357,18 @@ function create(s) {
     }
 
     // Riempimento sotto la mappa con tile ripetute
-    tile_riempimento = PP.assets.tilesprite.add(s, asset_tile_sotto, 1600, 0, 5000, 3000, 0, 0);
+    tile_riempimento = PP.assets.tilesprite.add(s, asset_tile_sotto, 1000, 0, 5000, 3000, 0, 0);
     
     // Lo aggiungiamo al layer di sfondo
     PP.layers.add_to_layer(layer_sfondo, tile_riempimento);
 }
 
 function update(s) {
+    PP.camera.start_follow(s, player, 50, 60);
+    s.cameras.main.setZoom(2)
+
+    
+    
     /* // Zoom Cheat da attivare nel caso ci serva alla presentazione
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2)
