@@ -118,7 +118,7 @@ function create(s) {
     }
 
     // HOME BUTTON
-    home_button = PP.assets.image.add(s, home_asset, 100, 625, 0.5, 0.5);
+    home_button = PP.assets.image.add(s, home_asset, 100, 650, 0.5, 0.5);
     setup_bottone(home_button, 1, 1.1);
     
     
