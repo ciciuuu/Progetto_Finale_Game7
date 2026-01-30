@@ -414,15 +414,16 @@ function attiva_checkpoint(s) {
 window.attiva_checkpoint = attiva_checkpoint
 
 function update(s) {
- /*    PP.camera.start_follow(s, player, 50, 60);
-    s.cameras.main.setZoom(2) */
+    PP.camera.start_follow(s, player, 50, 60);
+    s.cameras.main.setZoom(2)
 
     // Zoom 
+    /* // Zoom Cheat da attivare nel caso ci serva alla presentazione
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2)
     } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(2)
-    }
+    } */
 
     // Effetto Parallasse (lo sfondo si muove più lentamente della camera)
     ts_background_1.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.2
