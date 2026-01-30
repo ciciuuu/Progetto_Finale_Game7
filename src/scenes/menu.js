@@ -134,7 +134,7 @@ function create(s) {
 function update(s) {
     // Gestione Input Tastiera (Backup)
     
-    // Tasto SPACE -> Nuova Partita
+    /* // Tasto SPACE -> Nuova Partita
     if(PP.interactive.kb.is_key_down(s, PP.key_codes.SPACE)) {
         
         // 1. Reset Checkpoint
@@ -165,17 +165,9 @@ function update(s) {
         PP.game_state.set_variable("spawn_y", -2 * 32);
 
         PP.scenes.start("base");
-    }
+    } */
   
-    // Tasto C -> Crediti
-    if(PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
-        PP.scenes.start("credits");
-    }
-
-    // Tasto S -> Storia
-    if(PP.interactive.kb.is_key_down(s, PP.key_codes.S)) {
-        PP.scenes.start("storia");
-    }
+    
 }
 
 function destroy(s) {
