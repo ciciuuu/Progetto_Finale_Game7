@@ -1,26 +1,24 @@
-let player_speed = 300 // Velocità camminata normale
-let player_speed2 = 600 // Velocità corsa (Debug/Cheat)
-let jump_init_speed = 500 // Potenza del salto
-let space_pressed = false // Per evitare il "salto continuo" tenendo premuto
-let mid_jump = true // true = primo salto disponibile, false = secondo salto usato
-let curr_anim = "stop" // Per non resettare l'animazione ogni frame
-let j_pressed = false // Per il toggle della God Mode
+let player_speed = 300;
+let player_speed2 = 600;
+let jump_init_speed = 500;
+let space_pressed = false;
+let mid_jump = true;
+let curr_anim = "stop";
+let j_pressed = false;
 
 // Variabili per la gestione del danno e morte
-let player_vulnerable = true // Invulnerabilità temporanea dopo essere colpiti
-let sipario_nero_obj = null // Rettangolo nero per l'effetto dissolvenza morte
-let is_fading_death = false // Se true, stiamo facendo la dissolvenza verso Game Over
+let player_vulnerable = true;
+let sipario_nero_obj = null;
+let is_fading_death = false;
 
-// Variabili per i livelli grafici (Layer)
+// Variabili per i livelli di profondità
 let layer_effetti;
 let layer_player;
 
-// Variabile per l'asset grafico della nuvoletta
 let img_nuvoletta;
 
 
 function preload_player(s) {
-    // Carico lo spritesheet per l'effetto visivo del doppio salto
     img_nuvoletta = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Nuvoletta doppio salto.png", 39, 21)
 }
 
@@ -28,15 +26,14 @@ function preload_player(s) {
 function configure_player_animations(s, player) {
     
     // Creazione dei Layer per gestire la profondità (Z-Index)
-    // Il player deve stare davanti allo sfondo ma dietro agli effetti (HUD/Dissolvenza)
-    layer_player = PP.layers.create(s)
-    PP.layers.set_z_index(layer_player, 10)
-    PP.layers.add_to_layer(layer_player, player)
+    layer_player = PP.layers.create(s);
+    PP.layers.set_z_index(layer_player, 10);
+    PP.layers.add_to_layer(layer_player, player);
 
-    layer_effetti = PP.layers.create(s)
-    PP.layers.set_z_index(layer_effetti, 9999) // Altissimo per coprire tutto
+    layer_effetti = PP.layers.create(s);
+    PP.layers.set_z_index(layer_effetti, 9999);
 
-    // --- ANIMAZIONI ---
+    // ANIMAZIONI
     // Definisco tutte le possibili azioni del player leggendo i frame dallo spritesheet
     
     // Movimento base
@@ -70,26 +67,24 @@ function configure_player_animations(s, player) {
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_salto_su", [26, 27, 28], 11, 0)
     PP.assets.sprite.animation_add_list(player, "sparo_rinnovabile_salto_giu", [31, 32, 33], 11, 0)
 
-    // Configurazione Hitbox (Rettangolo di collisione)
-    // Riduco la larghezza perché lo sprite ha spazio vuoto ai lati
+    // Configurazione Hitbox
     PP.physics.set_collision_rectangle(player, 20, 44, 14, 8)
     player.facing_right = true // Parte guardando a destra
 
     // Inizializzazione variabili interne al player
-    player.sparo_attivo = false
-    player.coyote_counter = 0 // Per tolleranza salto al bordo delle piattaforme
-    player.is_frozen = false // Per bloccarlo durante i dialoghi
-    player.last_fired = 0
-    player.modalita_inquinante = false 
-    player.tasto_R_rilasciato = true   
-    player.fire_rate = 400     
-    player.anim_sparo_corrente = "sparo_rinnovabile"
-    player.god_mode = false // Trucco per volare
-    player.is_dead = false 
-    player_vulnerable = true
+    player.sparo_attivo = false;
+    player.coyote_counter = 0;
+    player.is_frozen = false;
+    player.last_fired = 0;
+    player.modalita_inquinante = false;
+    player.tasto_R_rilasciato = true;
+    player.fire_rate = 400;
+    player.anim_sparo_corrente = "sparo_rinnovabile";
+    player.god_mode = false;
+    player.is_dead = false;
+    player_vulnerable = true;
     
     // [PHASER] = Accesso diretto per pulire tinta e alpha
-    // Poliphaser non ha funzioni rapide per resettare questi stati visivi complessi
     if(player.ph_obj) {
         player.ph_obj.clearTint() 
         player.ph_obj.alpha = 1 
@@ -104,7 +99,7 @@ function spawn_nuvoletta(s, x, y) {
     let nuvola = PP.assets.sprite.add(s, img_nuvoletta, x, y, 0.5, 0.5)
     PP.layers.add_to_layer(layer_player, nuvola)
     
-    // Animazione "poof" che sparisce
+    // Animazione che sparisce
     PP.assets.sprite.animation_add_list(nuvola, "poof", [0, 1, 2, 3], 15, 0)
     PP.assets.sprite.animation_play(nuvola, "poof")
 
@@ -130,7 +125,6 @@ function damage_player(s, player) {
 
     // Attivo l'effetto vignetta rossa sull'HUD (se presente)
     // [PHASER] = Uso i Tweens (animazioni fluide di valori)
-    // Poliphaser non espone direttamente il sistema di Tweens
     if (typeof vignette_dannorosso !== 'undefined' && vignette_dannorosso) {
         vignette_dannorosso.ph_obj.alpha = 0 
         s.tweens.add({
@@ -144,7 +138,7 @@ function damage_player(s, player) {
     }
 
     // Coloro il player di rosso
-    // [PHASER] = setTint non presente in Poliphaser
+    // [PHASER] = setTint non c'è in Poliphaser
     if (player.ph_obj) {
         player.ph_obj.setTint(0xff523b)
     }
@@ -211,8 +205,7 @@ function morte_player(s, player) {
         PP.game.config.canvas_height/2, 
         PP.game.config.canvas_width, 
         PP.game.config.canvas_height, 
-        "0x000000", 
-        0 // Inizia trasparente
+        "0x000000", 0
     )
     
     if (layer_effetti) {
@@ -254,7 +247,7 @@ function manage_player_update(s, player, muri_livello) {
     
     if (player.is_dead) return
 
-    // --- GOD MODE (Volo libero) ---
+    // GOD MODE
     // Si attiva con J. Permette di volare attraverso i muri per testare.
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.J)) {
         if (j_pressed == false) {
@@ -296,7 +289,7 @@ function manage_player_update(s, player, muri_livello) {
         return // Esco perché il resto del codice è per la fisica normale
     }
 
-    // --- MOVIMENTO STANDARD ---
+    // MOVIMENTO
     let next_anim = curr_anim
 
     // Controllo se l'HUD ha cambiato la modalità di sparo (tasto L)
@@ -328,7 +321,7 @@ function manage_player_update(s, player, muri_livello) {
     // Movimento Destra
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.D)) {
         target_velocity_x = player_speed
-        // Se mi sto girando, aggiorno l'hitbox (il rettangolo di collisione)
+        // Se mi sto girando, aggiorno l'hitbox
         // perché lo sprite non è simmetrico
         if (player.facing_right === false) {
             player.geometry.flip_x = false
@@ -347,8 +340,8 @@ function manage_player_update(s, player, muri_livello) {
         }
         is_moving = true
     }
-    // Corsa Veloce (Cheat)
-    else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
+    // Corsa Veloce
+    /* else if (PP.interactive.kb.is_key_down(s, PP.key_codes.C)) {
         target_velocity_x = player_speed2
         if (player.facing_right === false) {
             player.geometry.flip_x = false
@@ -364,9 +357,9 @@ function manage_player_update(s, player, muri_livello) {
             player.facing_right = false
         }
         is_moving = true
-    }
+    } */
 
-    // Se sparo mentre corro, rallento un po' per il rinculo/focus
+    // Se sparo mentre corro il player rallenta un po'
     if (player.sparo_attivo && is_moving) {
         let direzione = player.geometry.flip_x ? -1 : 1
         target_velocity_x = 150 * direzione
@@ -374,10 +367,10 @@ function manage_player_update(s, player, muri_livello) {
 
     PP.physics.set_velocity_x(player, target_velocity_x)
 
-    // ==========================================
+
+
+
     // --- GESTIONE SALTO E DOPPIO SALTO ---
-    // ==========================================
-    
     // Controllo se i piedi toccano terra
     let is_on_solid_ground = player.ph_obj.body.blocked.down
 
@@ -423,8 +416,7 @@ function manage_player_update(s, player, muri_livello) {
         }
     }
 
-    // --- SELETTORE ANIMAZIONI ---
-    // Decide quale animazione mostrare in base allo stato
+    // SELETTORE ANIMAZIONI
     
     let anim_sparo_corsa = player.anim_sparo_corrente 
     let anim_sparo_fermo = player.modalita_inquinante ? "sparo_inquinante_fermo" : "sparo_rinnovabile_fermo"
@@ -438,7 +430,7 @@ function manage_player_update(s, player, muri_livello) {
             next_anim = (v_y < 0) ? anim_sparo_salto_su : anim_sparo_salto_giu
         } else {
             // Se mid_jump è true, non ho ancora usato il doppio salto -> Salto Normale
-            // Se è false, l'ho usato -> Animazione Doppio Salto (capriola)
+            // Se è false, l'ho usato -> Animazione Doppio Salto
             if (v_y < 0) {
                 next_anim = mid_jump ? "jump_up" : "double_jump_up"
             } 
@@ -454,7 +446,7 @@ function manage_player_update(s, player, muri_livello) {
         }
     }
 
-    // Cambio animazione solo se diversa dall'attuale (ottimizzazione)
+    // Cambio animazione solo se diversa dall'attuale
     if (next_anim != curr_anim) {
         PP.assets.sprite.animation_play(player, next_anim)
         curr_anim = next_anim
