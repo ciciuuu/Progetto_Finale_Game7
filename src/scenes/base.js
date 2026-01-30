@@ -8,6 +8,9 @@ let parallasse1; let parallasse2
 let ts_background_1; let ts_background_2
 
 let lista_trappole = [] // Sabbie mobili
+let asset_tile_sotto;
+let tile_riempimento;
+
 
 let img_muro_destra
 let muro_destra_obj
@@ -82,6 +85,9 @@ function preload(s) {
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52)
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png")
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png")
+
+    asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO CAVERNE/cave_pattern.png");
+
 
     // Preload mappa da Godot (file JSON tilemap)
     if (window.godot_preload) window.godot_preload(s)
@@ -371,6 +377,15 @@ function create(s) {
             morte_player(s, player, null)
         })
     }
+    // Parametri TileSprite:
+    // s, asset, x, y, larghezza, altezza, anchor_x, anchor_y
+    
+    // Calcoliamo una larghezza molto grande (es. 20.000) per coprire tutto il livello
+    // e un'altezza generosa (es. 3.000) per riempire il fondo
+    tile_riempimento = PP.assets.tilesprite.add(s, asset_tile_sotto, 0, 0, 2000, 3000, 0, 0);
+    
+    // Lo aggiungiamo al layer di sfondo (già presente nel tuo codice)
+    PP.layers.add_to_layer(layer_sfondo, tile_riempimento);
 }
 
 // Funzione globale per attivare il checkpoint
