@@ -6,6 +6,8 @@ let muro_invisibile_sinistra
 
 let parallasse1; let parallasse2
 let ts_background_1; let ts_background_2
+let parallasse_nuvole; 
+let ts_nuvole;         
 
 let lista_trappole = [] // Sabbie mobili
 let asset_tile_sotto;
@@ -85,6 +87,7 @@ function preload(s) {
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52)
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png")
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2.png")
+    parallasse_nuvole = PP.assets.image.load(s, "assets/images/parallax/nuvole.png");
 
     asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO CAVERNE/cave_pattern.png");
 
@@ -203,6 +206,10 @@ function create(s) {
     const PARALLAX_WIDTH = 15800
     const PARALLAX_HEIGHT = 3000
 
+     ts_nuvole = PP.assets.tilesprite.add(s, parallasse_nuvole, 0, -90, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5);
+    PP.layers.add_to_layer(layer_sfondo, ts_nuvole);
+    ts_nuvole.geometry.scale_x = 0.5; ts_nuvole.geometry.scale_y = 0.5;
+
     ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
     ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6
     PP.layers.add_to_layer(layer_sfondo, ts_background_1)
@@ -211,9 +218,15 @@ function create(s) {
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6
     PP.layers.add_to_layer(layer_sfondo, ts_background_2)
 
+   
+    
+
     // [PHASER] Imposto scroll factor a 0 perché lo muovo manualmente nell'update
     ts_background_1.tile_geometry.scroll_factor_x = 0
     ts_background_2.tile_geometry.scroll_factor_x = 0
+    ts_nuvole.tile_geometry.scroll_factor_x = 0;
+
+
 
     // CARICAMENTO MAPPA GODOT
     if (window.godot_create && typeof LIV1 !== 'undefined') {
@@ -413,6 +426,8 @@ function update(s) {
     ts_background_2.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.4
     ts_background_1.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.1
     ts_background_2.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.2
+    ts_nuvole.tile_geometry.x = PP.camera.get_scroll_x(s) * 0.5;
+    ts_nuvole.tile_geometry.y = PP.camera.get_scroll_y(s) * -0.03;
 
     // Attivazione Trappola Muro
     if (!trappola_attivata && player.ph_obj.x >= X_ATTIVAZIONE_TRAPPOLA) {
