@@ -84,7 +84,7 @@ function preload(s) {
     // Player e Sfondo
     img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52)
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png")
-    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2b.png")
+    parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2.png")
 
     asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO CAVERNE/cave_pattern.png");
 
@@ -203,11 +203,11 @@ function create(s) {
     const PARALLAX_WIDTH = 15800
     const PARALLAX_HEIGHT = 3000
 
-    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
+    ts_background_1 = PP.assets.tilesprite.add(s, parallasse1, 0, 500, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
     ts_background_1.geometry.scale_x = 0.6; ts_background_1.geometry.scale_y = 0.6
     PP.layers.add_to_layer(layer_sfondo, ts_background_1)
 
-    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 450, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
+    ts_background_2 = PP.assets.tilesprite.add(s, parallasse2, 0, 550, PARALLAX_WIDTH, PARALLAX_HEIGHT, 0, 0.5)
     ts_background_2.geometry.scale_x = 0.6; ts_background_2.geometry.scale_y = 0.6
     PP.layers.add_to_layer(layer_sfondo, ts_background_2)
 
