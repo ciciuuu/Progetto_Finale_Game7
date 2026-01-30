@@ -4,7 +4,8 @@ let tavola_attiva;
 let tavolalunga;
 let home_asset;
 let home_button;
-let end_button;
+let gioca_button;
+let gioca_asset
 
 let slide_curr_sheet;
 let slide_curr;
@@ -35,7 +36,8 @@ const COLORE_TESTO = "0x000000"; // Nero
 function preload(s) {
     // tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia.jpg");
     tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia_wordless.jpg");
-    home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Cartello_menù.png");
+    home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
+    gioca_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante gioca.png");
     arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_sinistra.png");
     arrow_right_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_destra.png");
     slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/Elementi tavole/puntitavole_sheet.png", 300, 100);
@@ -121,8 +123,8 @@ function create(s) {
     }
 
     // HOME BUTTON
-    home_button = PP.assets.image.add(s, home_asset, 20, 550, 0, 0);
-    setup_bottone(home_button, 0.2, 0.25);
+    home_button = PP.assets.image.add(s, home_asset, -70, 570, 0, 0);
+    
     
     PP.interactive.mouse.add(home_button, "pointerup", function (s) {
         PP.scenes.start("main_menu");
@@ -130,18 +132,19 @@ function create(s) {
 
 
     // END BUTTON
-    end_button = PP.assets.image.add(s, home_asset, 1150, 550, 0, 0);
-    end_button.visibility.hidden = true;
-    setup_bottone(end_button, 0.2, 0.25);
+    gioca_button = PP.assets.image.add(s, gioca_asset, 1050, 570, 0, 0);
+    gioca_button.visibility.hidden = true;
+    
 
-    PP.interactive.mouse.add(end_button, "pointerup", function (s) {
+    PP.interactive.mouse.add(gioca_button, "pointerup", function (s) {
         PP.scenes.start("base");
     });
 
 
     // FRECCIA SINISTRA
     arrow_left = PP.assets.image.add(s, arrow_left_asset, 50, 360, 0.5, 0.5);
-    setup_bottone(arrow_left, 0.15, 0.18);
+    arrow_left.geometry.scale_x = 0.80;
+    arrow_left.geometry.scale_y = 0.80;
 
     PP.interactive.mouse.add(arrow_left, "pointerdown", function (s) {
         if (tavola_attiva.geometry.x < 0) {
@@ -152,7 +155,8 @@ function create(s) {
 
     // FRECCIA DESTRA
     arrow_right = PP.assets.image.add(s, arrow_right_asset, 1230, 360, 0.5, 0.5);
-    setup_bottone(arrow_right, 0.15, 0.18);
+    arrow_right.geometry.scale_x = 0.80;
+    arrow_right.geometry.scale_y = 0.80;
 
     PP.interactive.mouse.add(arrow_right, "pointerdown", function (s) {
         if (tavola_attiva.geometry.x > LIMITE_SCROLL) {
@@ -176,10 +180,10 @@ function update(s) {
 
     // LOGICA VISIBILITÀ
     if (tavola_attiva.geometry.x <= LIMITE_SCROLL) {
-        end_button.visibility.hidden = false;
+        gioca_button.visibility.hidden = false;
         arrow_right.visibility.hidden = true; 
     } else {
-        end_button.visibility.hidden = true;
+        gioca_button.visibility.hidden = true;
         arrow_right.visibility.hidden = false;
     }
 
