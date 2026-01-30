@@ -247,7 +247,7 @@ function manage_player_update(s, player, muri_livello) {
     
     if (player.is_dead) return
 
-    // GOD MODE
+    /* // GOD MODE da attivare nel caso ci serva durante i test
     // Si attiva con J. Permette di volare attraverso i muri per testare.
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.J)) {
         if (j_pressed == false) {
@@ -264,7 +264,7 @@ function manage_player_update(s, player, muri_livello) {
         }
     } else {
         j_pressed = false
-    }
+    } */
 
     // Logica di movimento God Mode (WASD per muoversi in aria)
     if (player.god_mode) {
