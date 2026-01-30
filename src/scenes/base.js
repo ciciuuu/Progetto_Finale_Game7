@@ -384,7 +384,7 @@ function create(s) {
     let ing_liv1 = [
         { x: 41 * 32, y: 19 * 32, id: "ing_1" },
         { x: 156 * 32, y: -13 * 32, id: "ing_2" },
-        { x: 210 * 32, y: -17 * 32, id: "ing_3" },
+        { x: 210 * 32, y: -18 * 32+8, id: "ing_3" },
     ];
     if (typeof create_ingranaggi === "function") create_ingranaggi(s, ing_liv1, player);
 
