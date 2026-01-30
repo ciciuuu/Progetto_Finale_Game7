@@ -38,7 +38,7 @@ function create_game_over(s) {
     bg.geometry.scale_y = h / bg.ph_obj.height;
 
     // 2. TITOLO E SOTTOTITOLO (Causa morte)
-    let titolo = PP.shapes.text_styled_add(s, cx, h / 4, "GAME OVER", 60, "Helvetica", "bold", "0xFFFFFF", null, 0.5, 0.5);
+    let titolo = PP.shapes.text_styled_add(s, cx, h / 11, "GAME OVER", 60, "Times New Roman", "bold", "0xC2B280", null, 0.5, 0.5);
     
     let causa_raw = PP.game_state.get_variable("causa_morte");
     let testo_causa = "";
@@ -50,7 +50,7 @@ function create_game_over(s) {
     else if (causa_raw === "cactus_proiettile") testo_causa = "Spina nel fianco.";
     else testo_causa = "L'INQUINAMENTO HA VINTO!";
 
-    let sottotitolo = PP.shapes.text_styled_add(s, cx, h / 2.5, testo_causa, 40, "Helvetica", "bold", "0xFFFFFF", null, 0.5, 0.5);
+    let sottotitolo = PP.shapes.text_styled_add(s, cx, h / 6, testo_causa, 25, "Helvetica", "bold", "0xC2B280", null, 0.5, 0.5);
     sottotitolo.ph_obj.setAlign('center');
 
 
