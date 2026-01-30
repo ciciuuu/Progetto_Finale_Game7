@@ -1,14 +1,14 @@
 let rightpressed = false;
 let leftpressed = false;
-let tavola_attiva;
+let tavola_attiva; // L'immagine lunga che scorre
 let tavolalunga;
 let home_asset;
 let home_button;
 let gioca_button;
-let gioca_asset
+let gioca_asset;
 
 let slide_curr_sheet;
-let slide_curr;
+let slide_curr; // Indicatore pallini (1/6, 2/6...)
 
 let arrow_left;
 let arrow_right;
@@ -16,26 +16,28 @@ let arrow_right;
 let arrow_left_asset;
 let arrow_right_asset;
 
-// SCROLL
+// CONFIGURAZIONE SCROLL
 const LARGHEZZA_SCHERMO = 1280;
-const ALTEZZA_SCHERMO = 720; // Imposta l'altezza corretta del tuo gioco
+const ALTEZZA_SCHERMO = 720; 
 const NUMERO_TAVOLE = 6;
+// Il limite negativo massimo dove può arrivare la tavola
 const LIMITE_SCROLL = -(NUMERO_TAVOLE - 1) * LARGHEZZA_SCHERMO;
 
-// --- VARIABILI TESTO (Aggiornate per 1, 3, 5) ---
+// OGGETTI TESTO
+// Visualizziamo il testo solo sulle tavole dispari (1, 3, 5) come richiesto
 let txt_tavola_1;
 let txt_tavola_3;
 let txt_tavola_5;
 
-// --- CONFIGURAZIONE TESTO ---
-const TEXT_SIZE = 30;           // Grandezza font
-const MAX_CARATTERI_RIGA = 50;  // Larghezza riga (influisce sulla larghezza del blocco)
-const COLORE_TESTO = "0x000000"; // Nero
+// CONFIGURAZIONE STILE TESTO
+const TEXT_SIZE = 30;           
+const MAX_CARATTERI_RIGA = 50;  // Per l'a capo automatico
+const COLORE_TESTO = "0x000000"; 
 
 
 function preload(s) {
-    // tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia.jpg");
     tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia_wordless.jpg");
+    
     home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
     gioca_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante gioca.png");
     arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_sinistra.png");
@@ -46,9 +48,10 @@ function preload(s) {
 function create(s) {
     tavola_attiva = PP.assets.image.add(s, tavolalunga, 0, 0, 0, 0);
 
-    // --- FUNZIONE PER MANDARE A CAPO IL TESTO (NO PHASER) ---
+    // FORMATTAZIONE TESTO ---
+    // Funzione che inserisce \n per mandare a capo se la riga supera tot caratteri
     function formatta_testo(testo, max_chars) {
-        let paragrafi = testo.split("\n"); // Divide il testo dove hai messo \n
+        let paragrafi = testo.split("\n"); 
         let risultato_finale = "";
 
         for (let k = 0; k < paragrafi.length; k++) {
@@ -57,17 +60,13 @@ function create(s) {
 
             for (let i = 0; i < parole.length; i++) {
                 let parola = parole[i];
-                // Se la parola supera la lunghezza massima, manda a capo la riga corrente
                 if ((riga_corrente + parola).length > max_chars) {
                     risultato_finale += riga_corrente + "\n";
                     riga_corrente = "";
                 }
                 riga_corrente += parola + " ";
             }
-            // Aggiunge l'ultima riga del paragrafo corrente
             risultato_finale += riga_corrente.trim();
-            
-            // Se non è l'ultimo paragrafo, rimette il 'capo' originale
             if (k < paragrafi.length - 1) {
                 risultato_finale += "\n"; 
             }
@@ -75,16 +74,12 @@ function create(s) {
         return risultato_finale;
     }
 
-    // --- ESEMPIO CONTENUTI CON PARAGRAFI ---
-    // Aggiornato per Tavole 1, 3, 5
-    
+    // --- CONTENUTI NARRATIVI ---
     let stringa_t1 = "Il villaggio di Kale riceveva energia da un enorme macchinario alimentato da carbone e petrolio.\n\nTutti lo chiamavano la Grande Fornace, perché il suo calore garantiva la regolazione termica dell'interno villaggio durante le gelide notti del deserto.\n\nEra la loro luce, la loro sicurezza.";
     let stringa_t3 = "Un giorno, però, la Grande Fornace esplose.\n\nNello scoppio, dei componenti fondamentali furono scagliati lontano, dispersi nelle terre circostanti.";
     let stringa_t5 = "Il villaggio piombò nel caos.\n\nSi decise che sarebbe stata Eren, la tecnica del villaggio, a partire per recuperare i pezzi perduti.";
 
-    // Creazione oggetti testo
-    // Tavola 1, Tavola 3, Tavola 5
-    
+    // Creazione oggetti testo con stile
     txt_tavola_1 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t1, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
     txt_tavola_3 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t3, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
     txt_tavola_5 = PP.shapes.text_styled_add(s, 0, 0, formatta_testo(stringa_t5, MAX_CARATTERI_RIGA), TEXT_SIZE, "Cadeaux", "normal", COLORE_TESTO, null, 0.5, 0.5);
@@ -193,7 +188,7 @@ function update(s) {
         arrow_left.visibility.hidden = false;
     }
 
-    // --- LOGICA TASTIERA ---
+    // LOGICA TASTIERA
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.RIGHT) && rightpressed == false && tavola_attiva.geometry.x > LIMITE_SCROLL) {
         tavola_attiva.geometry.x -= LARGHEZZA_SCHERMO;
         rightpressed = true;
@@ -210,8 +205,7 @@ function update(s) {
         leftpressed = false;
     }
 
-    // --- AGGIORNAMENTO POSIZIONE TESTI (CENTRATI AUTOMATICAMENTE) ---
-    // NOTA: Tavola 1 è indice 0, Tavola 3 è indice 2, Tavola 5 è indice 4
+    // POSIZIONE TESTI
     
     // Tavola 1 (Indice 0)
     txt_tavola_1.geometry.x = tavola_attiva.geometry.x + (0 * LARGHEZZA_SCHERMO) + (LARGHEZZA_SCHERMO / 2);
@@ -226,7 +220,7 @@ function update(s) {
     txt_tavola_5.geometry.y = ALTEZZA_SCHERMO / 2;
 
 
-    // AGGIORNAMENTO ANIMAZIONE INDICATORE TAVOLE    
+    // ANIMAZIONE INDICATORE TAVOLE    
     let indice_tavola = Math.abs(tavola_attiva.geometry.x) / LARGHEZZA_SCHERMO;
     indice_tavola = Math.round(indice_tavola);
     let nome_animazione = "slide_" + (indice_tavola + 1);
