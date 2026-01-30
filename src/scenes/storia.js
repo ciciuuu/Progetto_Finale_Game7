@@ -124,7 +124,7 @@ function create(s) {
 
     // HOME BUTTON
     home_button = PP.assets.image.add(s, home_asset, -70, 570, 0, 0);
-    setup_bottone(home_button, 1, 1);
+    setup_bottone(home_button, 1, 1.01);
     
     
     PP.interactive.mouse.add(home_button, "pointerup", function (s) {
@@ -135,7 +135,7 @@ function create(s) {
     // END BUTTON
     gioca_button = PP.assets.image.add(s, gioca_asset, 1050, 570, 0, 0);
     gioca_button.visibility.hidden = true;
-    setup_bottone(gioca_button, 1, 1);
+    setup_bottone(gioca_button, 1, 1.01);
     
 
     PP.interactive.mouse.add(gioca_button, "pointerup", function (s) {
@@ -145,7 +145,7 @@ function create(s) {
 
     // FRECCIA SINISTRA
     arrow_left = PP.assets.image.add(s, arrow_left_asset, 50, 360, 0.5, 0.5);
-    setup_bottone(arrow_left, 0.80, 0.80);
+    setup_bottone(arrow_left, 0.80, 0.85);
 
     PP.interactive.mouse.add(arrow_left, "pointerdown", function (s) {
         if (tavola_attiva.geometry.x < 0) {
@@ -156,7 +156,7 @@ function create(s) {
 
     // FRECCIA DESTRA
     arrow_right = PP.assets.image.add(s, arrow_right_asset, 1230, 360, 0.5, 0.5);
-    setup_bottone(arrow_right, 0.80, 0.80);
+    setup_bottone(arrow_right, 0.80, 0.85);
 
     PP.interactive.mouse.add(arrow_right, "pointerdown", function (s) {
         if (tavola_attiva.geometry.x > LIMITE_SCROLL) {

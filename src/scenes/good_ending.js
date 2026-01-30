@@ -56,7 +56,7 @@ function create(s) {
 
     // HOME BUTTON
     home_button3 = PP.assets.image.add(s, home_asset3, -70, 570, 0, 0);
-    setup_bottone(home_button3, 1, 1);
+    setup_bottone(home_button3, 1, 1.01);
 
 
     PP.interactive.mouse.add(home_button3, "pointerup", function (s) {
