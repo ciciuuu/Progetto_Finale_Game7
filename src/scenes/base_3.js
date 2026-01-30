@@ -15,9 +15,10 @@ const X_FINE_LIVELLO = 152 * 32
 
 // Decorazioni
 let layer_tutorial
-let img_cactus_destra; let cactus_destra
-let img_cactus_sotto; let cactus_sotto
-let img_cactus_pericolo; let cactus_pericolo
+let img_cactus_destra; let cactus_destra;
+let img_cactus_sotto; let cactus_sotto;
+let img_cactus_pericolo; let cactus_pericolo;
+let img_cartello_torna_alla_città; let cartello_torna_alla_città;
 
 // [CHECKPOINT] Variabili specifiche per questo livello
 let checkpoint_obj       // Bandierina a metà livello
@@ -53,6 +54,7 @@ function preload(s) {
     img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png")
     img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus sotto.png")
     img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus pericolo.png")
+    img_cartello_torna_alla_città = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/torna alla città.png")
 
     // Preload entità esterne
     preload_hud(s)
@@ -88,6 +90,8 @@ function create(s) {
     cactus_sotto = PP.assets.image.add(s, img_cactus_sotto, 71 * 32-10, 0 * 32, 0, 1)
     PP.layers.add_to_layer(layer_tutorial, cactus_sotto)
     
+    cartello_torna_alla_città = PP.assets.image.add(s, img_cartello_torna_alla_città, 147 * 32-10, 85 * 32, 0, 1)
+    PP.layers.add_to_layer(layer_tutorial, cartello_torna_alla_città)
 
     // [CHECKPOINT SYSTEM] Gestione Spawn Intelligente
     let final_spawn_x, final_spawn_y
