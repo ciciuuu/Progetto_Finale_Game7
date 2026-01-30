@@ -20,9 +20,9 @@ function preload_game_over(s) {
 
     // --- CARICAMENTO BOTTONI SPECIFICI ---
     // Assicurati che i nomi dei file siano esattamente questi nella cartella
-    img_btn_rigioca = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante rigioca.png");
+    img_btn_rigioca = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante rigioca_game_over.png");
     img_btn_checkpoint = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante checkpoint.png");
-    img_btn_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
+    img_btn_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu_game_over.png");
 }
 
 function create_game_over(s) {
