@@ -278,7 +278,7 @@ function create(s) {
 
     // ZONE SEGRETE (Aree nascoste)
     let zone_liv1 = [
-        {
+        /* {
             asset: zona_pietra,
             img_x: 79 * 32,
             img_y: -12 * 32,
@@ -286,7 +286,7 @@ function create(s) {
             trigger_y: -12 * 32 + 32,
             trigger_w: 32 * 8,
             trigger_h: 32 * 4
-        },
+        }, */
         {
             asset: zona_inizio_sinistra,
             img_x: 448 - 64,
@@ -351,7 +351,7 @@ function create(s) {
 
     // COLLEZIONABILI
     let bp_liv1 = [
-        { x: 83 * 32, y: -8 * 32, id: "bp_1" },
+        { x: 58 * 32, y: -9 * 32, id: "bp_1" },
         { x: 114 * 32, y: 0 * 32, id: "bp_2" },
         { x: 189 * 32, y: 1 * 32, id: "bp_3" },
     ]
