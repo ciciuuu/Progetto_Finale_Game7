@@ -229,7 +229,7 @@ function create(s) {
         PP.game_state.set_variable("collezionabili_presi", []);
 
         // --- COORDINATE SPAWN INIZIALE AGGIORNATE ---
-        final_spawn_x = -27 * 32;
+        final_spawn_x = -35 * 32;
         final_spawn_y = -1 * 32;
 
         checkpoint_preso = false;
