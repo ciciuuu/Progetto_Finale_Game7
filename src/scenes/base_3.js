@@ -360,12 +360,12 @@ function create(s) {
 }
 
 function update(s) {
-    // Zoom Cheat
+    /* // Zoom Cheat da attivare nel caso ci serva alla presentazione
     if (PP.interactive.kb.is_key_down(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(0.2)
     } else if (PP.interactive.kb.is_key_up(s, PP.key_codes.M)) {
         s.cameras.main.setZoom(2)
-    }
+    } */
 
     // CAMBIO ARMA (Tasto L)
     // Uso un flag nella scena (s.tasto_l_premuto) per fare debounce (evitare click multipli)
