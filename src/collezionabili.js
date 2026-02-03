@@ -11,7 +11,7 @@ const OBIETTIVO_INGRANAGGI = 6
 function preload_blueprint(s) {
     img_blueprint = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Blueprint_coll.png")
     
-    img_ingranaggio_1 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/ingranaggio_coll_1.png")
+    img_ingranaggio_1 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/Ingranaggio_coll_1.png")
     img_ingranaggio_2 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/ingranaggio_coll_2.png")
     img_ingranaggio_3 = PP.assets.image.load(s, "assets/images/COLLEZIONABILI/ingranaggio_coll_3.png")
     
