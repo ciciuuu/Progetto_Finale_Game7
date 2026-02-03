@@ -78,7 +78,7 @@ function formatta_testo_dialogo(testo, max_chars) {
 
 function preload_vecchietto(s) {
     img_vecchietto = PP.assets.sprite.load_spritesheet(s, "assets/images/VECCHIETTO/Vecchietto.png", 28, 43)
-    img_tasto_S = PP.assets.sprite.load_spritesheet(s, "assets/images/VECCHIETTO/Tasto S.png", 22, 37)
+    img_tasto_S = PP.assets.sprite.load_spritesheet(s, "assets/images/VECCHIETTO/Tasto_S.png", 22, 37)
 }
 
 function create_vecchietto(s) {

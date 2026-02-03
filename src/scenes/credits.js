@@ -4,7 +4,7 @@ let home_button2;
 
 function preload(s) {
   img_sfondo_credits = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/credits.jpg");
-  home_asset2 = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
+  home_asset2 = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_menu.png");
 }
 
 function setup_bottone(oggetto, scala_base, scala_zoom) {

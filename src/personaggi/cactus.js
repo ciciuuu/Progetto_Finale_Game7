@@ -3,7 +3,7 @@ let gruppo_cactus;
 let asset_proiettile_cactus;
 
 function preload_cactus(s) {
-    img_cactus = PP.assets.sprite.load_spritesheet(s, "assets/images/CACTUS/Animazioni Cactus.png", 32, 38);
+    img_cactus = PP.assets.sprite.load_spritesheet(s, "assets/images/CACTUS/Animazioni_Cactus.png", 32, 38);
     asset_proiettile_cactus = PP.assets.image.load(s, "assets/images/CACTUS/Proiettile.png");
 }
 

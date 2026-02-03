@@ -38,11 +38,11 @@ const COLORE_TESTO = "0x000000";
 function preload(s) {
     tavolalunga = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/tavole_storia_wordless.jpg");
     
-    home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
-    gioca_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante gioca.png");
-    arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_sinistra.png");
-    arrow_right_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/Freccia_destra.png");
-    slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/Elementi tavole/puntitavole_sheet.png", 300, 100);
+    home_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_menu.png");
+    gioca_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_gioca.png");
+    arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/Freccia_sinistra.png");
+    arrow_right_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/Freccia_destra.png");
+    slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/Elementi_tavole/puntitavole_sheet.png", 300, 100);
 }
 
 function create(s) {

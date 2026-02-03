@@ -211,7 +211,7 @@ function check_collezionabili_vittoria() {
         PP.scenes.start("good_ending")
     } else {
         // Se manca qualcosa allora Bad Ending
-        console.log("MANCANO PEZZI -> Bad Ending")
+        console.log("MANCANO PEZZI -> Bad_Ending")
         console.log("Blueprint: " + tot_b + ", Ingranaggi: " + tot_i)
         PP.scenes.start("bad_ending")
     }

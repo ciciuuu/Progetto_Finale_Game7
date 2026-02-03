@@ -4,8 +4,8 @@ let home_asset3;
 let home_button3;
 
 function preload(s) {
-    img_good_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Good ending.jpg");
-    home_asset3 = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu.png");
+    img_good_ending_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Good_ending.jpg");
+    home_asset3 = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_menu.png");
 }
 
 function setup_bottone(oggetto, scala_base, scala_zoom) {

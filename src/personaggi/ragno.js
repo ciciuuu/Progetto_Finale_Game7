@@ -3,8 +3,8 @@ let img_enemy2;
 let gruppo_ragni;
 
 function preload_enemy(s) {
-    img_enemy = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/Morte e camminata.png", 36, 36)
-    img_enemy2 = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/attacco 59x59.png", 59, 59)
+    img_enemy = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/Morte_e_camminata.png", 36, 36)
+    img_enemy2 = PP.assets.sprite.load_spritesheet(s, "assets/images/RAGNO/attacco_59x59.png", 59, 59)
 }
 
 function imposta_pattuglia(ragno_wrapper, min_x, max_x) {

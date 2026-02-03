@@ -19,7 +19,7 @@ let img_nuvoletta;
 
 
 function preload_player(s) {
-    img_nuvoletta = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Nuvoletta doppio salto.png", 39, 21)
+    img_nuvoletta = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Nuvoletta_doppio_salto.png", 39, 21)
 }
 
 

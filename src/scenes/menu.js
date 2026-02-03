@@ -13,10 +13,10 @@ let btn_crediti;
 function preload(s) {
     asset_sfondo_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/sfondo_menu.jpg");
     
-    asset_titolo = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena titolo.png");
-    asset_gioca = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena gioca.png");
-    asset_storia = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena storia.png");
-    asset_crediti = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena crediti.png");
+    asset_titolo = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena_titolo.png");
+    asset_gioca = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena_gioca.png");
+    asset_storia = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena_storia.png");
+    asset_crediti = PP.assets.image.load(s, "assets/images/TAVOLE/Pergamene/pergamena_crediti.png");
 }
 
 function create(s) {

@@ -16,9 +16,9 @@ const SCALA_BOTTONI = 1.0;
 function preload_game_over(s) {
     img_bg_gameover = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Game over.jpg");
 
-    img_btn_rigioca = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante rigioca_game_over.png");
-    img_btn_checkpoint = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante checkpoint.png");
-    img_btn_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi tavole/pulsante menu_game_over.png");
+    img_btn_rigioca = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_rigioca_game_over.png");
+    img_btn_checkpoint = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_checkpoint.png");
+    img_btn_menu = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_menu_game_over.png");
 }
 
 function create_game_over(s) {

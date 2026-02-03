@@ -50,21 +50,21 @@ let zona_pietra; let zona_inizio_sinistra; let zona_dopo_vecchietto;
 let zona_fine_lvl1; let zona_caverna_finale_lvl1;
 
 function preload(s) {
-    zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png")
-    zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_inizio_sinistra.png")
-    zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_dopo_vecchietto.png")
-    zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine_lvl1.png")
-    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_pietra.png")
-    zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_caverna_finale_lvl1.png")
+    zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_pietra.png")
+    zona_inizio_sinistra = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_inizio_sinistra.png")
+    zona_dopo_vecchietto = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_dopo_vecchietto.png")
+    zona_fine_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_fine_lvl1.png")
+    img_zona_pietra = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_pietra.png")
+    zona_caverna_finale_lvl1 = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_caverna_finale_lvl1.png")
 
     img_EE = PP.assets.image.load(s, "assets/images/MAPPA/EE.png")
-    img_EE2 = PP.assets.sprite.load_spritesheet(s, "assets/images/MAPPA/Torcia EE.png", 32, 32)
+    img_EE2 = PP.assets.sprite.load_spritesheet(s, "assets/images/MAPPA/Torcia_EE.png", 32, 32)
 
     // Elementi Giganti di sfondo
-    img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/Casetta_inizio.png")
-    img_mura_città = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/muro città.png")
-    img_arco_città = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/arco città.png")
-    img_arco_città_davanti = PP.assets.image.load(s, "assets/images/MAPPA/Elementi grandi/arco città davanti.png")
+    img_casetta_inizio = PP.assets.image.load(s, "assets/images/MAPPA/Elementi_grandi/Casetta_inizio.png")
+    img_mura_città = PP.assets.image.load(s, "assets/images/MAPPA/Elementi_grandi/muro_città.png")
+    img_arco_città = PP.assets.image.load(s, "assets/images/MAPPA/Elementi_grandi/arco_città.png")
+    img_arco_città_davanti = PP.assets.image.load(s, "assets/images/MAPPA/Elementi_grandi/arco_città_davanti.png")
 
     // Tutorial Tasti
     img_wasd = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/wasd.png")
@@ -73,12 +73,12 @@ function preload(s) {
     img_doppio_salto = PP.assets.image.load(s, "assets/images/MAPPA/Tutorial/Doppio_salto.png")
 
     // Decorazioni Cactus
-    img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png")
-    img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus sotto.png")
-    img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus pericolo.png")
+    img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus_destra.png")
+    img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus_sotto.png")
+    img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus_pericolo.png")
 
     // Muro Trappola
-    img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_fine1_destra.png")
+    img_muro_destra = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_fine1_destra.png")
 
     // Preload Moduli Esterni se presenti
     if (typeof preload_zone_segrete === "function") preload_zone_segrete(s)
@@ -86,12 +86,12 @@ function preload(s) {
     if (typeof preload_checkpoint === "function") preload_checkpoint(s)
 
     // Player e Sfondo
-    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52)
+    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo_52x52.png", 52, 52)
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png")
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2.png")
     parallasse_nuvole = PP.assets.image.load(s, "assets/images/parallax/nuvole.png");
 
-    asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO CAVERNE/cave_pattern.png");
+    asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO_CAVERNE/cave_pattern.png");
 
 
     // Preload mappa da Godot (file JSON tilemap)

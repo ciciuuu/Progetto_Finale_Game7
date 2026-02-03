@@ -48,18 +48,18 @@ let zona3_igresso_caverna_lvl2
 
 function preload(s) {
     // Caricamento immagini coperture segrete
-    zona3_blocco_terra = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_blocco_terra.png")
-    zona3_terra_sotterranea = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_terra_sotterranea.png")
-    zona3_palazzo1 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_palazzo1.png")
-    zona3_palazzo2 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_palazzo2.png")
-    zona3_igresso_caverna_lvl2 = PP.assets.image.load(s, "assets/images/MAPPA/zone segrete/ZS_igresso_caverna_lvl2.png")
+    zona3_blocco_terra = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_blocco_terra.png")
+    zona3_terra_sotterranea = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_terra_sotterranea.png")
+    zona3_palazzo1 = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_palazzo1.png")
+    zona3_palazzo2 = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_palazzo2.png")
+    zona3_igresso_caverna_lvl2 = PP.assets.image.load(s, "assets/images/MAPPA/zone_segrete/ZS_igresso_caverna_lvl2.png")
 
     // Decorazioni ambiente
-    img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus destra.png")
-    img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus sotto.png")
-    img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus pericolo.png")
-    img_cartello_torna_alla_città = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/torna alla città.png")
-    asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO CAVERNE/cave_pattern.png");
+    img_cactus_destra = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus_destra.png")
+    img_cactus_sotto = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus_sotto.png")
+    img_cactus_pericolo = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/cactus_pericolo.png")
+    img_cartello_torna_alla_città = PP.assets.image.load(s, "assets/images/MAPPA/Decorazioni/torna_alla_città.png")
+    asset_tile_sotto = PP.assets.image.load(s, "assets/images/SFONDO_CAVERNE/cave_pattern.png");
 
     // Preload entità esterne
     preload_hud(s)
@@ -73,7 +73,7 @@ function preload(s) {
     if (typeof preload_checkpoint === "function") preload_checkpoint(s)
 
     // Player e Sfondo
-    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo 52x52.png", 52, 52)
+    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo_52x52.png", 52, 52)
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png")
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2.png")
     parallasse_nuvole = PP.assets.image.load(s, "assets/images/parallax/nuvole.png");
