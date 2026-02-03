@@ -42,8 +42,8 @@ function preload(s) {
     gioca_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_gioca.png");
     arrow_left_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/Freccia_sinistra.png");
     arrow_right_asset = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/Freccia_destra.png");
-    slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/Elementi_tavole/puntitavole_sheet.png", 300, 100);
-}
+    slide_curr_sheet= PP.assets.sprite.load_spritesheet(s, "assets/images/TAVOLE/Elementi_tavole/Puntitavole_sheet.png", 300, 100);
+} 
 
 function create(s) {
     tavola_attiva = PP.assets.image.add(s, tavolalunga, 0, 0, 0, 0);
