@@ -14,7 +14,7 @@ let go_mouse_lock = false;
 const SCALA_BOTTONI = 1.0; 
 
 function preload_game_over(s) {
-    img_bg_gameover = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Game over.jpg");
+    img_bg_gameover = PP.assets.image.load(s, "assets/images/TAVOLE/Tavole/Game_over.jpg");
 
     img_btn_rigioca = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_rigioca_game_over.png");
     img_btn_checkpoint = PP.assets.image.load(s, "assets/images/TAVOLE/Elementi_tavole/pulsante_checkpoint.png");
