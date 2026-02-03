@@ -5,7 +5,7 @@ let img_checkpoint_flag;
 const MIN_HP_RESPAWN = 5; 
 
 function preload_checkpoint(s) {
-    img_checkpoint_flag = PP.assets.sprite.load_spritesheet(s, "assets/images/MAPPA/checkpoint.png", 39, 73)
+    img_checkpoint_flag = PP.assets.sprite.load_spritesheet(s, "assets/images/MAPPA/Checkpoint.png", 39, 73)
 }
 
 function crea_bandierina_checkpoint(s, x, y, gia_preso) {

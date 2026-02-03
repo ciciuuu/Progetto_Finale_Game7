@@ -86,7 +86,7 @@ function preload(s) {
     if (typeof preload_checkpoint === "function") preload_checkpoint(s)
 
     // Player e Sfondo
-    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/sparo_52x52.png", 52, 52)
+    img_player = PP.assets.sprite.load_spritesheet(s, "assets/images/PLAYER/Sparo_52x52.png", 52, 52)
     parallasse1 = PP.assets.image.load(s, "assets/images/parallax/parallasse_1.png")
     parallasse2 = PP.assets.image.load(s, "assets/images/parallax/parallasse_2.png")
     parallasse_nuvole = PP.assets.image.load(s, "assets/images/parallax/nuvole.png");
