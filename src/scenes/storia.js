@@ -128,7 +128,7 @@ function create(s) {
 
 
     // END BUTTON
-    gioca_button = PP.assets.image.add(s, gioca_asset, 1180, 625, 0.5, 0.5);
+    gioca_button = PP.assets.image.add(s, gioca_asset, 1180, 650, 0.5, 0.5);
     gioca_button.visibility.hidden = true;
     setup_bottone(gioca_button, 1, 1.1);
     
