@@ -316,7 +316,7 @@ function create(s) {
         { x: 92 * 32, y: 74 * 32, id: "cactus_L3_11", raggio: 200 },
         { x: 112 * 32, y: 76 * 32, id: "cactus_L3_11", raggio: 200 },
     ]
-    create_cactus(s, muri_livello, cactus_liv3)
+    create_cactus(s, muri_livello, cactus_liv3, player)
 
     // COLLEZIONABILI
     let bp_liv3 = [
